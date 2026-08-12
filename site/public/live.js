@@ -508,12 +508,81 @@ function gpuLine() {
   const gb = (i.maxBuffer / 1073741824).toFixed(2);
   return `<b>${esc(i.vendor)}${i.arch ? ' · ' + esc(i.arch) : ''}</b> — <b>${esc(i.tier)}</b> class · ${gb} GB max buffer · ${i.maxInvocations} invocations/workgroup. That is measured off your actual adapter, not guessed.`;
 }
+/* ── the ledger: who pledged what, and where they want to be paid ── */
+try {
+  GPU.id = localStorage.getItem('gpu.id') || Math.random().toString(36).slice(2, 12);
+  localStorage.setItem('gpu.id', GPU.id);
+  GPU.dash = localStorage.getItem('gpu.dash') || '';
+  GPU.trust = localStorage.getItem('gpu.trust') || '';
+} catch { GPU.id = Math.random().toString(36).slice(2, 12); GPU.dash = ''; GPU.trust = ''; }
+GPU.pool = null;
+
+async function pushPledge(extra = {}) {
+  if (!GPU.ok) return null;
+  const i = GPU.info || {};
+  const r = await fetch(`${API}/api/compute`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      id: GPU.id, tier: 'tab', vendor: i.vendor, arch: i.arch, klass: i.tier,
+      maxBufferMB: Math.round((i.maxBuffer || 0) / 1048576), invocations: i.maxInvocations,
+      dash: GPU.dash, trust: GPU.trust, ...extra,
+    }),
+  }).then((x) => x.json()).catch(() => null);
+  return r;
+}
+async function pollPool() {
+  const j = await tryJson(`${API}/api/compute?ts=${Date.now()}`, 8000);
+  if (j) { GPU.pool = j; renderPool(); }
+}
+function renderPool() {
+  const el = $('#poolBody'); if (!el || !GPU.pool) return;
+  const p = GPU.pool;
+  const hrs = (p.seconds / 3600).toFixed(1);
+  el.innerHTML = `
+    <div class="pool-grid">
+      <div class="pool-stat"><span class="k">LIVE NOW</span><b>${p.live}</b><i>node${p.live === 1 ? '' : 's'} pledged and awake</i></div>
+      <div class="pool-stat"><span class="k">POOL CAPABILITY</span><b>${p.liveCapability}</b><i>tab-equivalents — a relative measure of what is pledged</i></div>
+      <div class="pool-stat"><span class="k">ALL TIME</span><b>${p.pledged}</b><i>machines have lent, ${hrs}h pledged</i></div>
+      <div class="pool-stat"><span class="k">PAYABLE</span><b>${p.withDash + p.withTrust}</b><i>${p.withDash} with a $DASH address · ${p.withTrust} with $TRUST</i></div>
+    </div>
+    <p class="pool-note">${p.jobsRunning
+      ? 'Jobs are running.'
+      : '<b>No jobs are dispatched yet.</b> This is the ledger, running honestly ahead of the work: pledges and payout addresses are recorded so the accounting exists before the first job does. Nothing is executing on your machine.'}</p>`;
+}
+
 async function pledgeGPU() {
   if (!GPU.probed) await probeGPU();
   if (!GPU.ok) { renderGPU(); return; }
   GPU.pledged = !GPU.pledged;
   try { localStorage.setItem('gpu.pledge', GPU.pledged ? '1' : '0'); } catch {}
-  renderGPU();
+  if (GPU.pledged) {
+    await pushPledge({ seconds: 0 });
+    clearInterval(GPU.beat);
+    // a heartbeat is what makes "live now" mean something rather than "ever"
+    GPU.beat = setInterval(() => { if (GPU.pledged) pushPledge({ seconds: 60 }); }, 60000);
+  } else {
+    clearInterval(GPU.beat); GPU.beat = 0;
+  }
+  renderGPU(); pollPool();
+}
+async function saveWallets() {
+  const d = ($('#gpuDash').value || '').trim();
+  const t = ($('#gpuTrust').value || '').trim();
+  const msg = $('#gpuWalletMsg');
+  const r = await fetch(`${API}/api/compute`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id: GPU.id, tier: 'tab', dash: d, trust: t }),
+  }).then((x) => x.json()).catch(() => null);
+  if (r && r.ok) {
+    GPU.dash = d; GPU.trust = t;
+    try { localStorage.setItem('gpu.dash', d); localStorage.setItem('gpu.trust', t); } catch {}
+    msg.className = 'gpu-msg ok';
+    msg.textContent = 'Saved. When rung 3 pays out, this is where it goes.';
+    pollPool();
+  } else {
+    msg.className = 'gpu-msg bad';
+    msg.textContent = (r && r.error) || 'that did not save';
+  }
 }
 function renderGPU() {
   const el = $('#gpuBody'); if (!el) return;
@@ -528,8 +597,19 @@ function renderGPU() {
         ? 'Pledged. Nothing is running yet — jobs arrive at rung 2, and you can stop any time.'
         : 'Opt-in only. Nothing ever runs without this button, and closing the tab ends it.'}</span>
     </div>
-    <p class="gpu-fine">Lent GPUs run <b>open-weight models</b>, render the MotusLive worlds, and crunch community research — <b>public work only</b>. They cannot speed up Davara: she runs on Claude in Anthropic's data centres, and pretending otherwise would be a lie. No background compute, no auto-start, one click to stop.</p>`;
+    <p class="gpu-fine">Lent GPUs run <b>open-weight models</b>, render the MotusLive worlds, and crunch community research — <b>public work only</b>. They cannot speed up Davara: she runs on Claude in Anthropic's data centres, and pretending otherwise would be a lie. No background compute, no auto-start, one click to stop.</p>
+    <div class="gpu-wallets">
+      <div class="k">WHERE TO PAY YOU — optional, and only ever your RECEIVING address</div>
+      <div class="gpu-w-row">
+        <input class="om-in" id="gpuDash" placeholder="$DASH address (starts with X)…" value="${esc(GPU.dash)}" spellcheck="false" autocomplete="off">
+        <input class="om-in" id="gpuTrust" placeholder="$TRUST / EVM address (0x…)…" value="${esc(GPU.trust)}" spellcheck="false" autocomplete="off">
+        <button class="mini" id="gpuSave">save</button>
+      </div>
+      <div class="gpu-msg" id="gpuWalletMsg"></div>
+      <p class="gpu-warn">⚠ Paste an <b>address</b>, never a private key or a seed phrase. The server refuses anything shaped like a key — but nothing should ever ask you for one, here or anywhere.</p>
+    </div>`;
   const b = $('#gpuBtn'); if (b) b.onclick = pledgeGPU;
+  const s = $('#gpuSave'); if (s) s.onclick = saveWallets;
 }
 
 /* ═══ BUILD THE UI ═══ */
@@ -635,7 +715,15 @@ addEventListener('DOMContentLoaded', () => {
   addEventListener('pointermove', (ev) => { S.mx = ev.clientX; S.my = ev.clientY; S.mt = performance.now(); }, { passive: true });
   $('#chat-form').addEventListener('submit', sendCrowd);
   renderGPU();
-  probeGPU().then(renderGPU);          // measure the real adapter, then tell the truth
+  probeGPU().then(() => {
+    renderGPU();
+    // resume a pledge across reloads — the heartbeat is what makes "live" true
+    if (GPU.pledged && GPU.ok) {
+      pushPledge({ seconds: 0 });
+      GPU.beat = setInterval(() => { if (GPU.pledged) pushPledge({ seconds: 60 }); }, 60000);
+    }
+  });
+  pollPool(); setInterval(pollPool, 20000);
   pollLive(); pollCrowd();
   setInterval(pollLive, 9000);
   setInterval(pollCrowd, 12000);
