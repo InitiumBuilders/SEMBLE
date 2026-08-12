@@ -9,6 +9,7 @@
 <meta property="og:description" content="Artists reclaiming their margins. An audience that becomes infrastructure. Semble.CC is building with The ZAO.">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="/partners.css">
+<link rel="stylesheet" href="/partners-motion.css">
 </head>
 <body>
 
@@ -40,6 +41,62 @@
     </div>
   </div>
 </header>
+
+<!-- ═══ THE PARTNERSHIP CARD ═══
+     Rebuilt as a LIVE component rather than shipped as a raster. It is
+     responsive, it animates, a screen reader can read it, and it can never go
+     missing or ship blurry on a retina phone. -->
+<section class="pcard-sec" id="card">
+  <div class="wrap">
+    <div class="pc glass">
+      <div class="pc-glow" aria-hidden="true"></div>
+
+      <div class="pc-head">
+        <div class="pc-marks">
+          <span class="pc-s">SEMBLE.CC</span>
+          <span class="pc-plus" aria-hidden="true">+</span>
+          <span class="pc-z">THE ZAO</span>
+        </div>
+        <div class="pc-kick">P A R T N E R S H I P</div>
+        <p class="pc-tag">BUILDING. TOGETHER.<br><span>FOR THE CULTURE. FOR THE FUTURE.</span></p>
+      </div>
+
+      <div class="pc-body">
+        <div class="pc-official">
+          <div class="kicker">Official partnership</div>
+          <h3 class="pc-h">SEMBLE.CC <span class="pc-plus2">+</span> THEZAO.COM</h3>
+          <p>A strategic partnership to empower creators, builders and communities through <strong>innovation, collaboration, and shared vision</strong>.</p>
+          <p class="pc-date"><span class="kicker">Announced</span> May 18, 2025 · CST</p>
+        </div>
+
+        <div class="pc-profile card2">
+          <div class="kicker">Partner profile</div>
+          <div class="pc-who">
+            <div class="avatar sm"><span class="mono">Z</span><img src="/partners/bettercallzaal.jpg" alt="Zaal" loading="lazy" onerror="this.remove()"></div>
+            <div>
+              <div class="pc-name">ZAAL</div>
+              <div class="pc-role">Founder of <b>The ZAO</b></div>
+            </div>
+          </div>
+          <div class="pc-socials">
+            <a class="tag" href="https://x.com/bettercallzaal" target="_blank" rel="noopener">𝕏 @bettercallzaal</a>
+            <a class="tag" href="https://farcaster.xyz/zaal" target="_blank" rel="noopener">⬡ farcaster.xyz/zaal</a>
+          </div>
+        </div>
+      </div>
+
+      <ul class="pc-pillars">
+        <li><span class="pi">✊</span><b>Build</b><i>in public</i></li>
+        <li><span class="pi">◎</span><b>Collaborate</b><i>live</i></li>
+        <li><span class="pi">⚡</span><b>Create</b><i>the future</i></li>
+        <li><span class="pi">⟳</span><b>Move</b><i>as one</i></li>
+        <li><span class="pi">🛡</span><b>Trust the practice</b><i>build $TRUST together</i></li>
+      </ul>
+
+      <div class="pc-hash" aria-label="Build the difference">#BUILDTHEDIFFERENCE</div>
+    </div>
+  </div>
+</section>
 
 <!-- ═══ WHY THIS ═══ -->
 <section>
@@ -207,5 +264,7 @@
   </div>
 </footer>
 
+<!-- No motion script. The entrance is pure CSS and always completes, so this
+     page cannot go blank if a script fails to load or an observer never fires. -->
 </body>
 </html>
