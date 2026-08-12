@@ -1,247 +1,374 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SEMBLE LIVE · AugustJames.Live — Davara Distinct V3, Nocturne.
-   The Contrast Law is absolute: body #F4F6F9, secondary #DCE3EC (near-bone,
-   never grey), labels #9FD6DD — all verified 7:1+ on the graphite substrate.
-   Electric hues are ARTWORK ONLY, never text. Squircles everywhere. Mobile-first.
+   MOTUSLIVE — the interstellar build. Davara Distinct V3 · Nocturne, deepened
+   to the VOID: the page is space itself, the stage is the event horizon, and
+   everything on screen orbits the same gravity.
+   THE CONTRAST LAW IS ABSOLUTE: body #F5F7FB, secondary #DEE5EF (near-bone,
+   never grey), labels #A6DDE6 — verified 7:1+ on every surface. Electric hues
+   are artwork only, never text. Long-radius squircles everywhere.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --void: #0F1114; --ground: #15171B; --panel: #1C1F24; --panel2: #22262C;
-  --ink: #F4F6F9; --ink2: #DCE3EC; --label: #9FD6DD; --accent-t: #7BE3EA;
+  --void: #04060A; --deep: #070A10; --ground: #0B0F16; --panel: #10151E; --panel2: #161C27;
+  --ink: #F5F7FB; --ink2: #DEE5EF; --label: #A6DDE6; --accent-t: #7BE3EA;
   --signal-t: #CBBCFF; --gold-t: #F0D48C;
   --cyan: #22D3EE; --azure: #60A5FA; --violet: #A78BFF; --ember: #E879C9; --gold: #E8C46B;
   --dj: var(--violet); --dj2: var(--cyan);
-  --r: 20px; --r-sm: 16px;
+  --r: 30px; --r-sm: 22px; --r-xs: 16px;
   --ease: cubic-bezier(.22, 1, .36, 1);
+  --pulse: 0;                         /* JS writes the beat here — CSS breathes with it */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   background: var(--void); color: var(--ink);
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 18px; line-height: 1.6;
+  font-size: 18px; line-height: 1.65;
   overflow-x: hidden; -webkit-font-smoothing: antialiased;
 }
-::selection { background: rgba(34,211,238,.3); }
-
-h1, h2, h3, .sora { font-family: 'Sora', 'Inter', sans-serif; }
+::selection { background: rgba(34,211,238,.32); }
+h1, h2, h3, h4, .sora { font-family: 'Sora', 'Inter', sans-serif; }
 .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 
-/* ── the resident swarm canvas — behind everything, alive everywhere ── */
+/* ── THE COSMOS — starfield + gravity swarm, behind everything ── */
 #swarm { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-/* ── shell ── */
-.shell { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 18px 90px; }
+/* a slow nebula wash so the void is never flat black — artwork, never under text panels */
+body::before {
+  content: ''; position: fixed; inset: -20%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(42% 30% at 78% 12%, color-mix(in srgb, var(--dj) 9%, transparent), transparent 70%),
+    radial-gradient(36% 26% at 12% 78%, color-mix(in srgb, var(--dj2) 7%, transparent), transparent 70%);
+  filter: blur(60px) saturate(1.3);
+  animation: nebula 26s var(--ease) infinite alternate;
+  transition: background 1.2s var(--ease);
+}
+@keyframes nebula { from { transform: translate3d(-1.5%, -1%, 0) } to { transform: translate3d(1.5%, 1.2%, 0) } }
+
+.shell { position: relative; z-index: 1; max-width: 1260px; margin: 0 auto; padding: 0 18px 110px; }
 
 /* ── top bar ── */
-.topbar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 16px 2px 10px;
-}
-.brand { font-family: 'Sora'; font-weight: 800; font-size: 19px; letter-spacing: .02em; }
+.topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 18px 2px 12px; }
+.brand { font-family: 'Sora'; font-weight: 800; font-size: 20px; letter-spacing: .04em; }
 .brand b { color: var(--accent-t); }
+.brand .sig { display: inline-block; margin-right: 9px; color: var(--gold-t); }
 .live-dot {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: 'IBM Plex Mono'; font-size: 13px; font-weight: 600; letter-spacing: .14em;
-  color: var(--label); padding: 8px 15px; border-radius: 16px;
+  color: var(--label); padding: 9px 16px; border-radius: var(--r-xs);
   background: var(--panel); border: 1px solid rgba(150,200,220,.16);
 }
 .live-dot i {
   width: 9px; height: 9px; border-radius: 50%; background: var(--ember);
-  box-shadow: 0 0 12px var(--ember); animation: livepulse 2.8s var(--ease) infinite;
+  box-shadow: 0 0 14px var(--ember); animation: livepulse 2.8s var(--ease) infinite;
 }
-.live-dot.off i { background: #6F8A96; box-shadow: none; animation: none; }
-@keyframes livepulse { 0%,100% { transform: scale(1); opacity: 1 } 50% { transform: scale(1.35); opacity: .7 } }
+.live-dot.off i { background: #7C93A4; box-shadow: none; animation: none; }
+@keyframes livepulse { 0%,100% { transform: scale(1); opacity: 1 } 50% { transform: scale(1.4); opacity: .7 } }
 .topbar .spacer { margin-left: auto; }
 
-/* ── generic squircle button ── */
+/* ── squircle buttons — long rounded corners, glow never highlight ── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; border-radius: 18px; border: 1px solid rgba(150,200,220,.2);
+  padding: 13px 22px; border-radius: var(--r-sm); border: 1px solid rgba(150,200,220,.2);
   background: var(--panel); color: var(--ink); cursor: pointer;
   font-family: 'Sora'; font-weight: 700; font-size: 14.5px; letter-spacing: .02em;
   transition: box-shadow .3s var(--ease), transform .3s var(--ease), border-color .3s var(--ease);
   text-decoration: none;
 }
-.btn:hover, .btn:focus-visible { box-shadow: 0 0 26px rgba(34,211,238,.22); border-color: rgba(34,211,238,.45); transform: translateY(-1px); }
-.btn:active { transform: translateY(1px) scale(.99); }
-.btn.prime { background: linear-gradient(140deg, rgba(34,211,238,.16), rgba(167,139,255,.14)), var(--panel); border-color: rgba(34,211,238,.4); }
-.btn.big { padding: 15px 26px; font-size: 16px; border-radius: 20px; }
+.btn:hover, .btn:focus-visible { box-shadow: 0 0 30px rgba(34,211,238,.24); border-color: rgba(34,211,238,.5); transform: translateY(-1px); }
+.btn:active { transform: translateY(1px) scale(.985); }
+.btn.prime { background: linear-gradient(140deg, rgba(34,211,238,.16), rgba(167,139,255,.15)), var(--panel); border-color: rgba(34,211,238,.42); }
+.btn.big { padding: 16px 30px; font-size: 16px; border-radius: 24px; }
 .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.mini {
+  padding: 8px 15px; border-radius: 14px; font-size: 12.5px; font-weight: 600;
+  background: var(--panel2); color: var(--ink); border: 1px solid rgba(150,200,220,.18); cursor: pointer;
+  transition: box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.mini:hover, .mini:focus-visible { border-color: rgba(34,211,238,.45); box-shadow: 0 0 18px rgba(34,211,238,.16); }
 
-/* ── THE STAGE — video + visualizer ── */
+/* ── THE EVENT HORIZON ──────────────────────────────────────────────────────
+   ⛔ NO ROTATING RING. A spinning conic border around a frame is banned on
+   every project, forever — it is a template effect that fights the content it
+   surrounds. What replaces it is light behaving like light: a still bloom that
+   BREATHES on the beat (opacity + blur only, no transform), so the horizon
+   glows from within rather than being chased around by a highlight. */
+.horizon { position: relative; margin: 14px auto 0; }
+.horizon::before {
+  content: ''; position: absolute; inset: -14px; border-radius: 48px; z-index: 0;
+  background:
+    radial-gradient(60% 100% at 50% 0%, color-mix(in srgb, var(--dj2) 55%, transparent), transparent 72%),
+    radial-gradient(70% 100% at 50% 100%, color-mix(in srgb, var(--dj) 60%, transparent), transparent 74%);
+  filter: blur(calc(26px + var(--pulse) * 22px)) saturate(1.45);
+  opacity: calc(.34 + var(--pulse) * .5);
+  transition: opacity .18s linear;
+}
 .stage {
-  position: relative; border-radius: 26px; overflow: hidden;
-  background: var(--ground);
-  border: 1px solid color-mix(in srgb, var(--dj) 38%, transparent);
-  box-shadow: 0 0 60px color-mix(in srgb, var(--dj) 16%, transparent), 0 24px 60px rgba(0,2,4,.6);
-  aspect-ratio: 16 / 9; max-height: 74vh; margin: 8px auto 0;
-  transition: border-color .8s var(--ease), box-shadow .8s var(--ease);
+  position: relative; z-index: 1; border-radius: 36px; overflow: hidden;
+  background: #000;
+  border: 1px solid color-mix(in srgb, var(--dj) 45%, transparent);
+  box-shadow: 0 0 calc(60px + var(--pulse) * 50px) color-mix(in srgb, var(--dj) 20%, transparent),
+              0 30px 80px rgba(0, 2, 6, .75);
+  aspect-ratio: 16 / 9; max-height: 72vh;
+  transition: border-color .9s var(--ease);
 }
 .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 #viz { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; }
+/* The copy sits LOW, so the world above it is never eclipsed by the words
+   describing it. The visual is the argument; the text is the caption. */
 .stage .curtain {
-  position: absolute; inset: 0; display: flex; flex-direction: column; gap: 18px;
-  align-items: center; justify-content: center; text-align: center; padding: 24px;
-  background: radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--dj) 14%, transparent), transparent 60%), var(--ground);
-  z-index: 3; transition: opacity .6s var(--ease);
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end; text-align: center;
+  padding: 26px 26px 62px; background: transparent; z-index: 3;
+  transition: opacity .7s var(--ease);
 }
 .stage .curtain.gone { opacity: 0; pointer-events: none; }
-.curtain h2 { font-size: clamp(1.9rem, 6vw, 3.2rem); font-weight: 800; }
-.curtain p { color: var(--ink2); font-size: 16.5px; max-width: 560px; }
-
-/* HUD over the stage */
-.hud {
-  position: absolute; left: 14px; bottom: 14px; right: 14px; z-index: 4;
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; pointer-events: none;
+/* THE CONTRAST LAW OVER MOVING ART: text never floats on the visuals — it sits
+   on its own soft glass, so the world stays fully visible around it and every
+   word still clears 7:1. The panel is the boundary; the void is the stage. */
+.curtain .said {
+  padding: 22px 28px 26px; border-radius: 28px; max-width: 620px;
+  background: rgba(5, 8, 14, .58); backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(150, 200, 220, .14);
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
 }
+.curtain h2 { font-size: clamp(1.8rem, 5.2vw, 2.9rem); font-weight: 800; letter-spacing: .03em; }
+.curtain p { color: var(--ink2); font-size: 16px; max-width: 540px; line-height: 1.5; }
+
+/* HUD chips over the stage */
+.hud { position: absolute; left: 16px; bottom: 16px; right: 16px; z-index: 4; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; pointer-events: none; }
 .hud .chip {
   pointer-events: auto;
   font-family: 'IBM Plex Mono'; font-size: 13px; font-weight: 600; letter-spacing: .06em;
-  color: var(--ink); background: rgba(15,17,20,.82); backdrop-filter: blur(10px);
-  border: 1px solid color-mix(in srgb, var(--dj) 45%, transparent);
-  padding: 9px 14px; border-radius: 14px;
+  color: var(--ink); background: rgba(4,6,10,.84); backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--dj) 50%, transparent);
+  padding: 10px 15px; border-radius: var(--r-xs);
 }
 .hud .chip b { color: var(--gold-t); font-weight: 700; }
 .hud .chip.power { color: var(--gold-t); animation: powerpulse 2.8s var(--ease) infinite; }
-@keyframes powerpulse { 0%,100% { box-shadow: 0 0 0 rgba(232,196,107,0) } 50% { box-shadow: 0 0 22px rgba(232,196,107,.35) } }
+@keyframes powerpulse { 0%,100% { box-shadow: 0 0 0 rgba(232,196,107,0) } 50% { box-shadow: 0 0 24px rgba(232,196,107,.38) } }
 .hud .spacer { margin-left: auto; }
-.hud .btn { pointer-events: auto; padding: 10px 16px; font-size: 13px; }
 
-/* ── transport row ── */
-.transport { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0 0; }
+/* transport */
+.transport { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 16px 0 0; }
 .transport .note { color: var(--ink2); font-size: 15px; }
 .transport .note b { color: var(--accent-t); font-weight: 600; }
 
-/* ── DJ DECK — one wide snap row, never orphaned cards ── */
-.deck-wrap { margin-top: 56px; }
+/* ── section frames ── */
+.sec { margin-top: 74px; }
 .sec-label {
-  font-family: 'IBM Plex Mono'; font-size: 13.5px; font-weight: 600; letter-spacing: .22em;
+  font-family: 'IBM Plex Mono'; font-size: 13.5px; font-weight: 600; letter-spacing: .24em;
   color: var(--label); text-transform: uppercase; margin-bottom: 14px;
 }
-.sec-title { font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; line-height: 1.12; margin-bottom: 10px; }
-.sec-sub { color: var(--ink2); font-size: 17px; max-width: 720px; }
-.deck {
-  display: flex; gap: 14px; overflow-x: auto; padding: 22px 4px 26px;
-  scroll-snap-type: x mandatory; scrollbar-width: none;
-}
+.sec-title { font-size: clamp(2.1rem, 6.2vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 12px; }
+.sec-sub { color: var(--ink2); font-size: 17px; max-width: 740px; }
+
+/* ── THE ORBIT DECK — DJ cards as bodies in orbit, one wide snap row ── */
+.deck { display: flex; gap: 16px; overflow-x: auto; padding: 24px 4px 28px; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .deck::-webkit-scrollbar { display: none; }
 .dj-card {
-  flex: 0 0 272px; scroll-snap-align: start; cursor: pointer;
-  background: var(--panel); border-radius: 22px; padding: 20px 20px 18px;
-  border: 1px solid rgba(150,200,220,.14);
-  transition: box-shadow .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease);
+  flex: 0 0 282px; scroll-snap-align: start; cursor: pointer;
+  background: var(--panel); border-radius: var(--r); padding: 22px 22px 20px;
+  border: 1px solid rgba(150,200,220,.13);
+  transition: box-shadow .4s var(--ease), border-color .4s var(--ease), transform .4s var(--ease);
   position: relative; overflow: hidden;
 }
 .dj-card::before {
-  content: ''; position: absolute; inset: -40% -20% auto; height: 90px; filter: blur(46px);
-  background: var(--c, var(--violet)); opacity: .16; transition: opacity .5s var(--ease);
+  /* each body carries its own corona */
+  content: ''; position: absolute; inset: -45% -20% auto; height: 100px; filter: blur(50px);
+  background: var(--c, var(--violet)); opacity: .15; transition: opacity .5s var(--ease);
 }
-.dj-card:hover, .dj-card:focus-visible { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c, var(--violet)) 55%, transparent); box-shadow: 0 0 34px color-mix(in srgb, var(--c, var(--violet)) 22%, transparent); }
+.dj-card::after {
+  /* the orbit line — a thin ellipse that only reveals when the body is charged */
+  content: ''; position: absolute; inset: 8px; border-radius: 24px; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--c, var(--violet)) 35%, transparent);
+  opacity: 0; transition: opacity .5s var(--ease);
+}
+.dj-card:hover, .dj-card:focus-visible { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c, var(--violet)) 60%, transparent); box-shadow: 0 0 40px color-mix(in srgb, var(--c, var(--violet)) 25%, transparent); }
 .dj-card:hover::before { opacity: .3; }
-.dj-card.on { border-color: color-mix(in srgb, var(--c, var(--violet)) 75%, transparent); box-shadow: 0 0 44px color-mix(in srgb, var(--c, var(--violet)) 30%, transparent); }
-.dj-card.on::after {
-  content: 'ON DECK'; position: absolute; top: 14px; right: 14px;
-  font-family: 'IBM Plex Mono'; font-size: 10.5px; font-weight: 700; letter-spacing: .18em;
-  color: var(--gold-t);
+.dj-card.on { border-color: color-mix(in srgb, var(--c, var(--violet)) 80%, transparent); box-shadow: 0 0 52px color-mix(in srgb, var(--c, var(--violet)) 33%, transparent); }
+.dj-card.on::after { opacity: 1; }
+.dj-tag {
+  position: absolute; top: 16px; right: 16px;
+  font-family: 'IBM Plex Mono'; font-size: 10.5px; font-weight: 700; letter-spacing: .18em; color: var(--gold-t);
 }
-.dj-name { font-family: 'Sora'; font-weight: 800; font-size: 1.55rem; line-height: 1.15; }
-.dj-say { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--label); letter-spacing: .1em; margin: 2px 0 10px; }
+.dj-name { font-family: 'Sora'; font-weight: 800; font-size: 1.6rem; line-height: 1.12; }
+.dj-say { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--label); letter-spacing: .1em; margin: 3px 0 11px; }
 .dj-power {
   display: inline-block; font-family: 'IBM Plex Mono'; font-size: 12px; font-weight: 700;
   letter-spacing: .14em; color: var(--gold-t);
-  padding: 6px 11px; border-radius: 12px; background: rgba(232,196,107,.09);
-  border: 1px solid rgba(232,196,107,.28); margin-bottom: 10px;
+  padding: 7px 12px; border-radius: 13px; background: rgba(232,196,107,.09);
+  border: 1px solid rgba(232,196,107,.28); margin-bottom: 11px;
 }
-.dj-ability { color: var(--ink2); font-size: 14.8px; line-height: 1.55; }
-.dj-more { margin-top: 12px; }
-.dj-more summary {
-  cursor: pointer; font-family: 'IBM Plex Mono'; font-size: 12.5px; font-weight: 600;
-  letter-spacing: .12em; color: var(--accent-t); list-style: none;
-}
+.dj-ability { color: var(--ink2); font-size: 14.8px; line-height: 1.58; }
+.dj-more { margin-top: 13px; }
+.dj-more summary { cursor: pointer; font-family: 'IBM Plex Mono'; font-size: 12.5px; font-weight: 600; letter-spacing: .12em; color: var(--accent-t); list-style: none; }
 .dj-more summary::-webkit-details-marker { display: none; }
 .dj-more[open] summary { color: var(--gold-t); }
-.dj-more p { color: var(--ink2); font-size: 14px; margin-top: 8px; line-height: 1.55; }
+.dj-more p { color: var(--ink2); font-size: 14px; margin-top: 8px; line-height: 1.58; }
+.dj-more p b { color: var(--ink); }
 
 /* ── WAVE POWERS — one symmetric row of five ── */
-.powers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 22px; }
+.powers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 13px; margin-top: 24px; }
 .power {
-  background: var(--panel); border: 1px solid rgba(150,200,220,.14); border-radius: 20px;
-  padding: 18px 16px; text-align: center; cursor: pointer;
+  background: var(--panel); border: 1px solid rgba(150,200,220,.13); border-radius: var(--r-sm);
+  padding: 20px 17px; text-align: center; cursor: pointer;
   transition: box-shadow .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
 }
-.power:hover, .power:focus-visible { transform: translateY(-2px); border-color: rgba(232,196,107,.45); box-shadow: 0 0 30px rgba(232,196,107,.16); }
-.power.on { border-color: rgba(232,196,107,.7); box-shadow: 0 0 38px rgba(232,196,107,.26); }
-.power h4 { font-size: 1.15rem; font-weight: 800; margin-bottom: 5px; }
-.power .sys { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .08em; color: var(--label); margin-bottom: 8px; }
-.power p { color: var(--ink2); font-size: 13.5px; line-height: 1.5; }
+.power:hover, .power:focus-visible { transform: translateY(-2px); border-color: rgba(232,196,107,.5); box-shadow: 0 0 32px rgba(232,196,107,.17); }
+.power.on { border-color: rgba(232,196,107,.75); box-shadow: 0 0 42px rgba(232,196,107,.28); }
+.power h4 { font-size: 1.18rem; font-weight: 800; margin-bottom: 6px; }
+.power .sys { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .08em; color: var(--label); margin-bottom: 9px; }
+.power p { color: var(--ink2); font-size: 13.5px; line-height: 1.52; }
 
 /* ── THE WORK — broadcast feed ── */
-.workgrid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; margin-top: 26px; }
-.card {
-  background: var(--panel); border: 1px solid rgba(150,200,220,.14);
-  border-radius: 24px; padding: 24px;
-}
+.workgrid { display: grid; grid-template-columns: 1.12fr .88fr; gap: 18px; margin-top: 28px; }
+.card { background: var(--panel); border: 1px solid rgba(150,200,220,.13); border-radius: var(--r); padding: 26px; }
 .card h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
 .card .hint { color: var(--ink2); font-size: 15px; margin-bottom: 16px; }
 .goalbox {
-  border-radius: 18px; padding: 18px;
-  background: linear-gradient(140deg, rgba(34,211,238,.08), rgba(167,139,255,.06)), var(--panel2);
-  border: 1px solid rgba(34,211,238,.24); margin-bottom: 14px;
+  border-radius: var(--r-sm); padding: 18px 20px;
+  background: linear-gradient(140deg, rgba(34,211,238,.08), rgba(167,139,255,.07)), var(--panel2);
+  border: 1px solid rgba(34,211,238,.25); margin-bottom: 14px;
 }
 .goalbox .k { font-family: 'IBM Plex Mono'; font-size: 12px; letter-spacing: .18em; color: var(--label); margin-bottom: 6px; }
-.goalbox .v { font-size: 17.5px; font-weight: 600; line-height: 1.5; }
+.goalbox .v { font-size: 17.5px; font-weight: 600; line-height: 1.52; }
 .witem {
   display: flex; gap: 12px; align-items: flex-start;
-  padding: 14px 16px; border-radius: 16px; background: var(--panel2);
+  padding: 15px 17px; border-radius: var(--r-xs); background: var(--panel2);
   border-left: 3px solid var(--dj); margin-bottom: 10px;
 }
 .witem .kind { font-family: 'IBM Plex Mono'; font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--label); padding-top: 3px; white-space: nowrap; }
-.witem .t { font-size: 15.5px; line-height: 1.5; }
-.agent-row { display: flex; gap: 10px; align-items: baseline; padding: 10px 4px; border-bottom: 1px solid rgba(150,200,220,.1); }
+.witem .t { font-size: 15.5px; line-height: 1.52; }
+.agent-row { display: flex; gap: 10px; align-items: baseline; padding: 11px 4px; border-bottom: 1px solid rgba(150,200,220,.1); }
 .agent-row:last-child { border-bottom: 0; }
 .agent-row .nm { font-family: 'Sora'; font-weight: 700; font-size: 15.5px; color: var(--signal-t); white-space: nowrap; }
 .agent-row .fo { color: var(--ink2); font-size: 14.5px; line-height: 1.5; }
 .quiet { color: var(--ink2); font-size: 15.5px; padding: 14px 0; }
 
-/* ── SEMBLES — the live thread ── */
-.chat-in { display: flex; gap: 10px; margin: 14px 0 18px; flex-wrap: wrap; }
+/* ── SOURCECROWD — the community voice ── */
+.sc-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.sc-tab {
+  flex: 1; padding: 11px 0; text-align: center; cursor: pointer;
+  font-family: 'Sora'; font-weight: 700; font-size: 13.5px; letter-spacing: .06em;
+  color: var(--ink); background: var(--panel2); border: 1px solid rgba(150,200,220,.16);
+  border-radius: var(--r-xs); transition: box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.sc-tab.on { border-color: rgba(34,211,238,.5); box-shadow: 0 0 22px rgba(34,211,238,.16); color: var(--accent-t); }
+.chat-in { display: flex; gap: 10px; margin: 4px 0 16px; flex-wrap: wrap; }
 .chat-in input, .chat-in textarea {
   flex: 1; min-width: 130px; background: var(--panel2); color: var(--ink);
-  border: 1px solid rgba(150,200,220,.2); border-radius: 16px;
-  padding: 13px 16px; font-family: 'Inter'; font-size: 15.5px;
+  border: 1px solid rgba(150,200,220,.2); border-radius: var(--r-xs);
+  padding: 13px 17px; font-family: 'Inter'; font-size: 15.5px;
 }
 .chat-in input:focus, .chat-in textarea:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
 .chat-in input[name=web] { display: none; }
-.msg { padding: 13px 2px; border-bottom: 1px solid rgba(150,200,220,.1); }
-.msg .who { font-family: 'Sora'; font-weight: 700; font-size: 14.5px; color: var(--accent-t); margin-right: 8px; }
-.msg .when { font-family: 'IBM Plex Mono'; font-size: 11.5px; color: var(--label); }
-.msg .tx { font-size: 15.5px; line-height: 1.55; margin-top: 3px; word-wrap: break-word; }
+.sc-msg { display: flex; gap: 12px; padding: 14px 2px; border-bottom: 1px solid rgba(150,200,220,.1); align-items: flex-start; }
+.sc-vote {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px;
+  padding: 7px 8px; border-radius: 14px; cursor: pointer; user-select: none;
+  background: var(--panel2); border: 1px solid rgba(150,200,220,.16);
+  transition: box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.sc-vote:hover, .sc-vote:focus-visible { border-color: rgba(232,196,107,.5); box-shadow: 0 0 18px rgba(232,196,107,.18); }
+.sc-vote.mine { border-color: rgba(232,196,107,.65); box-shadow: 0 0 20px rgba(232,196,107,.22); }
+.sc-vote .n { font-family: 'Sora'; font-weight: 800; font-size: 15px; color: var(--gold-t); }
+.sc-vote .a { font-size: 11px; color: var(--label); letter-spacing: .06em; }
+.sc-body { flex: 1; }
+.sc-who { font-family: 'Sora'; font-weight: 700; font-size: 14.5px; color: var(--accent-t); margin-right: 8px; }
+.sc-when { font-family: 'IBM Plex Mono'; font-size: 11.5px; color: var(--label); }
+.sc-tx { font-size: 15.5px; line-height: 1.55; margin-top: 3px; word-wrap: break-word; }
+.sc-link {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  font-family: 'IBM Plex Mono'; font-size: 12.5px; font-weight: 600; color: var(--accent-t);
+  padding: 7px 13px; border-radius: 13px; background: rgba(34,211,238,.08);
+  border: 1px solid rgba(34,211,238,.3); text-decoration: none; word-break: break-all;
+  transition: box-shadow .25s var(--ease);
+}
+.sc-link:hover { box-shadow: 0 0 18px rgba(34,211,238,.2); }
+.sc-res { margin-bottom: 16px; }
+.sc-res .k { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .18em; color: var(--label); margin-bottom: 8px; }
+.sc-res .row { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* ── footer ── */
-.foot { margin-top: 70px; text-align: center; color: var(--ink2); font-size: 15px; }
+.foot { margin-top: 84px; text-align: center; color: var(--ink2); font-size: 15px; }
 .foot a { color: var(--accent-t); text-decoration: none; font-weight: 600; }
-.foot .mantra { font-family: 'Sora'; font-weight: 700; font-size: 17px; color: var(--ink); margin-top: 8px; }
+.foot .mantra { font-family: 'Sora'; font-weight: 700; font-size: 17.5px; color: var(--ink); margin-top: 10px; }
 
-/* ── RIGHTNOW view: tasks only, huge ── */
-body.rightnow .stage, body.rightnow .deck-wrap, body.rightnow .powers-wrap { display: none; }
-body.rightnow .workgrid { grid-template-columns: 1fr; max-width: 860px; margin: 26px auto 0; }
+/* ── RIGHTNOW — tasks only, huge ── */
+body.rightnow .horizon, body.rightnow .deck-sec, body.rightnow .powers-sec, body.rightnow .transport { display: none; }
+body.rightnow .workgrid { grid-template-columns: 1fr; max-width: 880px; margin: 28px auto 0; }
 body.rightnow .witem .t { font-size: 18px; }
 
 /* ── responsive ── */
 @media (max-width: 900px) {
-  .powers { grid-template-columns: repeat(5, minmax(150px, 1fr)); display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
+  .powers { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
   .powers::-webkit-scrollbar { display: none; }
-  .power { flex: 0 0 180px; scroll-snap-align: start; }
+  .power { flex: 0 0 186px; scroll-snap-align: start; }
   .workgrid { grid-template-columns: 1fr; }
   .stage { max-height: none; }
 }
-@media (max-width: 480px) {
-  body { font-size: 17px; }
-  .shell { padding: 0 12px 70px; }
-  .dj-card { flex-basis: 240px; }
-  .hud { left: 8px; bottom: 8px; right: 8px; }
+/* ═══ MOBILE — not a shrunken desktop. The stage goes full-bleed edge to edge
+   (the visuals ARE the experience on a phone), every control clears 46px of
+   thumb, the deck peeks the next card so the swipe is discoverable, and the
+   type stays big enough to read one-handed. Verified at 375px and 390px. ═══ */
+@media (max-width: 700px) {
+  body { font-size: 17px; line-height: 1.62; }
+  .shell { padding: 0 14px 84px; }
+  .topbar { padding: 14px 0 10px; gap: 9px; }
+  .brand { font-size: 18px; }
+  .topbar .btn { padding: 11px 15px; font-size: 13px; }
+
+  /* the stage breaks the gutter — full width, taller frame, deeper corners */
+  .horizon { margin-left: -14px; margin-right: -14px; }
+  .horizon::before { inset: -8px; border-radius: 34px; filter: blur(calc(18px + var(--pulse) * 16px)); }
+  .stage { border-radius: 26px; aspect-ratio: 4 / 3; max-height: 56vh; }
+  .curtain { padding: 20px 18px; gap: 15px; }
+  .curtain h2 { font-size: clamp(1.9rem, 10vw, 2.8rem); }
+  .curtain p { font-size: 15.5px; line-height: 1.5; }
+  .btn.big { padding: 16px 26px; font-size: 15.5px; min-height: 52px; }
+
+  /* HUD: one row that never wraps into the video */
+  .hud { left: 10px; right: 10px; bottom: 10px; gap: 7px; }
+  .hud .chip { font-size: 11.5px; padding: 8px 11px; border-radius: 13px; }
+
+  .transport { gap: 8px; margin-top: 14px; }
+  .transport .btn { flex: 1 1 auto; min-height: 48px; }
+  .transport .note { font-size: 14px; order: 3; flex-basis: 100%; }
+
+  .sec { margin-top: 54px; }
+  .sec-label { font-size: 12px; letter-spacing: .2em; }
+  .sec-title { font-size: clamp(1.9rem, 8.5vw, 2.6rem); }
+  .sec-sub { font-size: 16px; }
+
+  /* deck: peek the next card so swiping is obvious */
+  .deck { gap: 12px; padding: 18px 0 22px; scroll-padding-left: 0; }
+  .dj-card { flex-basis: 79vw; max-width: 320px; padding: 20px; border-radius: 26px; }
+  .dj-name { font-size: 1.5rem; }
+  .dj-more summary { padding: 6px 0; }
+
+  .powers { gap: 10px; }
+  .power { flex-basis: 76vw; max-width: 300px; border-radius: 22px; padding: 18px; }
+
+  .card { padding: 20px 18px; border-radius: 26px; }
+  .card h3 { font-size: 1.35rem; }
+  .goalbox { padding: 16px; }
+  .goalbox .v { font-size: 16.5px; }
+  .witem { padding: 13px 14px; }
+
+  /* SourceCrowd: the composer stacks, send is full width and thumb-sized */
+  .sc-tab { min-height: 46px; font-size: 13px; }
+  .chat-in { gap: 9px; }
+  .chat-in input, .chat-in textarea { min-width: 100%; flex-basis: 100%; min-height: 48px; font-size: 16px; }
+  .chat-in .btn { width: 100%; min-height: 50px; }
+  .sc-vote { min-width: 48px; padding: 9px 8px; }
+  .sc-msg { gap: 10px; }
+  .foot { margin-top: 60px; }
+}
+@media (max-width: 380px) {
+  .dj-card, .power { flex-basis: 84vw; }
+  .hud .chip { font-size: 11px; padding: 7px 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   #swarm, #viz { display: none; }
+  body::before { animation: none; }
 }

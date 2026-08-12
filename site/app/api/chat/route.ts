@@ -1,5 +1,8 @@
-// /api/chat — Sembles, the live thread. GET public · POST rate-limited with a
-// honeypot · DELETE is the moderator (CortexInsight, operator secret).
+// /api/chat — SOURCECROWD, the community voice. GET public · POST a message
+// (rate-limited, honeypot) or a VOTE (one per voice per message) · DELETE is
+// the moderator (CortexInsight, operator secret).
+// Links: the first http(s) URL in a message is lifted into `link` so the crowd
+// can surface resources — and the strongest rise by votes.
 // Same zero-dependency fresh-path Blob pattern as /api/live.
 import { freshRead, freshWrite } from '../_blob';
 
@@ -18,7 +21,7 @@ const SECRETISH = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/, /\bAKIA[0-9A-Z]{16}\b/,
   /\beyJ[A-Za-z0-9_-]{18,}\.[A-Za-z0-9_-]{18,}/, /\bxpub[0-9A-Za-z]{50,}/, /\b0x[a-fA-F0-9]{62,}\b/,
 ];
-type Msg = { id: string; name: string; text: string; ts: number; iph?: string };
+type Msg = { id: string; name: string; text: string; ts: number; iph?: string; votes?: number; voters?: string[]; link?: string };
 const EMPTY: { msgs: Msg[] } = { msgs: [] };
 
 async function iph(req: Request): Promise<string> {
@@ -31,14 +34,29 @@ export async function OPTIONS() { return new Response(null, { status: 204, heade
 
 export async function GET() {
   const c = await freshRead(PREFIX, EMPTY);
-  // the IP hash is moderation metadata — it never leaves the server
-  return Response.json({ msgs: (c.msgs || []).map(({ iph: _drop, ...m }) => m) }, { headers: CORS });
+  // IP hashes and voter lists are moderation metadata — they never leave the server
+  return Response.json({ msgs: (c.msgs || []).map(({ iph: _a, voters: _b, ...m }) => m) }, { headers: CORS });
 }
 
 export async function POST(req: Request) {
   const b = await req.json().catch(() => null);
   if (!b) return Response.json({ ok: false, error: 'unreadable' }, { status: 400, headers: CORS });
   if (String(b.web || '')) return Response.json({ ok: true }, { headers: CORS });   // honeypot: pretend success
+
+  // ── A VOTE — one per voice per message, forever ──
+  if (b.vote) {
+    const who = await iph(req);
+    const c = await freshRead(PREFIX, EMPTY);
+    const m = (c.msgs || []).find((x) => x.id === String(b.vote));
+    if (!m) return Response.json({ ok: false, error: 'that voice is gone' }, { status: 404, headers: CORS });
+    m.voters = m.voters || [];
+    if (m.voters.includes(who)) return Response.json({ ok: true, votes: m.votes || 0 }, { headers: CORS });
+    m.voters.push(who);
+    m.votes = (m.votes || 0) + 1;
+    const ok = await freshWrite(PREFIX, c);
+    return Response.json({ ok, votes: m.votes }, { headers: CORS });
+  }
+
   const name = String(b.name || 'anon').slice(0, 40).replace(/[<>]/g, '');
   const text = String(b.text || '').slice(0, 420).trim();
   if (!text) return Response.json({ ok: false, error: 'say something' }, { status: 400, headers: CORS });
@@ -51,10 +69,13 @@ export async function POST(req: Request) {
   if (last && Date.now() - last.ts < 20_000) {
     return Response.json({ ok: false, error: 'one breath between sembles — 20s' }, { status: 429, headers: CORS });
   }
-  const msg: Msg = { id: Math.random().toString(36).slice(2, 10), name, text, ts: Date.now(), iph: who };
+  // lift the first URL into `link` so the crowd can rank resources
+  const linkM = /(https?:\/\/[^\s<>"']{8,300})/.exec(text);
+  const link = linkM && /^https?:\/\//i.test(linkM[1]) ? linkM[1] : undefined;
+  const msg: Msg = { id: Math.random().toString(36).slice(2, 10), name, text, ts: Date.now(), iph: who, votes: 0, voters: [], ...(link ? { link } : {}) };
   c.msgs = [msg, ...(c.msgs || [])].slice(0, 200);
   const ok = await freshWrite(PREFIX, c);
-  return Response.json({ ok }, { headers: CORS });
+  return Response.json({ ok, id: msg.id }, { headers: CORS });
 }
 
 export async function DELETE(req: Request) {

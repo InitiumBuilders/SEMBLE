@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>LIVE — the builder stream · Semble.CC</title>
-<meta name="description" content="The open build, streamed. Systems-thinking DJ modes, an ad-free vibe engine, and the work August selects to share — live, in motion. Built by the InitiumBuilders open-source incubator.">
-<meta property="og:title" content="THE BUILDER STREAM — live">
-<meta property="og:description" content="Watch the systems move. DJ modes, wave powers, and the real work — broadcast live.">
+<title>MOTUSLIVE — the builder stream</title>
+<meta name="description" content="MotusLive: the open build, streamed from the event horizon. Systems-thinking DJ modes led by DJ DAOZ, an ad-free vibe engine, the work August selects to share, and the SourceCrowd — the community voice. Built by the InitiumBuilders open-source incubator.">
+<meta property="og:title" content="MOTUSLIVE — the builder stream">
+<meta property="og:description" content="Watch the systems move. DJ DAOZ and the pantheon, wave powers, the real work, and the SourceCrowd — broadcast live from the event horizon.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -17,27 +17,31 @@
 <div class="shell">
 
   <div class="topbar">
-    <span class="brand">SEMBLE<b>.LIVE</b></span>
+    <span class="brand"><span class="sig">◈</span>MOTUS<b>LIVE</b></span>
     <span class="live-dot off" id="livedot"><i></i><span>OFF AIR</span></span>
     <span class="spacer"></span>
     <a class="btn" href="https://www.motusmoves.us/davara" target="_blank" rel="noopener">◈ DAVARA</a>
     <a class="btn" href="https://github.com/InitiumBuilders/SEMBLE" target="_blank" rel="noopener">⌁ SOURCE</a>
   </div>
 
-  <!-- THE STAGE -->
-  <div class="stage">
-    <iframe id="player" title="the vibe engine" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-    <canvas id="viz" aria-hidden="true"></canvas>
-    <div class="curtain">
-      <h2>THE BUILDER STREAM</h2>
-      <p>An open-source dev incubator with a resident DJ pantheon. Pick a mode below, or just press play — the vibe engine finds a set and the systems start moving.</p>
-      <button class="btn prime big" id="play">▶ &nbsp;DROP IN</button>
-    </div>
-    <div class="hud">
-      <span class="chip" id="hud-dj">MODE: <b>DJ DAUOZ</b></span>
-      <span class="chip mono" id="hud-pow">PARADIGM SHIFT</span>
-      <span class="chip power" id="hud-power" style="display:none"></span>
-      <span class="spacer"></span>
+  <!-- THE EVENT HORIZON -->
+  <div class="horizon">
+    <div class="stage">
+      <iframe id="player" title="the vibe engine" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+      <canvas id="viz" aria-hidden="true"></canvas>
+      <div class="curtain">
+        <div class="said">
+          <h2>MOTUSLIVE</h2>
+          <p>The builder stream, broadcast from the event horizon. Pick a mode below, or press play — the vibe engine finds a set, the visuals start evolving, and the systems begin to move.</p>
+          <button class="btn prime big" id="play">▶ &nbsp;CROSS THE HORIZON</button>
+        </div>
+      </div>
+      <div class="hud">
+        <span class="chip" id="hud-dj">MODE: <b>DJ DAOZ</b></span>
+        <span class="chip mono" id="hud-pow">PARADIGM SHIFT</span>
+        <span class="chip power" id="hud-power" style="display:none"></span>
+        <span class="spacer"></span>
+      </div>
     </div>
   </div>
   <div class="transport">
@@ -46,38 +50,43 @@
     <span class="note" id="tnote">the relay routes through open-source front-ends that strip every ad — if it sleeps, go direct</span>
   </div>
 
-  <!-- THE PANTHEON -->
-  <div class="deck-wrap">
+  <!-- THE ORBIT DECK -->
+  <div class="sec deck-sec">
     <div class="sec-label">THE SYSTEMS-THINKING DJ PANTHEON</div>
-    <div class="sec-title">Eleven modes.<br>One mind in motion.</div>
-    <p class="sec-sub">Every alias is a lens on system dynamics — a named superpower, a sound, and a physics of its own. Tap one and the whole room retunes.</p>
+    <div class="sec-title">Eleven bodies.<br>One gravity.</div>
+    <p class="sec-sub">Every alias is a lens on system dynamics — a named superpower, a sound, and a physics of its own. Tap one and the whole room retunes: the light, the motion, the set. DJ DAOZ holds the center.</p>
     <div class="deck" id="deck"></div>
   </div>
 
   <!-- WAVE POWERS -->
-  <div class="deck-wrap powers-wrap">
+  <div class="sec powers-sec">
     <div class="sec-label">WAVE POWERS · OPERATIONAL MODES</div>
     <div class="sec-title">Trigger the loop itself.</div>
     <div class="powers" id="powers"></div>
   </div>
 
-  <!-- THE WORK -->
+  <!-- THE WORK + SOURCECROWD -->
   <div class="workgrid">
     <div class="card">
       <h3>What we're building, right now</h3>
-      <p class="hint">Only what August selects reaches this page — never anything private, never security work. Selection is the whole privacy model, enforced at his machine.</p>
+      <p class="hint">Only what August selects reaches this page — never anything private, never security work. Selection is the whole privacy model, enforced at his machine and re-checked on arrival.</p>
       <div class="goalbox" id="goal"><div class="k">THE GOAL</div><div class="v">—</div></div>
       <div class="goalbox" id="motus"><div class="k">MOTUS SETTING</div><div class="v">—</div></div>
       <div id="feed"></div>
       <div id="agents" style="margin-top:14px"></div>
     </div>
     <div class="card">
-      <h3>Sembles — the live thread</h3>
-      <p class="hint">Say it into the room. What the community is working on, focused on, vibing to.</p>
+      <h3>SourceCrowd</h3>
+      <p class="hint">The community voice. Say it into the room, drop a link, raise what matters — the strongest voices and resources rise.</p>
+      <div class="sc-res" id="scRes"></div>
+      <div class="sc-tabs">
+        <button class="sc-tab on" data-tab="top">▲ TOP</button>
+        <button class="sc-tab" data-tab="live">◉ LIVE</button>
+      </div>
       <form class="chat-in" id="chat-form">
         <input id="c-name" placeholder="name" maxlength="40" autocomplete="nickname">
         <input id="c-web" name="web" tabindex="-1" autocomplete="off">
-        <textarea id="c-text" placeholder="drop a semble…" maxlength="420" rows="2" required></textarea>
+        <textarea id="c-text" placeholder="speak into the crowd — links welcome…" maxlength="420" rows="2" required></textarea>
         <button class="btn prime" id="c-send" type="submit">⤴ SEND</button>
       </form>
       <div id="msgs"></div>
@@ -85,12 +94,13 @@
   </div>
 
   <div class="foot">
-    <p>An <a href="https://github.com/InitiumBuilders/SEMBLE" target="_blank" rel="noopener">open-source</a> live build · part of the <a href="https://www.motusmoves.us" target="_blank" rel="noopener">Motus</a> ecosystem · with <a href="https://www.motusmoves.us/davara" target="_blank" rel="noopener">Davara</a>, the systems mind</p>
+    <p>MotusLive — an <a href="https://github.com/InitiumBuilders/SEMBLE" target="_blank" rel="noopener">open-source</a> live build · part of the <a href="https://www.motusmoves.us" target="_blank" rel="noopener">Motus</a> ecosystem · with <a href="https://www.motusmoves.us/davara" target="_blank" rel="noopener">Davara</a>, the systems mind</p>
     <p class="mantra">Motus is the mindset. The mindset means MOVE. ~aAa</p>
   </div>
 
 </div>
 <script src="/pantheon.js"></script>
+<script src="/viz.js"></script>
 <script src="/live.js"></script>
 </body>
 </html>

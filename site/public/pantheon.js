@@ -1,20 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE SYSTEMS-THINKING DJ PANTHEON — August James Domanchuk's identities.
+   MOTUSLIVE · THE SYSTEMS-THINKING DJ PANTHEON — August's identities.
    Every alias is a MODE: a lens on system dynamics with its own sound, its own
    visual physics, and one named systems superpower it puts into practice.
-   Canon shared by Semble.CC/live, AugustJames.Live, and CortexInsight.
+   Canon shared by MotusLive (semble.cc/live · augustjames.live/livenow ·
+   /rightnow · motuslive.vercel.app) and CortexInsight.
    From "freak of frequency" → the whole spectrum.            ~aAa · Motus.
    ═══════════════════════════════════════════════════════════════════════════ */
 window.PANTHEON = {
   djs: [
     {
-      id: 'dauoz', name: 'DJ DAUOZ', say: 'DOW-oz', headliner: true,
-      meaning: 'DAO (the self-organizing way) + OZ (the wizard who turns out to be the system itself). An invented word — no prior use anywhere. It is his.',
+      id: 'daoz', name: 'DJ DAOZ', say: 'DOWZ', headliner: true,
+      meaning: 'DAO (the self-organizing way) + Z (the last axis — the dimension the others rotate around). One syllable, said like a verb. An invented word with no prior use anywhere. It is his.',
       power: 'PARADIGM SHIFT', rung: 2,
-      ability: 'The deepest lever there is: change the lens the whole floor sees through. DAUOZ does not tweak the system — he transcends it, and the drop is the moment the old frame breaks.',
-      vibe: 'Cinematic dubstep. Tectonic builds, planet-cracking drops, gold only at the moment of shift.',
-      wave: 'DJ Dauozi — the autonomous orchestrator: set the initial conditions, then let the agents fill the melody.',
-      scene: 'tectonic', hue: '#A78BFF', hue2: '#22D3EE', bpm: 140, setMin: 14,
+      ability: 'The deepest lever there is: change the lens the whole floor sees through. DAOZ does not tweak the system — he transcends it, and the drop is the moment the old frame collapses past its own event horizon.',
+      vibe: 'Cinematic dubstep. Gravitational builds, singularity drops, gold only at the moment of shift.',
+      wave: 'DJ Daozi — the autonomous orchestrator: set the initial conditions, then let the agents fill the melody.',
+      scene: 'singularity', hue: '#B79BFF', hue2: '#38DCFF', bpm: 140, setMin: 14,
       query: 'dubstep mix heavy drops 2026',
     },
     {
@@ -34,7 +35,7 @@ window.PANTHEON = {
       ability: 'Reads the delay and response of the floor and plays the loops themselves — reinforcing loops when the system stagnates (hype), balancing loops when it overheats (chill). The crowd is the controller.',
       vibe: 'Fast, reactive, iterative technical dubstep. Every echo answered.',
       wave: 'Hype Builder — triggering exponential reinforcing loops mid-sprint.',
-      scene: 'wavegrid', hue: '#E879C9', hue2: '#60A5FA', bpm: 150, setMin: 12,
+      scene: 'feedback', hue: '#E879C9', hue2: '#60A5FA', bpm: 150, setMin: 12,
       query: 'melodic dubstep mix',
     },
     {
@@ -43,8 +44,8 @@ window.PANTHEON = {
       power: 'EMERGENCE & STIGMERGY', rung: 5,
       ability: 'Does not control the crowd — designs the environment where the crowd organizes itself. Agents read the cues and act; the whole becomes one organism. The ultimate DAO-operator mode.',
       vibe: 'Unpredictable, evolving, multi-layered EDM — isolated stems converging into one synchronized drop.',
-      wave: 'DJ Dauozi — the bassline is the initial condition; the swarm fills the melody.',
-      scene: 'swarm', hue: '#22D3EE', hue2: '#A78BFF', bpm: 126, setMin: 15,
+      wave: 'DJ Daozi — the bassline is the initial condition; the swarm fills the melody.',
+      scene: 'murmuration', hue: '#22D3EE', hue2: '#A78BFF', bpm: 126, setMin: 15,
       query: 'progressive house festival set',
     },
     {
@@ -84,7 +85,7 @@ window.PANTHEON = {
       ability: 'Stresses the system with structured noise to find where it rings. What survives the turbulence is real; what shakes apart needed rebuilding anyway. Chaos engineering with a subwoofer.',
       vibe: 'Neurobass. Turbulent fields resolving into resonance rings.',
       wave: 'Hype Builder — driven through the noise floor until the true frequency stands up.',
-      scene: 'noisefield', hue: '#A78BFF', hue2: '#7BE3EA', bpm: 172, setMin: 12,
+      scene: 'turbulence', hue: '#A78BFF', hue2: '#7BE3EA', bpm: 172, setMin: 12,
       query: 'neurofunk mix',
     },
     {
@@ -125,7 +126,7 @@ window.PANTHEON = {
       does: 'Push an update → the community reacts → the reaction feeds the visualizer → energy compounds. Tempo up, pulses harder.' },
     { id: 'crowdrise', name: 'Crowdrise', sys: 'Network-effect activation',
       does: 'Isolated viewers become a visible swarm — aggregate presence rendered as one organism on screen.' },
-    { id: 'dauozi',   name: 'DJ Dauozi', sys: 'Autonomous orchestration',
+    { id: 'dauozi',   name: 'DJ Daozi', sys: 'Autonomous orchestration',
       does: 'Stream selection handed to the agents: they pick the sound from the semantics of the task being worked.' },
     { id: 'vibez',    name: 'DJ VibeZ', sys: 'Balancing loop (B−)',
       does: 'System overheating? Auto-select chill, slow the animations, return to baseline. Sustainability is a set-length skill.' },
