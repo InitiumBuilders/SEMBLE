@@ -401,6 +401,7 @@ body.rightnow .witem .t { font-size: 18px; }
   .transport { gap: 8px; margin-top: 14px; }
   .transport .btn { flex: 1 1 auto; min-height: 48px; }
   .transport .note { font-size: 14px; order: 3; flex-basis: 100%; }
+  .keys { display: none; }          /* a keyboard legend on a phone is noise */
 
   .sec { margin-top: 54px; }
   .sec-label { font-size: 12px; letter-spacing: .2em; }

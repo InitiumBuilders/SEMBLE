@@ -27,6 +27,13 @@
 'use strict';
 const M = (window.MOTUSVIZ = {});
 
+/* AMBIENT SCALE — the same world is drawn twice: at full strength inside the
+   stage, and across the WHOLE VIEWPORT behind every section at a fraction of
+   the intensity. One multiplier, respected by both primitives, is what lets a
+   single world definition serve as both the focal image and the room you are
+   standing in. */
+let AMB = 1;
+
 /* ── glow sprites: the bloom primitive ── */
 const _spr = {};
 function sprite(hex) {
@@ -45,13 +52,16 @@ function sprite(hex) {
 }
 /* one glowing body */
 function dot(g, x, y, r, hex, a) {
-  if (a <= .004 || r <= .05) return;
+  a *= AMB;
+  if (!(a > .004) || !(r > .05) || !Number.isFinite(x) || !Number.isFinite(y)) return;
   g.globalAlpha = a > 1 ? 1 : a;
   const s = sprite(hex), d = r * 2;
   g.drawImage(s, x - r, y - r, d, d);
 }
 /* a glowing line — the streak primitive (light with a direction) */
 function streak(g, x1, y1, x2, y2, w, hex, a) {
+  a *= AMB;
+  if (!(a > .004) || !Number.isFinite(x1) || !Number.isFinite(x2)) return;
   g.globalAlpha = a; g.strokeStyle = hex; g.lineWidth = w;
   g.lineCap = 'round';
   g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
@@ -59,15 +69,23 @@ function streak(g, x1, y1, x2, y2, w, hex, a) {
 const TAU = Math.PI * 2;
 const F = 900;                                  // focal length for the 3D projection
 
-/* ── the field: 3D bodies reused by every world, so switching is instant ── */
+/* ── the field: 3D bodies reused by every world, so switching is instant ──
+   TWO independent fields, because the world is drawn TWICE per frame — once in
+   the stage and once across the whole viewport. Several worlds carry state in
+   screen pixels (the flock, the turbulence field), so a shared array would
+   have the two views fighting over the same bodies at two different scales.
+   The render entry points swap the binding; the world code never knows. */
 const N = 760;
-const P = Array.from({ length: N }, (_, i) => ({
+const mkField = (n) => Array.from({ length: n }, (_, i) => ({
   x: (Math.random() - .5) * 2, y: (Math.random() - .5) * 2, z: Math.random(),
   a: Math.random() * TAU, r: Math.random(), t: Math.random() * TAU,
   s: .5 + Math.random() * .9, seed: Math.random(), i,
 }));
+const P_MAIN = mkField(N), P_AMB = mkField(N);
+let P = P_MAIN;
 const RINGS = [];                               // Sâv's permanent memory rings
-const FLOCK = [];                               // DaoMode's private boids (see murmuration)
+const FLOCK_MAIN = [], FLOCK_AMB = [];          // DaoMode's private boids, per view
+let FLOCK = FLOCK_MAIN;
 
 /* every world declares its own trail persistence — the shutter speed */
 const FADE = {
@@ -631,7 +649,7 @@ function sigil(g, c) {
 /* ── the public engine ── */
 M.WORLDS = WORLDS;
 M.FADE = FADE;
-M.P = P;                    // exposed for the pixel/position audit, not for use
+M.P = P_MAIN;               // exposed for the pixel/position audit, not for use
 
 M.sigil = sigil;
 M.dot = dot;
@@ -639,9 +657,9 @@ M.markPhrase = (gold) => { RINGS.push({ r: 4, a: .5, gold: !!gold }); if (RINGS.
 // Switching worlds must not inherit the last world's bodies — a flock's
 // positions are meaningless as a spectrum's, and stale state reads as a glitch.
 M.reset = () => {
-  for (const p of P) { p.px = p.py = p.fx = p.fy = undefined; p.r = Math.random(); p.a = Math.random() * TAU; }
+  for (const f of [P_MAIN, P_AMB]) for (const p of f) { p.px = p.py = p.fx = p.fy = undefined; p.r = Math.random(); p.a = Math.random() * TAU; }
   RINGS.length = 0;
-  FLOCK.length = 0;                             // the flock is reborn, never inherited
+  FLOCK_MAIN.length = 0; FLOCK_AMB.length = 0;  // the flock is reborn, never inherited
 };
 /* ═══════════════════════════════════════════════════════════════════════════
    THE WAVE POWERS — operational modes that VISIBLY change the system.
@@ -711,6 +729,26 @@ const OVERLAY = {
       dot(g, x, y, (3 + beat * 4) * c.DPR, i === 0 ? '#E8C46B' : hue2, .28 + beat * .35);
     }
   },
+};
+
+/* THE AMBIENT PASS — the same world, across the whole viewport, behind every
+   section. This is what turns the page from "a video box on a dark background"
+   into standing inside the DJ's universe: scroll anywhere and the world is
+   still around you. Runs at a fraction of the intensity and the body count so
+   it costs a phone almost nothing, and it deliberately reuses the SAME world
+   definition — one physics, two windows onto it. */
+M.renderAmbient = function renderAmbient(g, name, c) {
+  const world = WORLDS[name] || WORLDS.murmuration;
+  g.globalCompositeOperation = 'source-over';
+  g.globalAlpha = 1;
+  g.fillStyle = `rgba(4,6,10,${(FADE[name] != null ? FADE[name] : .12) * 1.9})`;
+  g.fillRect(0, 0, c.W, c.H);
+  g.globalCompositeOperation = 'lighter';
+  AMB = c.amb == null ? .34 : c.amb;
+  P = P_AMB; FLOCK = FLOCK_AMB;
+  try { world(g, c); } finally { AMB = 1; P = P_MAIN; FLOCK = FLOCK_MAIN; }
+  g.globalAlpha = 1;
+  g.globalCompositeOperation = 'source-over';
 };
 
 M.render = function render(g, name, c) {

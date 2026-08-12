@@ -218,7 +218,11 @@ function vloop(t) {
    the field has depth and bloom instead of looking like scattered dots. */
 const sw = $('#swarm'); const sg = sw ? sw.getContext('2d') : null;
 let SWW = 0, SWH = 0, attractor = { x: .5, y: .3 };
-function swsize() { if (!sw) return; SWW = sw.width = Math.round(innerWidth * DPR); SWH = sw.height = Math.round(innerHeight * DPR); }
+function swsize() {
+  if (!sw) return;
+  SWW = sw.width = Math.round(innerWidth * DPR); SWH = sw.height = Math.round(innerHeight * DPR);
+  sg.fillStyle = '#04060a'; sg.fillRect(0, 0, SWW, SWH);   // seed the ambient trail buffer
+}
 addEventListener('resize', swsize);
 const MOBILE = innerWidth < 700;
 const stars = Array.from({ length: MOBILE ? 130 : 300 }, () => ({
@@ -235,13 +239,35 @@ setInterval(() => {
   const vis = secs.filter((s) => { const r = s.getBoundingClientRect(); return r.top < innerHeight * .7 && r.bottom > 0; });
   if (vis.length) { const r = vis[0].getBoundingClientRect(); attractor = { x: (r.left + r.width / 2) / innerWidth, y: Math.max(60, r.top + 40) / innerHeight }; }
 }, 2400);
+/* THE AMBIENT WORLD — the DJ's universe across the ENTIRE display.
+   This is the difference between watching a box and being inside the room:
+   whatever world is playing on the stage is also playing, quietly, behind
+   every section of the page — on the phone and on the desktop alike. It runs
+   at a third of the intensity, a fraction of the body count, and (on phones)
+   every other frame, so the immersion costs almost nothing. */
+const AMB_DPR = Math.min(DPR, innerWidth < 700 ? 1.4 : 1.75);
+const AMB_COUNT = () => (innerWidth < 700 ? 90 : innerWidth < 1200 ? 170 : 260);
+let ambFrame = 0;
 function swloop(t) {
   if (!sg || REDUCED) return;
   requestAnimationFrame(swloop);
   if (document.hidden || !window.MOTUSVIZ) return;
   if (!SWW || Math.abs(innerWidth * DPR - SWW) > 40) swsize();
   const dot = MOTUSVIZ.dot;
-  sg.clearRect(0, 0, SWW, SWH);
+
+  // ── the world, filling the whole display ──
+  ambFrame++;
+  const everyOther = innerWidth < 700 && (ambFrame & 1);
+  if (!everyOther) {
+    MOTUSVIZ.renderAmbient(sg, S.dj.scene, {
+      t, e: S.energy * .85, drop: S.drop, phrase: S.phrase,
+      W: SWW, H: SWH, hue: S.dj.hue, hue2: S.dj.hue2,
+      v: S.evo || (evolve(true), S.evo), DPR: AMB_DPR,
+      count: AMB_COUNT(), power: S.power ? S.power.id : '',
+      nodes: Math.max(3, ((S.live && S.live.items) || []).length || 6),
+      amb: S.theater ? .1 : .38,          // theater dims the room; the stage IS the room
+    });
+  }
   sg.globalCompositeOperation = 'lighter';
   const scroll = window.scrollY || 0;
   // ── the deep field ──
