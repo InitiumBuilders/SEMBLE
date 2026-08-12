@@ -28,6 +28,10 @@
 </head>
 <body>
 
+<!-- THE RAIL — the reader's position on the journey, drawn as light. Pure CSS
+     scroll-timeline; browsers without it keep the rail at width zero. -->
+<div class="rail" aria-hidden="true"></div>
+
 <!-- ═══ THE MARK SPRITE ═══
      One stroke weight, one geometry, currentColor. Defined once and referenced
      by <use>, so ten marks cost one definition. Inlined rather than linked
@@ -331,7 +335,11 @@
   'use strict';
   function put(k, v) {
     var el = document.querySelector('[data-pf="' + k + '"]');
-    if (el) el.textContent = v;
+    if (!el) return;
+    el.textContent = v;
+    // the landing pulse — fired only when a REAL value arrives, so the motion
+    // means "this came from the ledger just now". Dashes never pulse.
+    if (el.parentElement) el.parentElement.classList.add('landed');
   }
   function num(x) { return Math.round(x).toLocaleString('en-US'); }
 
@@ -354,6 +362,21 @@
        for. Never write a 0 here: a real zero and a failed fetch are different
        facts and this page does not blur them. */
   });
+
+  /* ── the battery gate ──
+     Pauses the infinite decorative loops in sections that are off screen.
+     ⚠ THE FAILURE DIRECTION IS MORE ANIMATION, NEVER LESS: if this observer
+     never fires, nothing is ever paused and the page merely spends battery.
+     It can pause glows; it cannot touch entrances and it cannot hide a word. */
+  try {
+    if ('IntersectionObserver' in window) {
+      var secs = document.querySelectorAll('section, header.hero');
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { e.target.classList.toggle('off', !e.isIntersecting); });
+      }, { rootMargin: '18% 0px 18% 0px' });
+      secs.forEach(function (s) { io.observe(s); });
+    }
+  } catch (e) { /* no observer, no pausing — everything simply keeps moving */ }
 })();
 </script>
 </body>

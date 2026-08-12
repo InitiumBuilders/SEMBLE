@@ -201,9 +201,133 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOTUS — THE CURRENT.
+
+   Everything below is ADDITIVE. Not one rule here can hide a word: no opacity
+   starts at 0, no transform moves anything out of its box, nothing waits on a
+   script. Strip this entire block and the pages read exactly the same — they
+   just stop breathing.
+
+   That constraint is the whole design. It is what makes it safe to put this
+   much motion on a page whose earlier motion system shipped it blank.
+
+   Battery: continuous loops pause when their section leaves the screen, driven
+   by an observer whose FAILURE DIRECTION IS MORE ANIMATION, never less. If the
+   observer never fires, nothing is paused and the page behaves as it does now.
+   An observer may optimise; it may never gate.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① THE RAIL — the journey, drawn. Pure CSS scroll-driven, zero JS. If the
+      browser has no scroll timeline the rail simply stays at zero width and
+      nobody misses it. ── */
+.rail {
+  position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 60;
+  pointer-events: none; transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--cyan), var(--violet) 52%, var(--gold));
+  box-shadow: 0 0 16px rgba(34, 211, 238, .75);
+}
+@supports (animation-timeline: scroll()) {
+  .rail { animation: railFill linear both; animation-timeline: scroll(root block); }
+}
+@keyframes railFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ── ② THE AURORA BREATHES. A drift, never a spin — a rotating box behind
+      content is permanently banned in this project. ── */
+body::before {
+  content: ''; position: fixed; inset: -22%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38vw 38vw at 18% 12%, rgba(34, 211, 238, .10), transparent 62%),
+    radial-gradient(34vw 34vw at 84% 22%, rgba(255, 107, 74, .09), transparent 60%),
+    radial-gradient(46vw 46vw at 50% 92%, rgba(167, 139, 255, .09), transparent 64%);
+  animation: auroraDrift 38s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes auroraDrift {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  to   { transform: translate3d(1.5%, 1.5%, 0) scale(1.07); }
+}
+
+/* ── ③ THE CHARGE CROSSES. The single most symbolic motion on the page: light
+      leaves SEMBLE, passes through the ×, and arrives at THE ZAO. One 6s cycle,
+      staged by delay — the partnership performing itself. ── */
+.hero .mark.s { animation: chargeS 6s var(--ease) infinite; }
+.hero .mark-x { animation: chargeX 6s var(--ease) infinite; }
+.hero .mark.z { animation: chargeZ 6s var(--ease) infinite; }
+@keyframes chargeS {
+  0%, 34%, 100% { box-shadow: var(--nn-raise); }
+  12%           { box-shadow: var(--nn-raise), 0 0 44px -6px rgba(34, 211, 238, .9); }
+}
+@keyframes chargeX {
+  0%, 100% { opacity: .55; transform: scale(1); }
+  32%      { opacity: 1; transform: scale(1.3); text-shadow: 0 0 24px rgba(96, 165, 250, .95); }
+}
+@keyframes chargeZ {
+  0%, 42%, 100% { box-shadow: var(--nn-raise); }
+  56%           { box-shadow: var(--nn-raise), 0 0 44px -6px rgba(255, 107, 74, .9); }
+}
+
+/* ── ④ THE CURRENT TRAVELS THE LOOP. The step badges charge in sequence, so
+      the energy visibly moves 1 → 2 → 3 → 4. Works on a phone, where the old
+      desktop-only thread between cards could not. ── */
+.loop .n { animation: stepCharge 5.2s var(--ease) infinite; }
+.loop li:nth-child(1) .n { animation-delay: 0s; }
+.loop li:nth-child(2) .n { animation-delay: .42s; }
+.loop li:nth-child(3) .n { animation-delay: .84s; }
+.loop li:nth-child(4) .n { animation-delay: 1.26s; }
+@keyframes stepCharge {
+  0%, 24%, 100% { transform: scale(1); }
+  9%            { transform: scale(1.16); box-shadow: 0 0 36px 0 var(--cyan); }
+}
+
+/* ── ⑤ THE AVATARS BREATHE. A person is the one thing on this page that is
+      alive, so their frame is the one that never sits perfectly still. ── */
+.avatar { animation: aura 7.5s var(--ease) infinite; }
+@keyframes aura {
+  0%, 100% { box-shadow: var(--nn-raise), 0 0 34px -16px var(--cyan); }
+  50%      { box-shadow: var(--nn-raise), 0 0 54px -10px var(--cyan); }
+}
+.person.z .avatar, .pc-who .avatar { animation-name: auraZ; }
+@keyframes auraZ {
+  0%, 100% { box-shadow: var(--nn-raise), 0 0 34px -16px var(--zao); }
+  50%      { box-shadow: var(--nn-raise), 0 0 54px -10px var(--zao); }
+}
+
+/* ── ⑥ THE NUMBERS LAND. Fired once, by class, after the ledger answers — so
+      the motion means "this just arrived from the ledger", not "decoration". ── */
+.pf.landed b { animation: landPulse .8s var(--ease); }
+@keyframes landPulse {
+  0%   { transform: translate3d(0, 7px, 0) scale(.96); }
+  55%  { transform: none; text-shadow: 0 0 36px rgba(34, 211, 238, .85); }
+  100% { transform: none; }
+}
+
+/* ── ⑦ the marks answer a pointer ── */
+.glass:hover .mk, .pcard:hover .mk { transform: scale(1.12) rotate(-4deg); }
+.mk { transition: transform .32s var(--ease); }
+
+/* ── THE PAUSE GATE. Set by the observer on sections that are off screen.
+   ⚠ SCOPED DELIBERATELY, AND THE SCOPE IS THE SAFETY. A blanket
+   `.off * { animation-play-state: paused }` would also freeze the ENTRANCE
+   animations — and those start at opacity 0, so every section below the fold
+   would be paused into invisibility. That is the exact failure this page
+   already shipped once.
+   So the gate names only the infinite decorative loops. Entrance animations are
+   never touched by it, and cannot be. ── */
+.off .mark.s, .off .mark-x, .off .mark.z,
+.off .loop .n, .off .avatar,
+.off .pc-glow, .off .pc-plus, .off .pc-plus2 { animation-play-state: paused; }
+
 @media (prefers-reduced-motion: reduce) {
   .pc-glow, .pc-plus, .pc-plus2 { animation: none !important; }
   .loop::before, .loop::after { animation: none !important; }
   .glass { transition: none; }
   .glass:hover { transform: none; }
+  /* everything the current does, undone — the page keeps every word and loses
+     only the movement */
+  .rail { display: none; }
+  body::before,
+  .hero .mark.s, .hero .mark-x, .hero .mark.z,
+  .loop .n, .avatar, .pf.landed b { animation: none !important; }
+  .mk, .glass:hover .mk, .pcard:hover .mk { transition: none; transform: none; }
 }
