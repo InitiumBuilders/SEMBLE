@@ -9,12 +9,12 @@
 // ① NOTHING IS PAID FOR UNTIL IT IS VERIFIED.
 //    A volunteer can return garbage, or nothing, and claim payment. That is THE
 //    problem of volunteer computing and it is older than crypto. Every unit is
-//    computed independently by `need` (default 2) machines and settles only
+//    computed independently by `need` (WORK.NEED, currently 3) machines and settles only
 //    when their digests AGREE. A disagreement settles nothing and credits
 //    nobody; it goes to `disputed` and is re-issued.
 //
 // ② CANARIES CATCH LIARS.
-//    1 unit in ~6 is a canary whose correct digest we already know. A node that
+//    1 unit in ~WORK.CANARY_RATE (currently 4) is a canary whose digest we know. A node that
 //    fails a canary is quarantined immediately — its results stop counting.
 //    Redundancy alone is beatable by two colluding clients; a canary is not,
 //    because the client cannot tell a canary from real work.
@@ -28,7 +28,7 @@
 //    than by a policy someone has to remember.
 import { freshRead, freshWrite } from '../_blob';
 import {
-  EMPTY_LEDGER, WORK, runUnit, capability, accrue,
+  EMPTY_LEDGER, WORK, runUnit, capability, accrue, fingerprint,
   type Ledger, type Unit, type Receipt, type WorkKind,
 } from '../_motus';
 
@@ -76,7 +76,9 @@ export async function GET(req: Request) {
 
   // ?node=… claims the next unit this node has not already computed.
   if (node) {
-    if (w.quarantine.includes(node)) {
+    const meG = w.nodes.find((x) => x.id === node);
+    const fpG = meG ? fingerprint(meG) : '';
+    if (w.quarantine.includes(node) || (fpG && w.quarantine.includes('fp:' + fpG))) {
       return Response.json({
         unit: null,
         quarantined: true,
@@ -123,7 +125,11 @@ export async function GET(req: Request) {
     need: WORK.NEED,
     quarantined: w.quarantine.length,
     byTask,
-    verification: 'Every unit is computed independently by 2 machines and settles only when their digests agree. Roughly 1 unit in 6 is a known-answer canary; a node that fails one is quarantined and stops being counted.',
+    // Derived from the constants, never hand-written — I raised NEED 2→3 and
+    // CANARY_RATE 6→4 and this sentence still claimed the old numbers. A
+    // security claim that drifts from the code is worse than no claim.
+    verification: `Every unit is computed independently by ${WORK.NEED} machines and settles only when their digests agree. Roughly 1 unit in ${WORK.CANARY_RATE} is a known-answer canary; a node that fails one is quarantined and stops being counted.`,
+    canaryRate: WORK.CANARY_RATE,
     recent: done.slice(-12).reverse().map((u) => ({
       id: u.id, kind: u.kind, task: u.task, digest: u.digest,
       by: u.results.map((r) => r.node.slice(0, 6)), settled: u.settled,
@@ -137,11 +143,28 @@ export async function POST(req: Request) {
   if (!b) return Response.json({ ok: false, error: 'unreadable' }, { status: 400, headers: CORS });
 
   // ── operator: enqueue work from a CortexInsight task ──
+  // ── kernel conformance probe ──
+  // Anyone can ask the server to run a kernel on a known input and compare it
+  // to their own implementation. This is how a contributor verifies that the
+  // PUBLISHED kernel is the kernel actually running — without it, "reproducible
+  // by anyone" is a claim rather than a check. It computes; it stores nothing.
+  if (b.op === 'kernel-probe') {
+    const kind: WorkKind = ['embed', 'score', 'matmul', 'canary'].includes(b.kind) ? b.kind : 'embed';
+    const payload = clean(b.payload, WORK.MAX_PAYLOAD);
+    const seed = (Math.floor(Number(b.seed) || 0) >>> 0) || 2166136261;
+    const r = runUnit({ kind, payload, seed });
+    return Response.json({
+      ok: true, kind, seed, payload,
+      out: r.out.slice(0, 400), digest: r.digest,
+      note: 'Computed by the SAME runUnit() the queue uses. Re-implement it from the docs and you must get this digest — if you do not, the docs are wrong and that is a bug worth reporting.',
+    }, { headers: CORS });
+  }
+
   if (b.op === 'enqueue') {
     if (!operator(req)) return Response.json({ ok: false, error: 'not the operator' }, { status: 401, headers: CORS });
     const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
     const task = clean(b.task, 120) || 'untitled';
-    const kind: WorkKind = ['embed', 'score'].includes(b.kind) ? b.kind : 'embed';
+    const kind: WorkKind = ['embed', 'score', 'matmul'].includes(b.kind) ? b.kind : 'embed';
     const chunks: string[] = (Array.isArray(b.chunks) ? b.chunks : [])
       .slice(0, 100).map((c: unknown) => clean(c, WORK.MAX_PAYLOAD)).filter(Boolean);
     if (!chunks.length) return Response.json({ ok: false, error: 'no payload chunks' }, { status: 400, headers: CORS });
@@ -180,7 +203,15 @@ export async function POST(req: Request) {
   if (!node || !unitId || !digest) return Response.json({ ok: false, error: 'node, unit and digest are required' }, { status: 400, headers: CORS });
 
   const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
-  if (w.quarantine.includes(node)) {
+  // Quarantine by id AND by coarse hardware fingerprint. Node ids are
+  // client-generated, so a reload buys a fresh one; the fingerprint makes that
+  // cost more than pressing F5. ⚠ It is NOT identity — a determined actor can
+  // lie about their adapter — and nothing here pretends otherwise. It raises
+  // the cost from "reload" to "lie convincingly", which is the honest size of
+  // the improvement.
+  const me = w.nodes.find((x) => x.id === node);
+  const fp = me ? fingerprint(me) : '';
+  if (w.quarantine.includes(node) || (fp && w.quarantine.includes('fp:' + fp))) {
     return Response.json({ ok: false, quarantined: true, error: 'this node is quarantined' }, { status: 403, headers: CORS });
   }
   const u = w.units.find((x) => x.id === unitId);
@@ -197,6 +228,7 @@ export async function POST(req: Request) {
       // the answer to. That distinction matters: honest machines fail all the
       // time, but they fail by being absent, not by being confidently wrong.
       if (!w.quarantine.includes(node)) w.quarantine.push(node);
+      if (WORK.FINGERPRINT && fp && !w.quarantine.includes('fp:' + fp)) w.quarantine.push('fp:' + fp);
       w.quarantine = w.quarantine.slice(-500);
       await freshWrite(PREFIX, w);
       return Response.json({
@@ -225,10 +257,14 @@ export async function POST(req: Request) {
 
   // ── credit the contributors, but only for a settled unit ──
   let earned = 0;
+  let unenrolled = false;
   if (u.status === 'done') {
     for (const r of u.results) {
       const n = w.nodes.find((x) => x.id === r.node);
-      if (!n) continue;
+      // A node that never pledged has no capability on record, so there is
+      // nothing to scale an award by. Silently returning 0 would look like the
+      // work did not count; say so instead.
+      if (!n) { if (r.node === node) unenrolled = true; continue; }
       const cap = capability(n);
       // A verified unit is worth a flat award scaled by capability. Completed
       // work outranks availability: availability is a promise, a verified
@@ -253,6 +289,10 @@ export async function POST(req: Request) {
     settled: u.status === 'done',
     earned: Math.round(earned * 1000) / 1000,
     waitingFor: u.status === 'verifying' ? u.need - u.results.length : 0,
+    ...(unenrolled ? {
+      unenrolled: true,
+      why: 'Your result was accepted and counted toward verification, but this node has never pledged, so there is no capability on record to scale an award by. POST to /api/compute first and future units will earn.',
+    } : {}),
   }, { headers: CORS });
 }
 

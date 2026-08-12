@@ -99,45 +99,49 @@
     </div>
   </div>
 
-  <!-- LEND YOUR GPU -->
-  <div class="sec gpu-sec">
-    <div class="sec-label">MOTUSCOMPUTE · THE COMMONS</div>
-    <div class="sec-title">Lend the commons<br>a graphics card.</div>
-    <p class="sec-sub">The cheapest possible way to move with us: one click, no install, no account. Your browser reports what your card can actually do — and you can stop it dead any time.</p>
-    <div class="card pool-card" id="poolBody"></div>
-    <div class="card gpu-card" id="gpuBody"></div>
-  </div>
+  <!-- ══ MOTUSCOMPUTE — one section, five views ══
+       Was five full-height stacked sections. That is a wall, and a wall is what
+       "busy" means: the reader cannot tell what matters because everything is
+       shouting at the same volume. One idea per viewport; the rest one tap away. -->
+  <div class="sec commons-sec">
+    <div class="sec-label">MOTUSCOMPUTE</div>
+    <div class="sec-title">The community<br>compute commons.</div>
+    <p class="sec-sub">Lend a machine in one click — no install, no account. It computes real work, gets checked by strangers' machines, and you keep the receipt. Stop it dead any time.</p>
 
-  <!-- THE WORK -->
-  <div class="sec work-sec">
-    <div class="sec-label">MOTUSCOMPUTE · THE WORK</div>
-    <div class="sec-title">Not availability.<br>Completed work.</div>
-    <p class="sec-sub">Pledging says your machine is there. This says go. Every unit is computed twice, by two machines that have never met, and counts only when they agree.</p>
-    <div class="card work-card" id="workBody"></div>
-  </div>
+    <div class="cmn-live" id="cmnLive"></div>
 
-  <!-- YOUR RECEIPTS -->
-  <div class="sec rcpt-sec">
-    <div class="sec-label">MOTUSCOMPUTE · YOUR RECEIPTS</div>
-    <div class="sec-title">Proof, not<br>a progress bar.</div>
-    <p class="sec-sub">A receipt names the unit your machine computed, the task it fed, and the digest an independent machine agreed with. You can re-run it yourself and check.</p>
-    <div class="card rcpt-card" id="rcptBody"></div>
-  </div>
+    <nav class="cmn-tabs" role="tablist" aria-label="MotusCompute views">
+      <button class="cmn-tab on" role="tab" data-tab="pool" aria-selected="true">⚡ <span>Lend</span></button>
+      <button class="cmn-tab" role="tab" data-tab="work" aria-selected="false">⚙ <span>Work</span></button>
+      <button class="cmn-tab" role="tab" data-tab="rcpt" aria-selected="false">◈ <span>Receipts</span></button>
+      <button class="cmn-tab" role="tab" data-tab="pay" aria-selected="false">◎ <span>Money</span></button>
+      <button class="cmn-tab" role="tab" data-tab="net" aria-selected="false">⬡ <span>Networks</span></button>
+    </nav>
 
-  <!-- THE PAYOUT LEDGER -->
-  <div class="sec pay-sec">
-    <div class="sec-label">MOTUSCOMPUTE · THE MONEY</div>
-    <div class="sec-title">Every payout,<br>in the open.</div>
-    <p class="sec-sub">Contribution is only real if the accounting is. Every batch, every DJ, every rail — published whether or not it flatters us.</p>
-    <div class="card pay-card" id="payBody"></div>
-  </div>
-
-  <!-- THE GOLEM GAUGE -->
-  <div class="sec gol-sec">
-    <div class="sec-label">MOTUSCOMPUTE · THE OTHER NETWORKS</div>
-    <div class="sec-title">We measured Golem,<br>so you don't have to.</div>
-    <p class="sec-sub">The adapter is wired and the gauge is live. It reads Golem's own API every time this page loads — so this panel reports what is actually there, not what anyone hopes is there.</p>
-    <div class="card gol-card" id="golemBody"></div>
+    <div class="cmn-panels">
+      <section class="cmn-panel on" data-panel="pool" role="tabpanel">
+        <div class="card gpu-card" id="gpuBody"></div>
+        <details class="cmn-more"><summary>Pool telemetry — history, per-DJ record, accrual</summary>
+          <div class="card pool-card" id="poolBody"></div>
+        </details>
+      </section>
+      <section class="cmn-panel" data-panel="work" role="tabpanel">
+        <p class="cmn-lead">Pledging says your machine is there. This says <b>go</b>. Every unit is computed by independent machines and counts only when they agree.</p>
+        <div class="card work-card" id="workBody"></div>
+      </section>
+      <section class="cmn-panel" data-panel="rcpt" role="tabpanel">
+        <p class="cmn-lead">A receipt names the unit your machine computed, the task it fed, and the digest another machine agreed with. <b>You can re-run it yourself and check.</b></p>
+        <div class="card rcpt-card" id="rcptBody"></div>
+      </section>
+      <section class="cmn-panel" data-panel="pay" role="tabpanel">
+        <p class="cmn-lead">Contribution is only real if the accounting is. Every batch, every DJ, every rail — published whether or not it flatters us.</p>
+        <div class="card pay-card" id="payBody"></div>
+      </section>
+      <section class="cmn-panel" data-panel="net" role="tabpanel">
+        <p class="cmn-lead">We measured the alternatives instead of trusting their marketing. This gauge reads Golem's own API every time you load the page.</p>
+        <div class="card gol-card" id="golemBody"></div>
+      </section>
+    </div>
   </div>
 
   <div class="foot">

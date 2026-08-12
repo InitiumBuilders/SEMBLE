@@ -547,7 +547,7 @@ async function pushPledge(extra = {}) {
 }
 async function pollPool() {
   const j = await tryJson(`${API}/api/compute?ts=${Date.now()}`, 8000);
-  if (j) { GPU.pool = j; renderPool(); }
+  if (j) { GPU.pool = j; renderPool(); renderCommonsStrip(); }
 }
 async function pollPayouts() {
   const j = await tryJson(`${API}/api/payouts?ts=${Date.now()}`, 8000);
@@ -559,7 +559,7 @@ async function pollGolem() {
 }
 async function pollWork() {
   const j = await tryJson(`${API}/api/work?ts=${Date.now()}`, 8000);
-  if (j) { GPU.work = j; renderWork(); }
+  if (j) { GPU.work = j; renderWork(); renderCommonsStrip(); }
 }
 async function pollReceipts() {
   const j = await tryJson(`${API}/api/receipts?node=${encodeURIComponent(GPU.id)}&ts=${Date.now()}`, 8000);
@@ -611,9 +611,37 @@ function scoreVecI(a, b) {
   if (!na || !nb) return 0;
   return Math.floor((dot * 10000) / Math.max(1, isqrtI(na) * isqrtI(nb)));
 }
+
+/* THE MATMUL KERNEL — INT8 x INT8 -> INT32, the real primitive of quantized
+   model inference, and EXACT on every machine. A float matmul could not be
+   verified by digest at all: two honest GPUs would differ in the low bits and
+   both would look like liars. */
+function tileI(seed, n) {
+  const v = new Array(n * n); let h = (seed >>> 0) || 2166136261;
+  for (let i = 0; i < n * n; i++) {
+    h = (Math.imul(h ^ (h >>> 15), 2246822507) >>> 0);
+    h = (Math.imul(h ^ (h >>> 13), 3266489909) >>> 0);
+    v[i] = ((h >>> 24) & 0xff) - 128;
+  }
+  return v;
+}
+function matmulTileI(a, b, n) {
+  const c = new Array(n * n).fill(0);
+  for (let i = 0; i < n; i++) for (let k = 0; k < n; k++) {
+    const aik = a[i * n + k]; if (!aik) continue;
+    for (let j = 0; j < n; j++) c[i * n + j] += aik * b[k * n + j];
+  }
+  return c;
+}
 function runUnitLocal(u) {
   let out = '';
   if (u.kind === 'embed' || u.kind === 'canary') out = embedVec(u.payload, u.seed).join(',');
+  else if (u.kind === 'matmul') {
+    const n = Math.max(4, Math.min(64, parseInt(u.payload, 10) || 32));
+    const c = matmulTileI(tileI(u.seed, n), tileI((u.seed ^ 0x9e3779b9) >>> 0, n), n);
+    let acc = 0; for (let i = 0; i < c.length; i++) acc = (acc + Math.imul(c[i], i + 1)) | 0;
+    out = n + ':' + acc;
+  }
   else if (u.kind === 'score') {
     const sp = String(u.payload).split(' ');
     out = String(scoreVecI(embedVec(sp[0] || '', u.seed), embedVec(sp.slice(1).join(' ') || '', u.seed)));
@@ -859,7 +887,7 @@ function renderReceipts() {
   el.innerHTML = `
     <div class="pool-grid">
       <div class="pool-stat"><span class="k">UNITS COMPLETED</span><b>${r.count}</b><i>verified and agreed</i></div>
-      <div class="pool-stat"><span class="k">COMPUTE TIME</span><b>${(r.computeMs / 1000).toFixed(1)}s</b><i>actual milliseconds your machine worked</i></div>
+      <div class="pool-stat"><span class="k">COMPUTE TIME</span><b>${r.computeMs >= 1000 ? (r.computeMs / 1000).toFixed(1) + 's' : r.computeMs + 'ms'}</b><i>actual time your machine worked — these kernels are fast, and rounding that up to "0.0s" would be a small lie</i></div>
       <div class="pool-stat"><span class="k">EARNED</span><b>${nfmt(r.motusSeconds)}</b><i>MOTUS-s from completed work</i></div>
       ${you ? `<div class="pool-stat"><span class="k">OWED TO YOU</span><b>${(you.owed || 0).toFixed(6)}</b><i>${esc(you.unit)} · $${(you.owedUsd || 0).toFixed(2)}</i></div>` : ''}
     </div>
@@ -872,6 +900,34 @@ function renderReceipts() {
         <span class="wby">${x.ms}ms · +${x.motusSeconds} MOTUS-s</span></div>`).join('')}</div>
       <p class="work-fine">${esc(r.verified || '')} The digest is the auditable artefact — anyone can re-run the unit with the published kernel and check they get the same eight characters.</p>
     </div>`;
+}
+
+/* ── THE COMMONS TABS ──────────────────────────────────────────────────────
+   Five stacked full-height sections were a wall. A wall is what "busy" means:
+   everything shouting at one volume, so nothing reads as important. One view at
+   a time, with the four numbers that actually matter pinned above the tabs so
+   you never have to go looking for them. */
+function setTab(name) {
+  $$('.cmn-tab').forEach((t) => {
+    const on = t.dataset.tab === name;
+    t.classList.toggle('on', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  $$('.cmn-panel').forEach((p) => p.classList.toggle('on', p.dataset.panel === name));
+  try { localStorage.setItem('cmn.tab', name); } catch {}
+}
+
+/* The pinned strip: the whole commons in four numbers, always visible. */
+function renderCommonsStrip() {
+  const el = $('#cmnLive'); if (!el) return;
+  const p = GPU.pool || {}, w = GPU.work || {}, m = p.motus || {};
+  const q = w.queue || {};
+  const live = (q.open || 0) + (q.verifying || 0);
+  el.innerHTML = `
+    <div class="cl-item ${w.jobsRunning ? 'go' : ''}"><b>${w.jobsRunning ? 'RUNNING' : 'IDLE'}</b><span>${live} unit${live === 1 ? '' : 's'} out</span></div>
+    <div class="cl-item"><b>${p.live || 0}</b><span>machine${(p.live || 0) === 1 ? '' : 's'} lending</span></div>
+    <div class="cl-item"><b>${w.completed || 0}</b><span>units verified</span></div>
+    <div class="cl-item"><b>${nfmt(m.accrued || 0)}</b><span>MOTUS-s earned</span></div>`;
 }
 
 /* ── the Golem gauge: measured on every load, never a stored claim ── */
@@ -1114,6 +1170,14 @@ addEventListener('DOMContentLoaded', () => {
   // numbers that did not move. Golem's API is also somebody else's server.
   pollPayouts(); setInterval(pollPayouts, 60000);
   pollGolem(); setInterval(pollGolem, 300000);
+  // the commons tabs — restore whichever view they were last on
+  $$('.cmn-tab').forEach((t) => {
+    t.onclick = () => setTab(t.dataset.tab);
+    t.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab(t.dataset.tab); } };
+  });
+  let startTab = 'pool';
+  try { startTab = localStorage.getItem('cmn.tab') || 'pool'; } catch {}
+  setTab(startTab);
   pollWork(); setInterval(pollWork, 15000);
   pollReceipts(); setInterval(pollReceipts, 30000);
   pollLive(); pollCrowd();

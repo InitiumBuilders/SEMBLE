@@ -116,7 +116,7 @@ export function owedOnRail(motusSeconds: number, rail: Rail, rate = MOTUS.DASH_P
    never be paid for.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export type WorkKind = 'embed' | 'score' | 'canary';
+export type WorkKind = 'embed' | 'score' | 'matmul' | 'canary';
 
 export type Unit = {
   id: string; kind: WorkKind;
@@ -140,17 +140,40 @@ export type Receipt = {
 };
 
 export const WORK = {
-  NEED: 2,                                // agreeing results to settle a unit
-  MAX_OPEN: 200,                          // queue depth cap
+  // ⚠ RAISED from 2 → 3 before work-based earnings carry real money.
+  // With need=2 a single colluding PAIR returning the same wrong answer settles
+  // a unit. With need=3 they must control a majority of three independent
+  // claims on the SAME unit, which is a materially harder problem — and the
+  // canary rate is what bounds the rest.
+  NEED: 3,
+  MAX_OPEN: 200,
   MAX_RECEIPTS: 2000,
-  CANARY_RATE: 6,                         // 1 in N units is a known-answer probe
-  CLAIM_TTL: 120_000,                     // a claim expires; nobody can squat
+  // RAISED from 1-in-6 → 1-in-4. Canaries are the defence collusion cannot
+  // beat, because a client cannot tell one from real work. The cost is that a
+  // quarter of the pool's effort is spent proving honesty rather than producing
+  // output — which is the correct trade while money is on the line.
+  CANARY_RATE: 4,
+  CLAIM_TTL: 120_000,
   MAX_PAYLOAD: 4000,
   // A unit is worth a flat accrual on top of pledged time, because completed
   // work is worth more than availability. Availability is a promise; a verified
   // result is a fact.
   UNIT_MOTUS: 25,
+  // Quarantine also catches the SAME HARDWARE returning under a new id. Node
+  // ids are client-generated, so a reload buys a fresh one — this makes that
+  // cost more than a reload. It is NOT identity, and nothing here pretends it
+  // is: a determined actor can change the reported adapter. It raises the cost
+  // from "press F5" to "lie about your hardware convincingly", which is the
+  // honest size of the improvement.
+  FINGERPRINT: true,
 };
+
+/** A coarse hardware fingerprint from values the adapter volunteers. Coarse on
+ *  purpose — it must not become a tracking identifier for honest users. */
+export function fingerprint(n: Pick<Node, 'vendor' | 'arch' | 'klass' | 'maxBufferMB' | 'invocations'>) {
+  return [n.vendor || '?', n.arch || '?', n.klass || '?',
+    Math.round((n.maxBufferMB || 0) / 512), Math.round((n.invocations || 0) / 256)].join('|');
+}
 
 /* ── THE KERNELS — integer-only, deterministic, identical on every machine ──
    These run in the browser (live.js) AND on the server (to make canaries and
@@ -206,15 +229,76 @@ export function scoreVec(a: number[], b: number[]): number {
   return Math.floor((dot * 10000) / Math.max(1, isqrt(na) * isqrt(nb)));
 }
 
+/* ── THE MATMUL KERNEL — the actual primitive of model inference ────────────
+   A transformer forward pass is, overwhelmingly, matrix multiplication. So the
+   honest step from "index a corpus" toward "run a model together" is a
+   verifiable matmul tile.
+
+   INT8 × INT8 → INT32 is exactly what quantized inference does, and it has a
+   property float matmul does not: it is EXACT. Every machine gets the same
+   bits, so the same consensus check that guards `embed` guards this too. A
+   float matmul tile could not be verified by digest at all — two honest GPUs
+   would disagree in the low bits and both would look like liars.
+
+   ⚠ WHAT THIS IS AND IS NOT. This is the correct primitive and it genuinely
+   works. It is NOT a running LLM: a real forward pass also needs weight
+   distribution, KV-cache residency, layer scheduling and a latency budget that
+   a pool of tabs opening and closing does not have yet. Building the verifiable
+   tile first is the right order; claiming the model runs today would be exactly
+   the lie this project exists to avoid. */
+
+/** Deterministic INT8 tile from a seed — keeps unit payloads tiny and lets
+ *  anyone auditing the ledger regenerate the exact inputs. */
+export function tile(seed: number, n: number): number[] {
+  const v = new Array(n * n);
+  let h = (seed >>> 0) || 2166136261;
+  for (let i = 0; i < n * n; i++) {
+    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 3266489909) >>> 0;
+    v[i] = ((h >>> 24) & 0xff) - 128;              // int8 range, exact
+  }
+  return v;
+}
+
+/** INT8 × INT8 → INT32 tile multiply. Exact on every machine, by construction. */
+export function matmulTile(a: number[], b: number[], n: number): number[] {
+  const c = new Array(n * n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < n; k++) {
+      const aik = a[i * n + k];
+      if (!aik) continue;
+      for (let j = 0; j < n; j++) c[i * n + j] += aik * b[k * n + j];
+    }
+  }
+  return c;
+}
+
 /** Run a unit. THE definition — browser and server both call this one. */
 export function runUnit(u: Pick<Unit, 'kind' | 'payload' | 'seed'>): { out: string; digest: string } {
   let out = '';
   if (u.kind === 'embed' || u.kind === 'canary') {
     out = embed(u.payload, u.seed).join(',');
   } else if (u.kind === 'score') {
-    // payload: "<query> <doc>"
-    const [q, d] = u.payload.split(' ');
-    out = String(scoreVec(embed(q || '', u.seed), embed(d || '', u.seed)));
+    // payload: "<query> <document…>"
+    // ⚠ WAS `const [q, d] = payload.split(' ')`, which destructures only the
+    // FIRST TWO tokens — every word after the second was silently discarded, so
+    // a document scored against one word of itself. It did not throw and it was
+    // deterministic, so consensus settled the wrong answer happily. Caught only
+    // by a known-answer conformance test.
+    const sp = u.payload.split(' ');
+    const q = sp[0] || '';
+    const d = sp.slice(1).join(' ');
+    out = String(scoreVec(embed(q, u.seed), embed(d, u.seed)));
+  } else if (u.kind === 'matmul') {
+    // payload: "<n>" — tile size. 32 ⇒ 32³ = 32,768 MACs, a few ms in a tab.
+    const n = Math.max(4, Math.min(64, parseInt(u.payload, 10) || 32));
+    const c = matmulTile(tile(u.seed, n), tile((u.seed ^ 0x9e3779b9) >>> 0, n), n);
+    // A checksum rather than the whole tile: the digest is what gets verified,
+    // and shipping 4KB of int32 from every browser is bandwidth nobody needs.
+    // The full tile stays reproducible from (seed, n) by anyone auditing it.
+    let s = 0;
+    for (let i = 0; i < c.length; i++) s = (s + Math.imul(c[i], i + 1)) | 0;
+    out = `${n}:${s}`;
   }
   return { out, digest: (fnv1a(out, (u.seed >>> 0) || 2166136261) >>> 0).toString(16).padStart(8, '0') };
 }

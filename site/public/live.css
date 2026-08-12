@@ -725,3 +725,88 @@ body.rightnow .witem .t { font-size: 18px; }
   .wrow .wd, .wrow .wby { grid-column: 2; justify-self: start; }
   .work-row .btn { width: 100%; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE COMMONS — one section, five views.
+
+   The problem this solves: five full-height MOTUSCOMPUTE sections stacked into
+   a wall. "Busy" is not a quantity of elements, it is an absence of hierarchy —
+   everything shouting at the same volume so nothing reads as important. So:
+   ONE section, four pinned numbers, five tabs, one panel at a time.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── the pinned strip: the whole commons in four numbers ── */
+.cmn-live {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin: 22px 0 18px; padding: 16px 18px; border-radius: var(--r-sm);
+  background: radial-gradient(120% 160% at 0% 0%, rgba(34,211,238,.09), transparent 62%),
+              linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid rgba(123,227,234,.16);
+}
+.cmn-live .cl-item b {
+  display: block; font-family: 'Sora'; font-weight: 800; font-size: 1.55rem;
+  color: var(--ink); line-height: 1.1; font-variant-numeric: tabular-nums;
+}
+.cmn-live .cl-item span { display: block; margin-top: 4px; font-size: 12.5px; color: var(--ink2); }
+.cmn-live .cl-item.go b { color: var(--gold-t); text-shadow: 0 0 18px rgba(232,196,107,.5); }
+
+/* ── the tab bar ── */
+.cmn-tabs {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: 14px;
+}
+.cmn-tab {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 18px; border-radius: var(--r-xs);           /* squircle, never a pill */
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid rgba(255,255,255,.10);
+  color: var(--ink); font-family: 'Sora'; font-weight: 700; font-size: 14px;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease), transform .18s var(--ease);
+}
+.cmn-tab:hover { transform: translateY(-1px); border-color: rgba(123,227,234,.4); }
+.cmn-tab:focus-visible { outline: 2px solid var(--accent-t); outline-offset: 3px; }
+/* GLOW, never a hard highlight */
+.cmn-tab.on {
+  border-color: rgba(123,227,234,.55); color: var(--accent-t);
+  box-shadow: 0 0 0 1px rgba(123,227,234,.22), 0 0 30px -8px rgba(34,211,238,.75);
+}
+
+/* ── panels: exactly one at a time ── */
+.cmn-panel { display: none; }
+.cmn-panel.on { display: block; animation: cmnIn .42s var(--ease) both; }
+@keyframes cmnIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .cmn-panel.on { animation: none; } }
+
+.cmn-lead {
+  font-size: 16px; line-height: 1.65; color: var(--ink2);
+  margin: 0 0 16px; max-width: 62ch;
+}
+.cmn-lead b { color: var(--ink); }
+
+/* ── progressive disclosure: telemetry is available, not shoved at you ── */
+.cmn-more { margin-top: 14px; }
+.cmn-more > summary {
+  cursor: pointer; list-style: none; padding: 12px 16px; border-radius: var(--r-xs);
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09);
+  color: var(--ink); font-size: 14px; font-weight: 600;
+  transition: border-color .22s var(--ease);
+}
+.cmn-more > summary::-webkit-details-marker { display: none; }
+.cmn-more > summary::after { content: ' ▾'; color: var(--label); }
+.cmn-more[open] > summary::after { content: ' ▴'; }
+.cmn-more > summary:hover { border-color: rgba(123,227,234,.35); }
+.cmn-more > summary:focus-visible { outline: 2px solid var(--accent-t); outline-offset: 3px; }
+.cmn-more[open] > summary { margin-bottom: 12px; }
+
+@media (max-width: 900px) { .cmn-live { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) {
+  /* tabs stay one row and scroll rather than wrapping into a stack that
+     pushes the content off screen — the row itself scrolls, never the page */
+  .cmn-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .cmn-tabs::-webkit-scrollbar { display: none; }
+  .cmn-tab { padding: 9px 13px; font-size: 13px; flex: 0 0 auto; }
+  .cmn-tab span { display: none; }        /* glyph-only when space is tight */
+  .cmn-tab.on span { display: inline; }   /* except the active one, which names itself */
+  .cmn-live { padding: 13px 14px; }
+  .cmn-live .cl-item b { font-size: 1.22rem; }
+}
