@@ -520,6 +520,7 @@ try {
   localStorage.setItem('gpu.id', GPU.id);
   GPU.dash = localStorage.getItem('gpu.dash') || '';
   GPU.trust = localStorage.getItem('gpu.trust') || '';
+  GPU.pref = localStorage.getItem('gpu.pref') === 'trust' ? 'trust' : 'dash';
 } catch { GPU.id = Math.random().toString(36).slice(2, 12); GPU.dash = ''; GPU.trust = ''; }
 GPU.pool = null;
 
@@ -555,6 +556,122 @@ async function pollPayouts() {
 async function pollGolem() {
   const j = await tryJson(`${API}/api/golem?ts=${Date.now()}`, 12000);
   if (j) { GPU.golem = j; renderGolem(); }
+}
+async function pollWork() {
+  const j = await tryJson(`${API}/api/work?ts=${Date.now()}`, 8000);
+  if (j) { GPU.work = j; renderWork(); }
+}
+async function pollReceipts() {
+  const j = await tryJson(`${API}/api/receipts?node=${encodeURIComponent(GPU.id)}&ts=${Date.now()}`, 8000);
+  if (j) { GPU.receipts = j; renderReceipts(); renderGPU(); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE WORKER — rung 5. This is where a pledge stops being a promise.
+
+   ⚠ EVERY KERNEL IS INTEGER-ONLY, and imported from the SAME definition the
+   server uses. Verification works by two machines computing one unit and
+   comparing digests — which only works if the result is bit-identical across
+   vendors. JS/WebGPU float ops are NOT guaranteed identical across GPUs,
+   drivers, or instruction orderings, so a single float anywhere in here would
+   make honest machines look like liars. Integers only. No Math.random, no
+   Date, no iteration over unordered structures.
+
+   THE CONTRACT WITH THE CONTRIBUTOR:
+   · nothing runs until they press the button
+   · one press stops it dead, mid-unit
+   · closing the tab ends it
+   · it yields between units so the page never janks
+   · public work only — the payload is served publicly to anyone who asks
+   ═══════════════════════════════════════════════════════════════════════════ */
+const W = { on: false, busy: false, done: 0, last: '', timer: 0, quarantined: false };
+
+/* the kernels — identical to _motus.ts, and that is deliberate, not duplication
+   by accident. If you change one, change both, and the harness will tell you. */
+function fnv1a(s, seed = 2166136261) {
+  let h = seed >>> 0;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i) & 0xff; h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+function embedVec(text, seed, dims = 64) {
+  const v = new Array(dims).fill(0);
+  const toks = String(text).toLowerCase().split(/[^a-z0-9]+/);
+  for (const t of toks) { if (t.length < 2) continue; v[fnv1a(t, (seed >>> 0) || 2166136261) % dims]++; }
+  return v;
+}
+function isqrtI(n) {
+  if (n < 2) return n < 0 ? 0 : n;
+  let x = n, y = Math.floor((x + 1) / 2);
+  while (y < x) { x = y; y = Math.floor((x + Math.floor(n / x)) / 2); }
+  return x;
+}
+function scoreVecI(a, b) {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length && i < b.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  if (!na || !nb) return 0;
+  return Math.floor((dot * 10000) / Math.max(1, isqrtI(na) * isqrtI(nb)));
+}
+function runUnitLocal(u) {
+  let out = '';
+  if (u.kind === 'embed' || u.kind === 'canary') out = embedVec(u.payload, u.seed).join(',');
+  else if (u.kind === 'score') {
+    const sp = String(u.payload).split(' ');
+    out = String(scoreVecI(embedVec(sp[0] || '', u.seed), embedVec(sp.slice(1).join(' ') || '', u.seed)));
+  }
+  return { out, digest: (fnv1a(out, (u.seed >>> 0) || 2166136261) >>> 0).toString(16).padStart(8, '0') };
+}
+
+async function workTick() {
+  if (!W.on || W.busy || !GPU.pledged || !GPU.ok) return;
+  W.busy = true;
+  try {
+    const claim = await tryJson(`${API}/api/work?node=${encodeURIComponent(GPU.id)}&ts=${Date.now()}`, 8000);
+    if (claim && claim.quarantined) {
+      // Honest machines fail by being ABSENT, not by being confidently wrong.
+      // So this state is rare and worth explaining rather than hiding.
+      W.on = false; W.quarantined = true; renderWork(); renderGPU();
+      return;
+    }
+    const u = claim && claim.unit;
+    if (!u) { W.last = 'queue empty — nothing to compute right now'; renderWork(); return; }
+
+    const t0 = performance.now();
+    const r = runUnitLocal(u);
+    const ms = Math.round(performance.now() - t0);
+
+    const res = await fetch(`${API}/api/work`, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ node: GPU.id, unit: u.id, digest: r.digest, out: r.out.slice(0, 2000), ms }),
+    }).then((x) => x.json()).catch(() => null);
+
+    if (res && res.quarantined) { W.on = false; W.quarantined = true; }
+    else if (res && res.ok) {
+      W.done++;
+      W.last = res.settled
+        ? `unit ${u.id.slice(0, 8)} verified — agreed with an independent machine (+${res.earned} MOTUS-s)`
+        : `unit ${u.id.slice(0, 8)} computed in ${ms}ms — waiting for ${res.waitingFor} more machine(s) to agree`;
+      if (res.settled) pollReceipts();
+    } else {
+      W.last = (res && res.error) || 'the queue did not take that result';
+    }
+    renderWork(); renderGPU();
+  } catch (e) {
+    W.last = 'worker paused — ' + ((e && e.message) || 'network');
+  } finally { W.busy = false; }
+}
+
+function toggleWork() {
+  if (W.quarantined) return;
+  W.on = !W.on;
+  clearInterval(W.timer); W.timer = 0;
+  if (W.on) {
+    // A gap between units keeps the page responsive and keeps a phone cool.
+    // Grinding a viewer's battery to look busy would be the worst possible
+    // trade: they leave, and a contributor who leaves contributes nothing.
+    W.timer = setInterval(workTick, 2500);
+    workTick();
+  }
+  renderWork(); renderGPU();
 }
 /* ── number helpers: big numbers stay readable, small ones stay honest ── */
 const nfmt = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + 'B'
@@ -691,6 +808,72 @@ function renderPayouts() {
     </div>`;
 }
 
+/* ── THE WORK PANEL — the queue, and this machine's part in it ── */
+function renderWork() {
+  const el = $('#workBody'); if (!el) return;
+  const w = GPU.work || {};
+  const q = w.queue || {};
+  const canWork = GPU.ok && GPU.pledged;
+  el.innerHTML = `
+    <div class="pool-grid">
+      <div class="pool-stat"><span class="k">JOBS RUNNING</span><b class="${w.jobsRunning ? 'go' : ''}">${w.jobsRunning ? 'YES' : 'IDLE'}</b><i>${(q.open || 0) + (q.verifying || 0)} unit(s) waiting for a machine</i></div>
+      <div class="pool-stat"><span class="k">VERIFIED</span><b>${w.completed || 0}</b><i>units agreed by two independent machines</i></div>
+      <div class="pool-stat"><span class="k">YOUR UNITS</span><b>${W.done}</b><i>${W.on ? 'computing now' : 'idle'}</i></div>
+      <div class="pool-stat"><span class="k">DISPUTED</span><b>${q.disputed || 0}</b><i>machines disagreed — nobody was credited, re-issued</i></div>
+    </div>
+
+    <div class="work-row">
+      <button class="btn ${W.on ? '' : 'prime'} ${canWork && !W.quarantined ? '' : 'off'}" id="workBtn" ${canWork && !W.quarantined ? '' : 'disabled'}>
+        ${W.quarantined ? '⚠ QUARANTINED' : W.on ? '◼ STOP COMPUTING' : '▶ START COMPUTING'}
+      </button>
+      <span class="work-state ${W.on ? 'on' : ''}">${W.quarantined
+        ? 'This machine returned a wrong answer to a known-answer probe, so its results stopped counting. Reload the page to re-enrol.'
+        : !GPU.ok ? 'No WebGPU on this device — nothing to compute with.'
+        : !GPU.pledged ? 'Pledge your GPU above first, then you can take work.'
+        : W.on ? (W.last || 'claiming a unit…')
+        : 'Opt-in, again, on purpose. Pledging says available; this says go.'}</span>
+    </div>
+
+    <p class="work-fine"><b>How you know the work is real:</b> ${esc(w.verification || 'every unit is computed by two independent machines and settles only when their digests agree.')}
+      Each unit is worth <b>${w.unitsWorth || 25} MOTUS-seconds</b> × your capability — completed work is worth more than availability, because availability is a promise and a verified result is a fact.</p>
+
+    ${(w.byTask || []).length ? `<div class="ps-card" style="margin-top:14px"><div class="k">WHAT THE POOL IS ACTUALLY WORKING ON</div>
+      <ul class="kv">${w.byTask.map((t) => `<li><b>${esc(t.task)}</b><span>${t.units} unit(s) · ${t.contributors} machine(s)</span></li>`).join('')}</ul></div>` : ''}
+
+    ${(w.recent || []).length ? `<div class="ps-card" style="margin-top:12px"><div class="k">RECENTLY VERIFIED</div>
+      <div class="wlist">${w.recent.map((u) => `<div class="wrow"><span class="wk">${esc(u.kind)}</span>
+        <span class="wt">${esc(u.task)}</span><code class="wd">${esc(u.digest)}</code>
+        <span class="wby">${(u.by || []).join(' + ')}</span></div>`).join('')}</div></div>` : ''}`;
+  const b = $('#workBtn'); if (b) b.onclick = toggleWork;
+}
+
+/* ── YOUR RECEIPTS — proof of what this machine actually did ── */
+function renderReceipts() {
+  const el = $('#rcptBody'); if (!el) return;
+  const r = GPU.receipts || {};
+  const you = r.you;
+  if (!r.count) {
+    el.innerHTML = `<p class="pool-empty">No receipts yet. A receipt appears the moment one of your computed units is confirmed by an independent machine — it is proof of work completed, not of time spent.</p>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="pool-grid">
+      <div class="pool-stat"><span class="k">UNITS COMPLETED</span><b>${r.count}</b><i>verified and agreed</i></div>
+      <div class="pool-stat"><span class="k">COMPUTE TIME</span><b>${(r.computeMs / 1000).toFixed(1)}s</b><i>actual milliseconds your machine worked</i></div>
+      <div class="pool-stat"><span class="k">EARNED</span><b>${nfmt(r.motusSeconds)}</b><i>MOTUS-s from completed work</i></div>
+      ${you ? `<div class="pool-stat"><span class="k">OWED TO YOU</span><b>${(you.owed || 0).toFixed(6)}</b><i>${esc(you.unit)} · $${(you.owedUsd || 0).toFixed(2)}</i></div>` : ''}
+    </div>
+    ${(r.byTask || []).length ? `<div class="ps-card" style="margin-top:14px"><div class="k">WHAT YOU HELPED FINISH</div>
+      <ul class="kv">${r.byTask.map((t) => `<li><b>${esc(t.task)}</b><span>${t.units} unit(s) · ${(t.ms / 1000).toFixed(1)}s · ${nfmt(t.motusSeconds)} MOTUS-s</span></li>`).join('')}</ul></div>` : ''}
+    <div class="ps-card" style="margin-top:12px"><div class="k">YOUR RECEIPTS</div>
+      <div class="wlist">${(r.receipts || []).slice(0, 12).map((x) => `<div class="wrow">
+        <span class="wk">${esc(x.kind)}</span><span class="wt">${esc(x.task)}</span>
+        <code class="wd">${esc(x.digest || '—')}</code>
+        <span class="wby">${x.ms}ms · +${x.motusSeconds} MOTUS-s</span></div>`).join('')}</div>
+      <p class="work-fine">${esc(r.verified || '')} The digest is the auditable artefact — anyone can re-run the unit with the published kernel and check they get the same eight characters.</p>
+    </div>`;
+}
+
 /* ── the Golem gauge: measured on every load, never a stored claim ── */
 function renderGolem() {
   const el = $('#golemBody'); if (!el || !GPU.golem) return;
@@ -775,10 +958,43 @@ function renderGPU() {
         <button class="mini" id="gpuSave">save</button>
       </div>
       <div class="gpu-msg" id="gpuWalletMsg"></div>
+
+      <div class="rail-pick">
+        <div class="k">PAY ME IN — your choice, and only yours</div>
+        <div class="rail-opts">
+          <button class="rail-opt ${GPU.pref !== 'trust' ? 'on' : ''}" data-rail="dash">
+            <b>$DASH</b><span>~2s finality · a real off-ramp · the default</span></button>
+          <button class="rail-opt ${GPU.pref === 'trust' ? 'on' : ''}" data-rail="trust">
+            <b>$TRUST</b><span>same earned value, sent in $TRUST</span></button>
+        </div>
+        <p class="rail-fine">Both rails pay the <b>same earned value</b> — only the currency differs, and the $5 floor is applied in USD either way, so choosing $TRUST never means waiting longer.
+        <br><b>⚠ To be exact about what $TRUST is here:</b> the operator <b>transfers $TRUST they already hold</b>. It is a payment in your currency of choice. It is <b>not</b> protocol emissions — Intuition emissions go only to veTRUST bonders and cannot be earned for off-chain work by anyone, ever. Nobody should tell you otherwise.</p>
+      </div>
+
       <p class="gpu-warn">⚠ Paste an <b>address</b>, never a private key or a seed phrase. The server refuses anything shaped like a key — but nothing should ever ask you for one, here or anywhere.</p>
     </div>`;
   const b = $('#gpuBtn'); if (b) b.onclick = pledgeGPU;
   const s = $('#gpuSave'); if (s) s.onclick = saveWallets;
+  $$('#gpuBody .rail-opt').forEach((o) => { o.onclick = () => setRail(o.dataset.rail); });
+}
+
+async function setRail(rail) {
+  const msg = $('#gpuWalletMsg');
+  const r = await fetch(`${API}/api/compute`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id: GPU.id, tier: 'tab', payoutPref: rail }),
+  }).then((x) => x.json()).catch(() => null);
+  if (r && r.ok) {
+    GPU.pref = rail;
+    try { localStorage.setItem('gpu.pref', rail); } catch {}
+    if (msg) { msg.className = 'gpu-msg ok'; msg.textContent = `Saved — you will be paid in ${rail === 'trust' ? '$TRUST' : '$DASH'}.`; }
+    renderGPU(); pollPool();
+  } else if (msg) {
+    // The refusal that matters: choosing a rail you have no address for would
+    // strand the balance forever, so it is refused with the reason.
+    msg.className = 'gpu-msg bad';
+    msg.textContent = (r && r.error) || 'could not set that rail';
+  }
 }
 
 /* ═══ BUILD THE UI ═══ */
@@ -898,6 +1114,8 @@ addEventListener('DOMContentLoaded', () => {
   // numbers that did not move. Golem's API is also somebody else's server.
   pollPayouts(); setInterval(pollPayouts, 60000);
   pollGolem(); setInterval(pollGolem, 300000);
+  pollWork(); setInterval(pollWork, 15000);
+  pollReceipts(); setInterval(pollReceipts, 30000);
   pollLive(); pollCrowd();
   setInterval(pollLive, 9000);
   setInterval(pollCrowd, 12000);

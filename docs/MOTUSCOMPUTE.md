@@ -10,22 +10,29 @@ streamed — and a document that is equally clear about what it does **not** do.
 
 ## ⚠ Status, first, in plain words
 
-**Rung 4 of 5. Contribution is measured, attributed and accrued. The payout
-engine is built and tested. No jobs are dispatched. No money has been sent.**
+**All 5 rungs live. Work is dispatched, computed and VERIFIED; contributors get
+receipts. The payout engine is built and tested on both rails. No money has been
+sent yet — `moneyMoved: false` is the live proof.**
 
-`GET /api/compute` returns `jobsRunning: false` in every single response. That
-field is hard-coded, not computed, so no surface anywhere can imply work is
-happening when it is not.
+`jobsRunning` on `/api/work` is **computed from the queue** — true when units are
+open or verifying, false when they are not. For rungs 1–4 it was deliberately
+hard-coded `false` so that no surface could imply work was happening while
+dispatch was unbuilt. It earned the right to be true.
 
-If you pledge a machine today, what actually happens is: your browser's WebGPU
-capability is measured, that measurement plus an optional payout address is
-recorded in a public ledger, and you appear in the pool. **That is the whole
-current behaviour.** It is a real thing — a pool exists, it is visible, it is
-yours — and it is not yet compute.
+If you pledge a machine today and press **START COMPUTING**, what actually
+happens is: your browser claims a unit, computes it with integer-only math,
+submits a digest, and an independent machine computes the same unit. If the two
+digests agree the unit settles, both machines are credited, and **you get a
+receipt** naming the unit, the task it fed, and the digest you can re-verify
+yourself.
+
+What has *not* happened is payment. The payout engine is built and tested on
+both rails, but no batch has been armed and sent — `moneyMoved: false` on
+`/api/payouts` is the live proof, and it will flip the day that changes.
 
 Being straight about this is the point. A compute-donation page that implies
-your GPU is spinning when it is not is the exact failure this project is built
-to avoid.
+your GPU is spinning when it is not — or that money moved when it did not — is
+the exact failure this project is built to avoid.
 
 ---
 
@@ -37,7 +44,7 @@ to avoid.
 | 2 | Pledge ledger — record contributions and payout addresses | ✅ live |
 | 3 | Telemetry — per-DJ/per-mode attribution, hourly history, accrual | ✅ live |
 | 4 | Settlement — plan → arm → settle, idempotent, publicly audited | ✅ **live, unarmed** |
-| **5** | **Dispatch — real WASM/WebGPU work units, verified** | 🔨 **next** |
+| 5 | Dispatch — real work units, verified by consensus + canaries | ✅ live |
 
 **Rung 4 before rung 5 is deliberate.** The accounting exists before the work
 does, so that when the first job runs there is already a tested, auditable,
@@ -91,24 +98,31 @@ every viewer-triggered job eats a 60–120 second cold start *on camera*.
 
 | Job | Rail | Why |
 |---|---|---|
-| **Reward** | **$DASH** | ~2s InstantSend finality, median fee **$0.000069**, and a real off-ramp |
-| **Receipt** | **$TRUST** attestation | permanent public record that you contributed |
+| **Reward — default** | **$DASH** | ~2s InstantSend finality, median fee **$0.000069**, a real off-ramp |
+| **Reward — by choice** | **$TRUST transfer** | same earned value, sent from the operator's own holdings |
+| **Receipt** | **$TRUST attestation** | permanent public record that you contributed; zero value moved |
 | **Meaning** | **MOTUS** | the move itself, on our own rails |
 
-**⚠ The correction that matters most: you cannot earn $TRUST for donated
-compute, and we will never say that you can.** $TRUST emissions go to veTRUST
-bonders — locked stakers — not to off-chain contributors. Any page saying "lend
-your GPU, earn $TRUST" is factually wrong under current mechanics *and* is a
-yield-flavored promise about a traded asset. **TRUST is the receipt. DASH is the
-reward. Never the reverse.**
+**⚠ The distinction that matters, stated exactly.** There are three different
+things people mean by "$TRUST" here and only one of them was ever false:
 
-What Intuition *does* give us is genuinely valuable: `deposit(receiver =
-contributor)` credits **the contributor** with shares while **we** pay the gas.
-No viewer wallet, no signature, no gas token, no seed phrase. A gift, correctly
-modeled. The canonical `contributed to` predicate already exists on-chain with
-49 triples — we reuse it rather than minting a competing one, so the attestation
-is legible to the rest of the graph. Cost: **~0.1 TRUST ≈ $0.0051 per triple**,
-about **$2.57** for a 500-viewer stream.
+- **❌ Emissions** — "lend your GPU, earn $TRUST from the protocol." Wrong.
+  Emissions go to **veTRUST bonders**, never to off-chain contributors. It is
+  also a yield-flavored promise about a traded asset, which is worse than merely
+  wrong. **We never say it.**
+- **✅ Transfer** — "get paid in $TRUST if you prefer." Shipped. The operator
+  sends $TRUST they already hold to whoever picked that rail. An ordinary
+  payment in a currency of choice.
+- **✅ Attestation** — a permanent record of contribution. No value moves, and
+  that is the point: it is a receipt, not a reward.
+
+What Intuition *does* give us for the attestation is genuinely valuable:
+`deposit(receiver = contributor)` credits **the contributor** with shares while
+**we** pay the gas. No viewer wallet, no signature, no gas token, no seed
+phrase. A gift, correctly modeled. The canonical `contributed to` predicate
+already exists on-chain with 49 triples — we reuse it rather than minting a
+competing one, so the attestation is legible to the rest of the graph. Cost:
+**~0.1 TRUST ≈ $0.0051 per triple**, about **$2.57** for a 500-viewer stream.
 
 ---
 
@@ -123,7 +137,9 @@ never a speed-up of her. Anyone claiming otherwise is selling something.
 garbage, or nothing, and claim payment. This is *the* problem of volunteer
 computing, older than crypto. Redundant execution with agreement checks and
 spot-audited canary units is the answer; paying for unverified work is a fraud
-faucet. This is why rung 3 is hard and why it is not shipped yet.
+faucet. **This is now built** — every unit is computed twice and settles only on
+agreement, and ~1 in 6 is a known-answer canary the client cannot identify. See
+[`DISPATCH.md`](DISPATCH.md), which also lists where it is still thin.
 
 **③ You cannot send private work to strangers' machines.** Published attacks
 (ACM CCS 2025) reconstruct original prompts from the intermediate activations

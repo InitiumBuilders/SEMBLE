@@ -79,17 +79,22 @@ signed on the operator's own node.
 |---|---|---|
 | 1 | Capability probe — measure what the browser can really do | ✅ live |
 | 2 | Pledge ledger — record contributions and payout addresses | ✅ live |
-| **3** | **Telemetry — per-DJ/per-mode attribution, hourly history, accrual** | ✅ **live** |
-| **4** | **Payout engine — plan → arm → settle, idempotent, audited** | ✅ **live, unarmed** |
-| 5 | **Dispatch** — real verified work units | 🔨 not built |
+| 3 | Telemetry — per-DJ/per-mode attribution, hourly history, accrual | ✅ live |
+| 4 | Payout engine — plan → arm → settle, idempotent, audited | ✅ live, unarmed |
+| **5** | **Dispatch — real verified work units + receipts** | ✅ **live** |
 
-Read rung 4 carefully: **the payout engine works and has been tested end to end,
-including replay-safety. No money has been sent.** `moneyMoved: false` on
-`/api/payouts` is the live proof, and it will flip the day a real batch settles.
+**All five rungs are up.** Read rung 4 carefully though: the payout engine works
+and is tested end to end including replay-safety, but **no money has been sent.**
+`moneyMoved: false` on `/api/payouts` is the live proof, and it flips the day a
+real batch settles.
 
-Rung 5 is last on purpose. Paying for work you cannot verify is a fraud faucet,
-so dispatch waits for redundant execution and canary auditing — not the other
-way round.
+Rung 5 came last on purpose. Paying for work you cannot verify is a fraud
+faucet, so dispatch waited for consensus checking and canary auditing to exist
+first — not the other way round. `jobsRunning` is now **computed** from the
+queue rather than hard-coded, because it finally earned the right to be true.
+
+Full design, including everything about it that is still weak:
+[`DISPATCH.md`](DISPATCH.md).
 
 ---
 
@@ -99,10 +104,21 @@ way round.
    data centres. No mechanism exists at any price. Lent GPUs run open-weight
    models, render worlds, and crunch public research. Saying otherwise would be
    the easiest lie available, so the copy says exactly this instead.
-2. **Say "earn $TRUST".** Emissions go to veTRUST bonders, not to off-chain
-   contributors. **TRUST is the receipt; DASH is the reward.**
+2. **Say contributors "earn $TRUST" from the protocol.** Emissions go to veTRUST
+   bonders, never to off-chain work. ⚠ But **being *paid* in $TRUST is real and
+   shipped** — the operator transfers $TRUST they already hold to anyone who
+   picks that rail. Same earned value, their currency. The distinction between
+   *emissions* and a *transfer* is the whole thing: [`PAYOUTS.md`](PAYOUTS.md#the-three-things-trust-can-be--and-only-one-of-them-was-ever-false).
 3. **Hold a private key in a web service.** `/api/payouts` plans, arms and
    audits. It cannot sign. That is structural, not a policy.
+
+## And the one thing we refuse to pay for
+
+**Unverified work.** Every unit is computed by two independent machines and
+settles only when they agree; a disagreement credits **nobody**. Roughly 1 unit
+in 6 is a known-answer canary the client cannot identify, and failing one
+quarantines the node on the spot. Details, including where this is still thin:
+[`DISPATCH.md`](DISPATCH.md).
 
 ---
 

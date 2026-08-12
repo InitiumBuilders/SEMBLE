@@ -265,6 +265,94 @@ whether it could be matched against live supply. It never signs.
 
 ---
 
+## `GET /api/work` — the dispatch queue
+
+Public. `?node=<id>` claims the next unit that node has not already computed.
+
+```jsonc
+// public queue view
+{
+  "jobsRunning": true,          // ⚠ COMPUTED from the queue, no longer hard-coded
+  "queue": { "open": 2, "verifying": 3, "done": 1, "disputed": 1 },
+  "completed": 1, "unitsWorth": 25, "need": 2, "quarantined": 1,
+  "byTask": [ { "task": "Index the Motus corpus", "units": 1, "contributors": 2 } ],
+  "verification": "Every unit is computed independently by 2 machines and settles only when their digests agree…",
+  "recent": [ { "id": "u…", "kind": "embed", "task": "…", "digest": "edce4537", "by": ["honest", "hones2"] } ]
+}
+
+// ?node=… — a claim
+{ "unit": { "id": "u…", "kind": "embed", "payload": "…", "seed": 2654435761, "task": "…" },
+  "queue": 5, "ttlMs": 120000 }
+```
+
+⚠ **The client is never told which units are canaries.** That is the point — a
+probe you can recognise is a probe you can pass.
+
+A quarantined node gets `{ unit: null, quarantined: true, why: "…" }`.
+
+## `POST /api/work` — submit a result, or enqueue (operator)
+
+**Submit:** `{ node, unit, digest, out, ms }`
+
+| Outcome | Meaning |
+|---|---|
+| `{ status: "verifying", waitingFor: 1 }` | recorded, awaiting an independent machine |
+| `{ status: "done", settled: true, earned }` | digests agreed — both machines credited, receipts written |
+| `{ status: "disputed" }` | machines disagreed — **nobody credited**, unit re-issued with `need` raised |
+| `403 { quarantined: true }` | failed a known-answer canary; results no longer counted |
+| `{ already: true }` | duplicate submission — ignored, never double-credited |
+
+**Enqueue** (operator, `x-live-secret`):
+`{ op: "enqueue", task, kind: "embed"|"score", chunks: [ … ] }`
+→ `{ enqueued, canaries, queue }`. Seeds are derived from content and index,
+never random, so the ledger is reproducible from its own contents.
+
+## `DELETE /api/work` — operator only
+
+Drops unfinished units. **Receipts are kept** — the queue is the operator's, the
+receipt is the contributor's, and one must never be able to erase the other's
+proof. → `{ dropped, receiptsKept }`
+
+---
+
+## `GET /api/receipts` — proof of completed work
+
+Public. `?node=<id>` scopes it to one machine.
+
+```jsonc
+{
+  "what": "A receipt is proof that a specific unit of work was computed on a specific machine, checked against an independent machine, and agreed.",
+  "count": 1, "motusSeconds": 147.5, "computeMs": 14,
+  "byTask": [ { "task": "Index the Motus corpus", "units": 1, "motusSeconds": 147.5, "ms": 14 } ],
+  "receipts": [ { "id": "r…", "node": "honest", "unit": "u…", "kind": "embed",
+                  "task": "…", "ts": …, "ms": 14, "agreed": true,
+                  "motusSeconds": 147.5, "dj": "daoz", "digest": "edce4537" } ],
+  "you": { "unitsCompleted": 1, "open": 147.5, "payoutPref": "dash",
+           "owed": 0.0000826, "unit": "$DASH", "owedUsd": 0.00,
+           "quarantined": false, "note": "…" }
+}
+```
+
+The `digest` is the auditable artefact — **anyone can re-run the unit with the
+published kernel and check they get the same eight hex characters.**
+
+---
+
+## Choosing a payout rail
+
+`POST /api/compute` accepts `payoutPref: "dash" | "trust"`.
+
+⚠ Choosing a rail you have no address for is **refused with the reason** —
+accepting it silently would strand the balance forever:
+
+> *Add a $TRUST (EVM) receiving address first — otherwise a TRUST balance would
+> have nowhere to go.*
+
+Both rails pay the **same earned value**; the $5 floor is applied in USD on
+both. See [`PAYOUTS.md`](PAYOUTS.md#the-rail-is-the-contributors-choice-never-the-operators).
+
+---
+
 ## Storage
 
 All three routes persist through [`_blob.ts`](../site/app/api/_blob.ts) using

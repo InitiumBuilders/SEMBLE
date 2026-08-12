@@ -28,6 +28,7 @@ working model of the system concept its DJ is named for.
 | [`docs/VISUALS.md`](docs/VISUALS.md) | The render engine, all eleven worlds, and how to add one |
 | [`docs/API.md`](docs/API.md) | Every endpoint, every field, every limit |
 | [`docs/MOTUSCOMPUTE.md`](docs/MOTUSCOMPUTE.md) | The shared-compute protocol — including what it does **not** do yet |
+| [`docs/DISPATCH.md`](docs/DISPATCH.md) | Rung 5 — how work is verified, and every place we assumed you might be lying |
 | [`docs/PAYOUTS.md`](docs/PAYOUTS.md) | How compute becomes money, and why we made that harder on purpose |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | The threat model, the privacy model, and the scrub gate |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to add a world, a DJ, or a fix |
@@ -47,12 +48,16 @@ site/
 │     │                        hourly history, accrual
 │     ├─ payouts/route.ts      the payout engine: plan → arm → settle, idempotent
 │     ├─ golem/route.ts        Golem requestor adapter + LIVE supply gauge
+│     ├─ work/route.ts         rung 5 dispatch: claim, verify by consensus,
+│     │                        canary probes, quarantine
+│     ├─ receipts/route.ts     proof of completed work, per machine
 │     ├─ _motus.ts             shared model: types, units, accrual math
 │     └─ _blob.ts              fresh-path Blob storage (see ARCHITECTURE §3)
 └─ public/
    ├─ pantheon.js              the canon: 11 DJs, 5 powers   (data, no logic)
    ├─ viz.js                   the render engine: 11 worlds + overlays
-   └─ live.js                  the vibe engine: stream cycler, state, telemetry UI
+   └─ live.js                  the vibe engine: stream cycler, state, telemetry UI,
+                               and the integer-only compute worker
 ```
 
 **`_motus.ts` is the single source of truth for units and money math.** The
@@ -108,16 +113,20 @@ in [`docs/SECURITY.md`](docs/SECURITY.md).
   → settle is complete and **verified end to end against production, including
   replay-safety** (a repeated `settle` cannot double-credit). **No money has been
   sent.** `moneyMoved: false` on `/api/payouts` is the live proof.
-- 🔨 **Not built:** job dispatch (rung 5). **No work is dispatched.**
-  `GET /api/compute` returns `jobsRunning: false` in every response — hard-coded,
-  not computed — so no surface can drift into implying otherwise.
+- ✅ **Live:** job dispatch (rung 5). Real integer-only work units go to pledged
+  browsers, are computed by **two independent machines**, and settle only when
+  their digests agree. ~1 unit in 6 is a known-answer canary; failing one
+  quarantines the node. `jobsRunning` is now **computed** from the queue.
+  Contributors get **receipts** with an auditable digest anyone can re-verify.
 - ⚠ **Wired but structurally unusable:** Golem. The requestor adapter is real and
   a **live gauge measures Golem's own API on every request**. It reports what is
   actually there: ~370 providers and **zero GPUs**. A livestream viewer cannot
   contribute through Golem at all. Receipts in
   [`docs/MOTUSCOMPUTE.md`](docs/MOTUSCOMPUTE.md#-what-we-ruled-out-and-why).
-- ❌ **Corrected and removed:** any suggestion that contributors can earn $TRUST.
-  Emissions go to veTRUST bonders. **TRUST is the receipt; DASH is the reward.**
+- ⚖ **$TRUST, stated precisely:** contributors cannot **earn** $TRUST from the
+  protocol (emissions go to veTRUST bonders) — but they **can choose to be paid**
+  in $TRUST, transferred from the operator's own holdings. Same earned value,
+  their currency. Emissions vs transfer is the distinction that matters.
 
 Part of the [Motus](https://www.motusmoves.us) ecosystem · with
 [Davara](https://www.motusmoves.us/davara), the systems mind.

@@ -21,7 +21,7 @@
 // The RESULT of every batch is public: /api/payouts GET is the audit log.
 import { freshRead, freshWrite } from '../_blob';
 import {
-  MOTUS, EMPTY_LEDGER, owedDash, settleable, shortAddr, MAX_PAYOUTS,
+  MOTUS, EMPTY_LEDGER, owedDash, owedOnRail, settleable, shortAddr, MAX_PAYOUTS, TRUST_USD,
   type Ledger, type Node, type Payout,
 } from '../_motus';
 
@@ -51,12 +51,20 @@ function hydrate(l: Partial<Ledger> | null): Ledger {
   return led;
 }
 
-/** Who is owed, and does it clear the off-ramp floor? Pure — no state change. */
-function plan(led: Ledger, rail: 'dash' | 'trust', rate: number, dashUsd: number) {
+/** Who is owed, and does it clear the off-ramp floor? Pure — no state change.
+ *
+ *  ⚠ RAIL SELECTION IS THE CONTRIBUTOR'S CHOICE, NOT THE OPERATOR'S.
+ *  A node carries `payoutPref`. A batch on the `dash` rail pays everyone who
+ *  chose dash (plus anyone who expressed no preference but gave a dash
+ *  address); a `trust` batch pays those who chose trust. Nobody is silently
+ *  moved onto a rail they did not pick — being paid in an asset you did not
+ *  choose is its own kind of harm. */
+function plan(led: Ledger, rail: 'dash' | 'trust', rate: number, dashUsd: number, trustUsd = TRUST_USD) {
   const addrOf = (n: Node) => (rail === 'dash' ? n.dash : n.trust);
+  const prefOf = (n: Node) => ((n as unknown as { payoutPref?: string }).payoutPref === 'trust' ? 'trust' : 'dash');
   const eligible = led.nodes
     .map((n) => ({ n, open: Math.round((n.accrued - n.paid) * 1000) / 1000 }))
-    .filter((x) => x.open > 0 && addrOf(x.n));
+    .filter((x) => x.open > 0 && addrOf(x.n) && prefOf(x.n) === rail);
 
   // Aggregate by ADDRESS, not by node — one contributor may lend several
   // machines, and paying each separately burns the floor for no reason.
@@ -71,21 +79,27 @@ function plan(led: Ledger, rail: 'dash' | 'trust', rate: number, dashUsd: number
   }
 
   const rows = [...byAddr.entries()].map(([address, e]) => {
-    const amount = owedDash(e.motusSeconds, rate);
+    // Same earned VALUE, expressed in the currency they chose. The floor is
+    // applied in USD for both rails, so choosing TRUST never means waiting
+    // longer (or shorter) for the same work.
+    const usd = Math.round(e.motusSeconds * rate * dashUsd * 100) / 100;
+    const amount = owedOnRail(e.motusSeconds, rail, rate, dashUsd, trustUsd);
     return {
       address, short: shortAddr(address),
       motusSeconds: Math.round(e.motusSeconds * 1000) / 1000,
-      amount, usd: Math.round(amount * dashUsd * 100) / 100,
+      amount, usd, unit: rail === 'trust' ? '$TRUST' : '$DASH',
       nodes: e.nodes.length,
       topDj: Object.entries(e.djs).sort((a, b) => b[1] - a[1])[0]?.[0] || '',
-      clears: rail === 'trust' ? true : settleable(e.motusSeconds, dashUsd, rate),
+      clears: usd >= MOTUS.MIN_SETTLE_USD,
     };
   }).sort((a, b) => b.amount - a.amount);
 
   const paying = rows.filter((r) => r.clears);
   const held = rows.filter((r) => !r.clears);
   return {
-    rail, rate, dashUsd,
+    rail, rate, dashUsd, trustUsd,
+    unit: rail === 'trust' ? '$TRUST' : '$DASH',
+    kind: rail === 'trust' ? 'transfer' : 'payment',
     recipients: paying.length,
     total: Math.round(paying.reduce((a, r) => a + r.amount, 0) * 1e8) / 1e8,
     totalUsd: Math.round(paying.reduce((a, r) => a + r.usd, 0) * 100) / 100,
@@ -97,6 +111,16 @@ function plan(led: Ledger, rail: 'dash' | 'trust', rate: number, dashUsd: number
     sendmany: rail === 'dash'
       ? Object.fromEntries(paying.map((r) => [r.address, r.amount]))
       : null,
+    // For the TRUST rail the operator sends ERC-20 transfers from their OWN
+    // holdings. Emitting the exact recipient/amount list keeps that step
+    // mechanical too — and makes plain that this is a transfer of an asset the
+    // operator already owns, never anything minted or emitted.
+    transfers: rail === 'trust'
+      ? paying.map((r) => ({ to: r.address, amount: r.amount, unit: '$TRUST' }))
+      : null,
+    funding: rail === 'trust'
+      ? 'Funded from the operator\'s own $TRUST holdings. This is a payment in the contributor\'s chosen currency — NOT protocol emissions, which go only to veTRUST bonders and can never be earned for off-chain work.'
+      : 'Funded from the operator\'s capped hot wallet, signed on their own node.',
   };
 }
 
@@ -154,7 +178,7 @@ export async function GET(req: Request) {
       sent: sent.filter((p) => p.rail === r).length,
       amount: Math.round(sent.filter((p) => p.rail === r).reduce((a, p) => a + p.amount, 0) * 1e8) / 1e8,
       note: r === 'trust'
-        ? 'TRUST is the RECEIPT, never the reward. Contributors cannot earn $TRUST for off-chain work — emissions go to veTRUST bonders. Amount is always 0 by design.'
+        ? '$TRUST as a PAYOUT CHOICE: the operator transfers $TRUST they already hold to contributors who chose that rail — same earned value, their currency. ⚠ This is NOT protocol emissions: Intuition emissions go only to veTRUST bonders and can never be earned for off-chain work. Separately, a $TRUST ATTESTATION is a permanent receipt of contribution and transfers no value at all.'
         : 'DASH is the reward rail: ~2s InstantSend, median fee $0.000069.',
     })),
 
@@ -180,6 +204,7 @@ export async function POST(req: Request) {
   const rail: 'dash' | 'trust' = b.rail === 'trust' ? 'trust' : 'dash';
   const rate = Number(b.rate) > 0 ? Number(b.rate) : MOTUS.DASH_PER_MOTUS_SECOND;
   const dashUsd = Number(b.dashUsd) > 0 ? Number(b.dashUsd) : MOTUS.DASH_USD;
+  const trustUsd = Number(b.trustUsd) > 0 ? Number(b.trustUsd) : TRUST_USD;
   const dj = String(b.dj || 'all').slice(0, 24);
   const mode = String(b.mode || 'all').slice(0, 16);
 
@@ -187,13 +212,13 @@ export async function POST(req: Request) {
 
   // ── 1 · PLAN — pure dry run, no state change, nothing armed ──────────────
   if (op === 'plan') {
-    const p = plan(led, rail, rate, dashUsd);
+    const p = plan(led, rail, rate, dashUsd, trustUsd);
     return Response.json({ ok: true, op: 'plan', dryRun: true, ...p }, { headers: CORS });
   }
 
   // ── 2 · ARM — freeze an immutable batch and emit the sendmany spec ───────
   if (op === 'arm') {
-    const p = plan(led, rail, rate, dashUsd);
+    const p = plan(led, rail, rate, dashUsd, trustUsd);
     if (!p.recipients) {
       return Response.json({
         ok: false, op: 'arm', error: 'nothing clears the floor yet',
@@ -204,10 +229,11 @@ export async function POST(req: Request) {
     const rec: Payout = {
       id: batchId, batchId, ts: Date.now(), rail, status: 'armed',
       recipients: p.recipients, motusSeconds: p.motusSeconds,
-      amount: rail === 'dash' ? p.total : 0,
-      rate, dashUsd, dj, mode, txid: '',
+      amount: p.total,                                  // real value on BOTH rails now
+      rate, dashUsd, unitUsd: rail === 'trust' ? trustUsd : dashUsd,
+      dj, mode, txid: '',
       note: rail === 'trust'
-        ? 'attestation batch — receipt only, no value transferred'
+        ? `armed — ${p.recipients} $TRUST transfer(s) from the operator's own holdings`
         : `armed for ${p.recipients} recipient(s)`,
     };
     led.payouts.push(rec);
@@ -239,7 +265,7 @@ export async function POST(req: Request) {
     }
 
     // Mark the contributing nodes paid, up to what the batch actually covered.
-    const p = plan(led, rec.rail, rec.rate, rec.dashUsd);
+    const p = plan(led, rec.rail, rec.rate, rec.dashUsd, rec.unitUsd || TRUST_USD);
     const payingAddrs = new Set(p.paying.map((r) => r.address));
     let settled = 0;
     for (const n of led.nodes) {
@@ -272,7 +298,7 @@ export async function POST(req: Request) {
 
   // ── dry-run record — log a plan without arming it ────────────────────────
   if (op === 'record-dry-run') {
-    const p = plan(led, rail, rate, dashUsd);
+    const p = plan(led, rail, rate, dashUsd, trustUsd);
     led.payouts.push({
       id: `d${Date.now().toString(36)}`, batchId: `d${Date.now().toString(36)}`,
       ts: Date.now(), rail, status: 'dry-run', recipients: p.recipients,

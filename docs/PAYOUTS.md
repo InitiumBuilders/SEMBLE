@@ -117,27 +117,53 @@ returns a single machine's full history, including which DJs it contributed to.
 | **Reward** | **$DASH** | ~2s InstantSend finality, negligible fee, a real off-ramp |
 | **Receipt** | **$TRUST** attestation | permanent public record of the contribution |
 
-### ⚠ Contributors cannot earn $TRUST. We will not say they can.
+### The three things $TRUST can be — and only one of them was ever false
 
-$TRUST emissions go to **veTRUST bonders** — locked stakers — **not** to
-off-chain contributors. So "lend your GPU, earn $TRUST" is:
+This distinction is the whole thing, and it is worth being exact about because
+an earlier version of these docs was too blunt and ruled out a legitimate option
+along with the illegitimate one.
 
-1. **factually wrong** under current mechanics, and
-2. a **yield-flavored promise about a traded asset**, which is worse.
+**❌ EMISSIONS — "lend your GPU, earn $TRUST from the protocol."**
+Factually wrong. Intuition emissions go to **veTRUST bonders** — locked stakers
+— never to off-chain contributors. It is also a yield-flavored promise about a
+traded asset, which is worse than merely wrong. **We never say this, anywhere.**
 
-The `trust` rail therefore always records `amount: 0`, by design, and the API
-carries the correction in its own payload so no client can render it wrong:
+**✅ TRANSFER — "get paid in $TRUST if you prefer."**
+Completely honest and now **shipped**. The operator holds $TRUST and sends it to
+a contributor who chose that rail. It is an ordinary payment in a currency of
+choice, funded from the operator's own holdings, never minted and never promised
+as yield. The plan emits the exact recipient list and stamps the funding source:
 
-> *"TRUST is the RECEIPT, never the reward. Contributors cannot earn $TRUST for
-> off-chain work — emissions go to veTRUST bonders. Amount is always 0 by design."*
+```jsonc
+"kind": "transfer",
+"transfers": [ { "to": "0x…", "amount": 1222.06, "unit": "$TRUST" } ],
+"funding": "Funded from the operator's own $TRUST holdings. … NOT protocol emissions."
+```
 
-What Intuition genuinely offers is better than a fake yield:
+**✅ ATTESTATION — a permanent public record that you contributed.**
+Zero value transferred, and that is the point: it is a receipt, not a reward.
 `deposit(receiver = contributor)` credits **the contributor** with shares while
-**we** pay the gas. No viewer wallet, no signature, no gas token, no seed
-phrase. A gift, correctly modeled. Cost is ~0.1 TRUST (**≈ $0.0051**) per
-attestation, and the canonical `contributed to` predicate already exists
-on-chain — we reuse it rather than minting a competitor, so the record is
-legible to the rest of the graph.
+**we** pay the gas — no viewer wallet, no signature, no gas token, no seed
+phrase. Cost ~0.1 TRUST (**≈ $0.0051**). The canonical `contributed to`
+predicate already exists on-chain, so we reuse it rather than minting a
+competitor and the record stays legible to the rest of the graph.
+
+### The rail is the contributor's choice, never the operator's
+
+Each node carries `payoutPref`. A `dash` batch pays those who chose DASH; a
+`trust` batch pays those who chose TRUST. **Nobody is silently moved onto a rail
+they did not pick** — being paid in an asset you did not choose is its own kind
+of harm.
+
+Both rails pay the **same earned value**, and the $5 floor is applied **in USD**
+on both, so choosing $TRUST never means waiting longer for the same work.
+
+⚠ Choosing a rail you have no address for is **refused**, with the reason —
+silently accepting "pay me in TRUST" from someone with no EVM address would
+strand their balance forever:
+
+> *Add a $TRUST (EVM) receiving address first — otherwise a TRUST balance would
+> have nowhere to go.*
 
 ---
 

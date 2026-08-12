@@ -62,6 +62,7 @@ function hydrate(l: Partial<Ledger> | null): Ledger {
     byMode: n.byMode && typeof n.byMode === 'object' ? n.byMode : {},
     accrued: Number(n.accrued) || 0,
     paid: Number(n.paid) || 0,
+    payoutPref: n.payoutPref === 'trust' ? 'trust' : 'dash',
   }));
   // buckets written before motusSeconds existed carry 0 rather than a bad
   // derived value — an honest gap beats a confident wrong number
@@ -223,7 +224,8 @@ export async function POST(req: Request) {
     n = {
       id, tier, vendor: clean(b.vendor, 40), arch: clean(b.arch, 40), klass: clean(b.klass, 20),
       maxBufferMB: num(b.maxBufferMB, 65536), invocations: num(b.invocations, 8192),
-      features: [], dash: '', trust: '', first: now, last: now, seconds: 0,
+      features: [], dash: '', trust: '', payoutPref: 'dash',
+      first: now, last: now, seconds: 0,
       byDj: {}, byMode: {}, accrued: 0, paid: 0,
     };
     led.nodes.push(n);
@@ -240,6 +242,22 @@ export async function POST(req: Request) {
   if (Array.isArray(b.features)) n.features = b.features.slice(0, 16).map((f: unknown) => clean(f, 32)).filter(Boolean);
   if (dashRaw) n.dash = dashRaw;
   if (trustRaw) n.trust = trustRaw;
+  // The contributor picks their rail. Refuse to set a preference they cannot
+  // actually be paid on — silently accepting "pay me in TRUST" from someone
+  // with no EVM address would strand their balance forever.
+  if (b.payoutPref === 'trust' || b.payoutPref === 'dash') {
+    const want = b.payoutPref as 'trust' | 'dash';
+    const have = want === 'trust' ? n.trust : n.dash;
+    if (have) n.payoutPref = want;
+    else {
+      return Response.json({
+        ok: false,
+        error: want === 'trust'
+          ? 'Add a $TRUST (EVM) receiving address first — otherwise a TRUST balance would have nowhere to go.'
+          : 'Add a $DASH receiving address first.',
+      }, { status: 400, headers: CORS });
+    }
+  }
 
   // Pledged seconds are clamped per beat so a client cannot inflate its record.
   const add = num(b.seconds, 120);
