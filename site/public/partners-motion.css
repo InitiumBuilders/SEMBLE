@@ -92,7 +92,8 @@
   box-shadow: var(--nn-raise);
 }
 .pc-pillars li:last-child { grid-column: 1 / -1; }
-.pc-pillars .pi { font-size: 19px; line-height: 1.2; margin-bottom: 3px; }
+/* holds a drawn mark now, not a glyph — so it centres as a box, not as text */
+.pc-pillars .pi { display: flex; justify-content: center; margin-bottom: 7px; }
 .pc-pillars b { font-size: 13.5px; color: var(--ink); }
 .pc-pillars i { font-style: normal; font-size: 12px; color: var(--ink2); }
 .pc-pillars li:last-child i { color: var(--gold-t); }

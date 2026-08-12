@@ -150,3 +150,88 @@ Two rules travel with them:
 2. **Audit contrast after, not before.** Compute the ratios — the whole point of
    a low-contrast aesthetic is that it *looks* fine while failing. Eyeballing is
    how neumorphism becomes unreadable.
+
+---
+
+## The mark system
+
+Ten symbols — bolt, diamond, orbit, spark, hex, check, arc, shield, cycle,
+frame — defined once as an inline SVG sprite and referenced with `<use>`.
+
+They replaced a mix that had grown on the partner pages: emoji (✊ 🛡 ✅ 🔨 ⚡)
+sitting directly beside geometric glyphs (◎ ⟳ ◈ ✦ ⬡). That mix reads as two
+different products stapled together, because it *is* two different rendering
+systems — emoji are colour bitmaps the reader's OS supplies and restyles, and
+they cannot be given a palette hue.
+
+The rules:
+
+1. **One stroke weight** (1.7px on a 24px viewBox), one corner treatment.
+2. **`currentColor` always.** A mark takes the hue of the thing it means:
+   `.m-cyan` compute, `.m-violet` open rails, `.m-gold` systems design and the
+   in-progress arc, `.m-zao` The ZAO's heat.
+3. **Inlined, never linked.** A cross-document `<use>` is one more request that
+   can fail, and a missing mark is a hole in the page.
+4. **Never load-bearing.** Every mark sits beside a text label that says the
+   same thing. Removing the whole sprite must lose decoration, not meaning.
+
+### When a glyph is fine
+
+Not every symbol needs drawing. Before converting anything, **measure** whether
+the font stack actually has it — render the glyph to a canvas and compare its
+advance width against `U+E000` (private use, guaranteed absent everywhere).
+Matching widths mean tofu.
+
+Measured on the live pages: `◈ ★ ✕ × · 𝕏 ⬡ ✦ ◎ ⟳` all resolve through the
+browser fallback chain, in both Sora and IBM Plex Mono. They were left as
+characters. The emoji were the actual defect; the geometry never was.
+
+---
+
+## Share cards (`/og`)
+
+Every surface had `og:title` and no `og:image` — so a partnership announcement,
+a page whose entire job is to be shared, rendered as a blank grey rectangle in
+X, Farcaster, iMessage, Slack and Discord. The rooms were finished and the
+doorway was unbuilt.
+
+`/og?v=thezao|partners|live|semble` renders a 1200×630 PNG through Satori, from
+the same palette as the pages, so a shared link and the page behind it are
+visibly the same world.
+
+**Satori is not a browser**, and the constraints are load-bearing:
+
+- Every element with more than one child needs an explicit `display: flex`, or
+  the render throws — which is a 500, which is no card at all.
+- No CSS grid, no `backdrop-filter`. The glass is faked with layered
+  translucent fills and a hairline border; on a flat raster there is nothing
+  behind it to blur anyway.
+- No `background-clip: text` — gradient wordmarks become solid ink, which the
+  contrast law prefers regardless.
+- **No symbol glyphs.** There is no fallback chain. The first render put five
+  tofu boxes on the card, including the ✕ joining the two partner names. Every
+  mark on a card is now drawn as geometry — rotated squares and dots. The only
+  non-ASCII characters permitted are the ones Latin-1 guarantees: `×` and `·`
+- No external fetch and no live data. Crawlers give short timeouts and retry
+  rarely; a card that sometimes fails is worse than one that is always the same.
+
+Verify with `og-check.sh`. A 200 is not enough — an error page can be a 200 and
+an empty body is still "successful" — so it checks the PNG magic bytes and reads
+the width and height straight out of the IHDR chunk.
+
+---
+
+## The ledger strip
+
+Both partner pages read `/api/compute` and `/api/work` on load and print four
+numbers, including the one that does not flatter us: **paid out so far**.
+
+The contract that makes it safe to ship:
+
+> Every slot ships as an em-dash in the markup. The script only ever
+> **overwrites** a dash. If it throws, if the network is down, if a crawler runs
+> with JS off — the dashes stay and the page reads exactly the same.
+
+The `catch` is deliberately empty and must stay that way. **Never write `0` on
+failure.** A real zero and a failed fetch are different facts, and a page whose
+entire argument is "you can check this" does not get to blur them.

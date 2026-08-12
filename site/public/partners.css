@@ -224,14 +224,81 @@ section > .wrap > .lead { margin-bottom: 26px; max-width: 62ch; }
   font-weight: 600;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE MARK SYSTEM
+
+   ⚠ These pages were mixing two visual languages: emoji (✊ 🛡 ✅ 🔨 ⚡) sitting
+   directly beside geometric glyphs (◎ ⟳ ◈ ✦ ⬡). Emoji are colour bitmaps the
+   reader's OS picks — different art on Android, Windows, iOS and Slack — while
+   the geometry is monochrome line work in our palette. Side by side they read
+   as two different products stapled together.
+
+   Every mark is now one inline SVG sprite: a single stroke weight, a single
+   corner treatment, and `currentColor` so each mark takes the hue of the thing
+   it means. No font can fail to carry it and no platform can restyle it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mk { width: 22px; height: 22px; flex: 0 0 auto; display: block; }
+.mk-lg { width: 27px; height: 27px; }
+.mk-sm { width: 14px; height: 14px; }
+/* a tag holding a mark is a row, not a line of text — otherwise the SVG sits
+   on the text baseline and hangs below it */
+.tag { display: inline-flex; align-items: center; gap: 7px; }
+/* a mark and its heading are one unit — the mark sits ON the baseline row
+   rather than inside the heading text, so it never inherits the heading's
+   clamp() and never resizes with it */
+.bring-head { display: flex; align-items: center; gap: 12px; }
+.m-cyan   { color: var(--cyan); }
+.m-violet { color: var(--violet); }
+.m-gold   { color: var(--gold); }
+.m-zao    { color: var(--zao); }
+.m-azure  { color: var(--azure); }
+
 /* ── honest status ── */
 .status li {
   list-style: none; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.07);
-  font-size: 15px; color: var(--ink2); display: grid; grid-template-columns: 26px 1fr; gap: 10px;
+  font-size: 15px; color: var(--ink2); display: grid; grid-template-columns: 26px 1fr; gap: 12px;
+  align-items: start;
 }
 .status li:last-child { border-bottom: 0; }
-.status .m { font-size: 17px; line-height: 1.4; }
+.status .m { display: flex; padding-top: 2px; line-height: 1.4; }
 .status b { color: var(--ink); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE LEDGER STRIP — the page checking itself.
+
+   This page tells you every claim on it is falsifiable with curl. So it curls
+   itself, in front of you, and prints what comes back.
+
+   ⚠ THE NUMBERS ARE AN ENHANCEMENT, NEVER THE CONTENT. The markup ships an
+   em-dash in every slot, and if the fetch fails the dash is exactly what stays
+   on screen — no spinner, no zero, no stale cache. A number nobody can check
+   is worth less than no number at all, and on a partnership page it is worse
+   than that: it is a claim.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.proof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0 16px; }
+.pf {
+  text-align: center; padding: 16px 10px; border-radius: var(--r-xs);
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+  border: 1px solid rgba(255,255,255,.09); box-shadow: var(--nn-raise);
+}
+.pf b {
+  display: block; font-size: clamp(1.35rem, 6.6vw, 1.95rem); font-weight: 800; line-height: 1.05;
+  color: var(--accent-t); font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 26px rgba(34,211,238,.35);
+}
+/* the honest one. A partnership page publishing "$0.00 moved" is the whole
+   posture of this project in four characters — so it gets the gold, not a
+   muted treatment that hides it. */
+.pf.zero b { color: var(--gold-t); text-shadow: 0 0 26px rgba(232,196,107,.32); }
+.pf i { font-style: normal; display: block; margin-top: 7px; font-size: 12.5px; color: var(--ink2); line-height: 1.45; }
+.proof-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.pf-dot {
+  width: 8px; height: 8px; border-radius: 999px; background: var(--zao); flex: 0 0 auto;
+  box-shadow: 0 0 14px var(--zao);
+}
+.proof-note { font-size: 14px; }
+.proof code { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--accent-t); }
+@media (min-width: 720px) { .proof-grid { grid-template-columns: repeat(4, 1fr); } }
 
 /* ── partner card (index page) ── */
 .pcard { display: block; text-decoration: none; color: inherit; transition: transform .24s var(--ease), border-color .24s var(--ease); }
