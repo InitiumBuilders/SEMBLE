@@ -205,6 +205,50 @@ availability is a promise and a verified result is a fact.
 
 ---
 
+## The standing queue — why the pool is never idle
+
+⚠ **Measured 2026-08-12:** a visitor clicked *lend*, clicked *start*, and got
+**"queue empty — nothing to compute right now."** Every part of the machine
+worked and a stranger still got nothing. No amount of verification machinery
+matters if the first move lands on an empty queue — that is the funnel failing
+at step one, and it wastes the single moment someone was willing.
+
+So when a machine asks for work and there is none it can take, the queue tops up
+from a **standing corpus**: real, verifiable units over text that is already
+public.
+
+**Two details that make this honest rather than theatre:**
+
+1. **Standing work is labelled everywhere** — `standing: true` on the claim,
+   a separate task name in `byTask`, and its own note on the page. A pool that
+   looks busy while secretly spinning its wheels would be worse than an honest
+   idle one.
+2. **Replenishment is measured per-node, not globally.** Counting only *global*
+   open units meant a machine that had already computed everything was told
+   "nothing to compute" while the page simultaneously reported eight units out —
+   because a node may never take the same unit twice. The guarantee has to be
+   measured from the perspective of the machine asking.
+
+Operator control: `POST /api/work {op:"standing", on, task, kind, corpus[]}`.
+
+### ⚠ The honest cost of `need = 3`
+
+Raising the agreement threshold means **a unit cannot settle until three
+distinct machines have computed it**. With a small pool, units accumulate in
+`verifying` and nobody is credited yet.
+
+That is correct behaviour, not a stall — those units settle the moment enough
+people arrive, and everyone who computed them is credited then. The page says so
+directly rather than letting it look broken:
+
+> *N units are waiting for more machines. Verification needs 3 independent
+> machines and the pool currently has X.*
+
+**A commons needs a crowd.** That is a real property of the design, and hiding
+it would misrepresent what the system is.
+
+---
+
 ## Receipts — the contributor's evidence
 
 `GET /api/receipts?node=<id>` returns what a machine actually did: the unit, the

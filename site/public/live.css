@@ -810,3 +810,63 @@ body.rightnow .witem .t { font-size: 18px; }
   .cmn-live { padding: 13px 14px; }
   .cmn-live .cl-item b { font-size: 1.22rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE PITCH — a stranger has to understand this before being asked to lend a
+   graphics card. Two additions, no new sections:
+     · one line in the hero saying what this IS
+     · the three-step loop as a diagram rather than a paragraph
+   Prose describing a three-step process is a three-step process the reader has
+   to assemble themselves.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.said-line {
+  font-family: 'Sora'; font-weight: 800;
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem); line-height: 1.2;
+  color: var(--accent-t); margin: 6px 0 10px !important;
+  text-shadow: 0 0 26px rgba(34,211,238,.4);           /* glow, not highlight */
+}
+.said-jump { color: var(--gold-t); text-decoration: none; border-bottom: 1px solid rgba(232,196,107,.45); }
+.said-jump:hover { border-bottom-color: var(--gold-t); }
+.said-jump:focus-visible { outline: 2px solid var(--accent-t); outline-offset: 3px; }
+
+.how {
+  list-style: none; margin: 24px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  counter-reset: how;
+}
+.how li {
+  position: relative; padding: 20px 20px 18px; border-radius: var(--r-sm);
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid rgba(123,227,234,.14);
+}
+/* the connective thread: energy travelling between the steps, not three
+   unrelated boxes sitting next to each other */
+.how li::after {
+  content: ''; position: absolute; top: 50%; right: -14px; width: 14px; height: 2px;
+  background: linear-gradient(90deg, rgba(34,211,238,.55), transparent);
+}
+.how li:last-child::after { display: none; }
+.how .hn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 10px; margin-bottom: 12px;
+  font-family: 'IBM Plex Mono'; font-size: 14px; font-weight: 600;
+  color: var(--void); background: linear-gradient(145deg, var(--cyan), var(--azure));
+  box-shadow: 0 0 22px -6px var(--cyan);
+}
+.how b { display: block; font-family: 'Sora'; font-weight: 800; font-size: 1.14rem; color: var(--ink); margin-bottom: 7px; }
+.how i { font-style: normal; display: block; font-size: 14px; line-height: 1.6; color: var(--ink2); }
+
+@media (max-width: 860px) {
+  .how { grid-template-columns: 1fr; gap: 10px; }
+  /* the thread turns to point downward when the steps stack */
+  .how li::after { top: auto; bottom: -10px; right: auto; left: 34px; width: 2px; height: 10px;
+    background: linear-gradient(180deg, rgba(34,211,238,.55), transparent); }
+}
+
+/* the honest "we need more people" note — a warning tone without alarm */
+.work-fine.warn {
+  padding: 13px 16px; border-radius: var(--r-xs); margin-top: 14px;
+  background: rgba(232,196,107,.07); border: 1px solid rgba(232,196,107,.22);
+  color: var(--ink);
+}
+.work-fine.warn b { color: var(--gold-t); }

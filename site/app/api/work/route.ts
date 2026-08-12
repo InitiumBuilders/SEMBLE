@@ -47,8 +47,79 @@ const operator = (req: Request) => {
   return !!s && req.headers.get('x-live-secret') === s;
 };
 
-type WLedger = Ledger & { units: Unit[]; receipts: Receipt[]; quarantine: string[] };
-const EMPTY: WLedger = { ...EMPTY_LEDGER, units: [], receipts: [], quarantine: [] };
+type Standing = { on: boolean; task: string; kind: WorkKind; corpus: string[]; made: number };
+type WLedger = Ledger & {
+  units: Unit[]; receipts: Receipt[]; quarantine: string[]; standing: Standing;
+};
+
+/* ── THE STANDING CORPUS ────────────────────────────────────────────────────
+   ⚠ THE PROBLEM THIS SOLVES, measured 2026-08-12: a visitor clicked LEND, then
+   START COMPUTING, and got "queue empty — nothing to compute right now."
+   Every part of the machine worked and a stranger still got NOTHING. That is
+   the mover loop failing at step one, and no amount of verification machinery
+   matters if the first move lands on an empty queue.
+
+   So the pool is never idle. When the queue runs dry, units are generated from
+   a standing public corpus — real, verifiable work on text that is already
+   public. It is labelled `standing` everywhere so it is never confused with
+   work the operator actually needed done: a busy-looking pool that is secretly
+   spinning its wheels would be exactly the lie this project exists to avoid. */
+const DEFAULT_CORPUS = [
+  'motus is the mindset the mindset means move',
+  'a stock is a quantity a flow is a rate of change',
+  'reinforcing loops compound balancing loops resist',
+  'emergence is behaviour that no single part contains',
+  'leverage points are places where a small shift changes everything',
+  'the map is not the territory but a good map moves you',
+  'conviction is what survives contact with cost',
+  'a receipt is proof a promise is not',
+  'systems thinking asks what structure produces this behaviour',
+  'stigmergy is coordination through traces left in the world',
+  'delay in a feedback loop is what makes it oscillate',
+  'the goal of a system is what it actually does not what it says',
+];
+const EMPTY: WLedger = {
+  ...EMPTY_LEDGER, units: [], receipts: [], quarantine: [],
+  standing: { on: true, task: 'Standing — index the Motus corpus', kind: 'embed', corpus: DEFAULT_CORPUS, made: 0 },
+};
+
+/** Top the queue up from the standing corpus. Deterministic seeds derived from
+ *  a rolling counter, so the whole ledger stays reproducible from its contents.
+ *
+ *  ⚠ `forNode` matters more than it looks. Counting only GLOBAL open units means
+ *  a machine that has already computed everything in the queue is told "nothing
+ *  to compute" while the page simultaneously reports eight units out — because
+ *  a node may never take the same unit twice. The guarantee has to be measured
+ *  from the perspective of the machine asking, not the queue as a whole. */
+function replenish(w: WLedger, want = 8, forNode = ''): number {
+  const st = w.standing;
+  if (!st || !st.on || !st.corpus?.length) return 0;
+  const available = w.units.filter((u) =>
+    (u.status === 'open' || u.status === 'verifying') &&
+    u.results.length < u.need &&
+    (!forNode || !u.results.some((r) => r.node === forNode))).length;
+  if (available >= want) return 0;
+  let made = 0;
+  for (let i = available; i < want; i++) {
+    const idx = (st.made + made) % st.corpus.length;
+    const seed = (((st.made + made) + 1) * 2654435761) >>> 0;
+    const isCanary = (st.made + made) % WORK.CANARY_RATE === WORK.CANARY_RATE - 1;
+    const payload = st.kind === 'matmul' ? '32' : st.corpus[idx];
+    w.units.push({
+      id: `s${Date.now().toString(36)}${(st.made + made).toString(36)}`,
+      kind: isCanary ? 'canary' : st.kind,
+      task: st.task, payload, seed,
+      need: isCanary ? 1 : WORK.NEED,
+      results: [], status: 'open', digest: '',
+      expect: isCanary ? runUnit({ kind: 'canary', payload, seed }).digest : '',
+      created: Date.now(), settled: 0,
+    });
+    made++;
+  }
+  st.made += made;
+  w.units = w.units.slice(-600);
+  return made;
+}
 
 function hydrate(l: Partial<WLedger> | null): WLedger {
   const w: WLedger = { ...EMPTY, ...(l || {}) } as WLedger;
@@ -59,6 +130,8 @@ function hydrate(l: Partial<WLedger> | null): WLedger {
   w.units = (w.units || []).map((u) => ({ ...u, results: u.results || [] }));
   w.receipts = w.receipts || [];
   w.quarantine = w.quarantine || [];
+  w.standing = { ...EMPTY.standing, ...(w.standing || {}) };
+  if (!Array.isArray(w.standing.corpus) || !w.standing.corpus.length) w.standing.corpus = DEFAULT_CORPUS;
   w.history = (w.history || []).map((b) => ({ ...b, motusSeconds: Number(b.motusSeconds) || 0, byDj: b.byDj || {} }));
   w.djs = w.djs || {}; w.modes = w.modes || {}; w.payouts = w.payouts || [];
   w.totals = { sessions: 0, seconds: 0, accrued: 0, paid: 0, ...(w.totals || {}) };
@@ -85,12 +158,24 @@ export async function GET(req: Request) {
         why: 'This node returned a wrong answer to a known-answer probe. Results are no longer counted. Reload to re-enrol.',
       }, { headers: CORS });
     }
-    const u = w.units.find((x) =>
+    const pick = () => w.units.find((x) =>
       (x.status === 'open' || x.status === 'verifying') &&
       x.results.length < x.need &&
       !x.results.some((r) => r.node === node));
+
+    let u = pick();
+    // ⚠ THE FIRST-MOVE GUARANTEE. If there is nothing this node can take, top
+    // the queue up from the standing corpus and try once more. A stranger who
+    // clicks START must never be told "nothing to compute" — that is the whole
+    // funnel, and an empty queue wastes the one moment they were willing.
+    if (!u && replenish(w, 8, node)) { await freshWrite(PREFIX, w); u = pick(); }
+
     return Response.json({
       unit: u ? { id: u.id, kind: u.kind, payload: u.payload, seed: u.seed, task: u.task } : null,
+      // is this standing work or something the operator actually needed done?
+      // Never blur the two: a busy-looking pool spinning its wheels in secret
+      // would be exactly the lie this project exists to avoid.
+      standing: u ? u.task === w.standing.task : false,
       queue: w.units.filter((x) => x.status !== 'done').length,
       // the client is NOT told which units are canaries — that is the point
       ttlMs: WORK.CLAIM_TTL,
@@ -125,6 +210,13 @@ export async function GET(req: Request) {
     need: WORK.NEED,
     quarantined: w.quarantine.length,
     byTask,
+    standing: {
+      on: w.standing.on,
+      task: w.standing.task,
+      kind: w.standing.kind,
+      generated: w.standing.made,
+      what: 'Standing work keeps the pool from ever being idle: real, verifiable units over text that is already public. It is labelled separately from work the operator actually needed done, because a busy-looking pool that is secretly spinning its wheels would be worse than an honest idle one.',
+    },
     // Derived from the constants, never hand-written — I raised NEED 2→3 and
     // CANARY_RATE 6→4 and this sentence still claimed the old numbers. A
     // security claim that drifts from the code is worse than no claim.
@@ -158,6 +250,21 @@ export async function POST(req: Request) {
       out: r.out.slice(0, 400), digest: r.digest,
       note: 'Computed by the SAME runUnit() the queue uses. Re-implement it from the docs and you must get this digest — if you do not, the docs are wrong and that is a bug worth reporting.',
     }, { headers: CORS });
+  }
+
+  // ── operator: configure the standing corpus ──
+  if (b.op === 'standing') {
+    if (!operator(req)) return Response.json({ ok: false, error: 'not the operator' }, { status: 401, headers: CORS });
+    const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+    if (typeof b.on === 'boolean') w.standing.on = b.on;
+    if (b.task) w.standing.task = clean(b.task, 120);
+    if (['embed', 'score', 'matmul'].includes(b.kind)) w.standing.kind = b.kind;
+    if (Array.isArray(b.corpus) && b.corpus.length) {
+      w.standing.corpus = b.corpus.slice(0, 200).map((c: unknown) => clean(c, WORK.MAX_PAYLOAD)).filter(Boolean);
+    }
+    const made = w.standing.on ? replenish(w) : 0;
+    const ok = await freshWrite(PREFIX, w);
+    return Response.json({ ok, standing: { ...w.standing, corpus: w.standing.corpus.length }, topUp: made }, { headers: CORS });
   }
 
   if (b.op === 'enqueue') {

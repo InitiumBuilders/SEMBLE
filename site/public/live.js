@@ -841,11 +841,12 @@ function renderWork() {
   const el = $('#workBody'); if (!el) return;
   const w = GPU.work || {};
   const q = w.queue || {};
+  const p2 = GPU.pool || {};
   const canWork = GPU.ok && GPU.pledged;
   el.innerHTML = `
     <div class="pool-grid">
       <div class="pool-stat"><span class="k">JOBS RUNNING</span><b class="${w.jobsRunning ? 'go' : ''}">${w.jobsRunning ? 'YES' : 'IDLE'}</b><i>${(q.open || 0) + (q.verifying || 0)} unit(s) waiting for a machine</i></div>
-      <div class="pool-stat"><span class="k">VERIFIED</span><b>${w.completed || 0}</b><i>units agreed by two independent machines</i></div>
+      <div class="pool-stat"><span class="k">VERIFIED</span><b>${w.completed || 0}</b><i>units agreed by ${w.need || 3} independent machines</i></div>
       <div class="pool-stat"><span class="k">YOUR UNITS</span><b>${W.done}</b><i>${W.on ? 'computing now' : 'idle'}</i></div>
       <div class="pool-stat"><span class="k">DISPUTED</span><b>${q.disputed || 0}</b><i>machines disagreed — nobody was credited, re-issued</i></div>
     </div>
@@ -862,8 +863,16 @@ function renderWork() {
         : 'Opt-in, again, on purpose. Pledging says available; this says go.'}</span>
     </div>
 
-    <p class="work-fine"><b>How you know the work is real:</b> ${esc(w.verification || 'every unit is computed by two independent machines and settles only when their digests agree.')}
+    <p class="work-fine"><b>How you know the work is real:</b> ${esc(w.verification || '')}
       Each unit is worth <b>${w.unitsWorth || 25} MOTUS-seconds</b> × your capability — completed work is worth more than availability, because availability is a promise and a verified result is a fact.</p>
+
+    ${(q.verifying || 0) > 0 && (p2.live || 0) < (w.need || 3) ? `
+      <p class="work-fine warn"><b>${q.verifying} unit(s) are waiting for more machines.</b>
+      Verification needs <b>${w.need || 3}</b> independent machines and the pool currently has <b>${p2.live || 0}</b>.
+      Nothing is lost — those units settle the moment enough people are here, and everyone who computed them is credited then.
+      This is the honest cost of checking work properly: <b>a commons needs a crowd.</b></p>` : ''}
+
+    ${w.standing && w.standing.on ? `<p class="work-fine dim"><b>Standing work:</b> when nothing is queued from a live task, the pool computes <b>${esc(w.standing.task)}</b> so your machine is never idle. It is real, verifiable work over public text — and it is labelled separately from work the operator actually needed done, because a pool that looks busy while secretly spinning its wheels would be worse than an honest idle one. <b>${w.standing.generated || 0}</b> unit(s) generated so far.</p>` : ''}
 
     ${(w.byTask || []).length ? `<div class="ps-card" style="margin-top:14px"><div class="k">WHAT THE POOL IS ACTUALLY WORKING ON</div>
       <ul class="kv">${w.byTask.map((t) => `<li><b>${esc(t.task)}</b><span>${t.units} unit(s) · ${t.contributors} machine(s)</span></li>`).join('')}</ul></div>` : ''}
@@ -946,6 +955,15 @@ function renderGolem() {
     <p class="gol-note dim">${esc(v.rentNote || '')} <b>This gauge re-measures every time you load the page</b> — if supply ever appears, this panel says so on its own.</p>`;
 }
 
+/* ⚠ ONE MOVE, NOT TWO.
+   Pledging and computing were separate clicks. The distinction is real —
+   "available" is not "go" — but it cost the cheapest-possible-first-move,
+   which is the entire thesis of this project. A stranger should not have to
+   discover a second button to make anything happen.
+
+   So the primary action now does both, and the copy says so plainly before it
+   is pressed. Consent is not weakened: nothing runs until this button, one
+   press stops everything, and closing the tab ends it. */
 async function pledgeGPU() {
   if (!GPU.probed) await probeGPU();
   if (!GPU.ok) { renderGPU(); return; }
@@ -956,10 +974,12 @@ async function pledgeGPU() {
     clearInterval(GPU.beat);
     // a heartbeat is what makes "live now" mean something rather than "ever"
     GPU.beat = setInterval(() => { if (GPU.pledged) pushPledge({ seconds: 60 }); }, 60000);
+    if (!W.on && !W.quarantined) toggleWork();     // …and actually start working
   } else {
     clearInterval(GPU.beat); GPU.beat = 0;
+    if (W.on) toggleWork();                         // stopping means stopping
   }
-  renderGPU(); pollPool();
+  renderGPU(); pollPool(); pollWork();
 }
 async function saveWallets() {
   const d = ($('#gpuDash').value || '').trim();
@@ -987,11 +1007,11 @@ function renderGPU() {
     <p class="gpu-read">${gpuLine()}</p>
     <div class="gpu-row">
       <button class="btn ${GPU.pledged ? '' : 'prime'} ${GPU.ok ? '' : 'off'}" id="gpuBtn" ${GPU.ok ? '' : 'disabled'}>
-        ${GPU.pledged ? '◼ STOP LENDING' : '⚡ LEND YOUR GPU'}
+        ${GPU.pledged ? '◼ STOP' : '⚡ LEND & START'}
       </button>
       <span class="gpu-state ${GPU.pledged ? 'on' : ''}">${GPU.pledged
-        ? 'Pledged. Nothing is running yet — jobs arrive at rung 2, and you can stop any time.'
-        : 'Opt-in only. Nothing ever runs without this button, and closing the tab ends it.'}</span>
+        ? (W.on ? (W.last || 'computing — claiming a unit…') : 'Lending. Computing is paused; the Work tab restarts it.')
+        : 'One press: your machine joins the pool and starts computing. Nothing runs before it, one press stops everything, and closing the tab ends it.'}</span>
     </div>
     <p class="gpu-fine">Lent GPUs run <b>open-weight models</b>, render the MotusLive worlds, and crunch community research — <b>public work only</b>. They cannot speed up Davara: she runs on Claude in Anthropic's data centres, and pretending otherwise would be a lie. No background compute, no auto-start, one click to stop.</p>
     ${GPU.mine && GPU.pledged ? `
@@ -1156,12 +1176,18 @@ addEventListener('DOMContentLoaded', () => {
   addEventListener('pointermove', (ev) => { S.mx = ev.clientX; S.my = ev.clientY; S.mt = performance.now(); }, { passive: true });
   $('#chat-form').addEventListener('submit', sendCrowd);
   renderGPU();
+  // ⚠ RESUME MEANS RESUME. A returning contributor who already pressed
+  // LEND & START came back expecting to still be lending — leaving them
+  // "pledged but idle" makes them hunt for a second button to restart
+  // something they never chose to stop. The pledge is the consent; the tab
+  // being open is the session.
   probeGPU().then(() => {
     renderGPU();
     // resume a pledge across reloads — the heartbeat is what makes "live" true
     if (GPU.pledged && GPU.ok) {
       pushPledge({ seconds: 0 });
       GPU.beat = setInterval(() => { if (GPU.pledged) pushPledge({ seconds: 60 }); }, 60000);
+      if (!W.on && !W.quarantined) toggleWork();     // …and pick the work back up
     }
   });
   pollPool(); setInterval(pollPool, 20000);
