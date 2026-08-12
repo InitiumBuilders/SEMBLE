@@ -152,6 +152,34 @@ body::before {
 .transport .note { color: var(--ink2); font-size: 15px; }
 .transport .note b { color: var(--accent-t); font-weight: 600; }
 
+/* ── the keyboard legend + live power readout ── */
+.keys { font-family: 'IBM Plex Mono'; font-size: 12.5px; color: var(--label); letter-spacing: .04em; margin-left: auto; }
+.keys kbd {
+  font-family: 'IBM Plex Mono'; font-size: 11.5px; color: var(--ink);
+  background: var(--panel2); border: 1px solid rgba(150,200,220,.2);
+  border-radius: 8px; padding: 3px 7px; margin: 0 2px;
+}
+.power-now {
+  margin-top: 16px; padding: 15px 20px; border-radius: var(--r-sm);
+  background: var(--panel2); border: 1px solid rgba(150,200,220,.14);
+  color: var(--ink2); font-size: 15.5px; line-height: 1.55;
+}
+.power-now b { color: var(--gold-t); }
+
+/* ═══ THEATER — the stage takes the whole screen. On a desktop this is the
+   difference between watching a page and being in the room. ═══ */
+body.theater { overflow: hidden; }
+body.theater .horizon {
+  position: fixed; inset: 0; z-index: 60; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--void); padding: 0;
+}
+body.theater .horizon::before { inset: 0; border-radius: 0; opacity: calc(.22 + var(--pulse) * .38); }
+body.theater .stage { width: 100vw; height: 100vh; max-height: none; aspect-ratio: auto; border-radius: 0; border: 0; }
+body.theater .hud { left: 26px; right: 26px; bottom: 26px; top: auto; }
+body.theater .topbar, body.theater .transport, body.theater .sec, body.theater .workgrid, body.theater .foot { display: none; }
+body.theater .curtain { padding-bottom: 96px; }
+
 /* ── section frames ── */
 .sec { margin-top: 74px; }
 .sec-label {
@@ -297,6 +325,40 @@ body::before {
 body.rightnow .horizon, body.rightnow .deck-sec, body.rightnow .powers-sec, body.rightnow .transport { display: none; }
 body.rightnow .workgrid { grid-template-columns: 1fr; max-width: 880px; margin: 28px auto 0; }
 body.rightnow .witem .t { font-size: 18px; }
+
+/* ═══ THE BIG SCREEN — a desktop is not a large phone. Above 1500px the room
+   opens up: more of the pantheon visible at once, a bigger stage, larger type,
+   and deeper hover relief. Nothing is merely stretched. ═══ */
+@media (min-width: 1500px) {
+  .shell { max-width: 1560px; padding: 0 34px 130px; }
+  body { font-size: 19px; }
+  .stage { max-height: 78vh; }
+  .dj-card { flex-basis: 316px; padding: 26px 26px 24px; }
+  .dj-name { font-size: 1.75rem; }
+  .dj-ability { font-size: 15.4px; }
+  .powers { gap: 16px; }
+  .power { padding: 24px 20px; }
+  .power h4 { font-size: 1.3rem; }
+  .workgrid { gap: 24px; }
+  .card { padding: 32px; }
+  .card h3 { font-size: 1.7rem; }
+  .sec { margin-top: 92px; }
+  /* hover gains real depth at this size — the cards lift off the void */
+  .dj-card:hover { transform: translateY(-7px) scale(1.012); }
+  .power:hover { transform: translateY(-4px); }
+}
+@media (min-width: 1900px) {
+  .shell { max-width: 1760px; }
+  .dj-card { flex-basis: 344px; }
+}
+/* pointer-precise devices get the richer hover; touch never pays for it */
+@media (hover: hover) and (pointer: fine) {
+  .btn, .mini, .dj-card, .power, .sc-tab { will-change: transform, box-shadow; }
+  .witem { transition: box-shadow .3s var(--ease), border-color .3s var(--ease); }
+  .witem:hover { border-left-color: var(--gold); box-shadow: 0 0 24px rgba(232,196,107,.12); }
+  .sc-msg { transition: background .25s var(--ease); border-radius: 14px; }
+  .sc-msg:hover { background: rgba(150,200,220,.045); }
+}
 
 /* ── responsive ── */
 @media (max-width: 900px) {

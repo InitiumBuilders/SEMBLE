@@ -35,7 +35,7 @@ const S = {
   // nothing on load reads as broken for the first ten seconds
   vid: null, rotateT: 0, live: null, energy: .45, phrase: 0, drop: 0, beatFlash: 0,
   evo: null,                    // the current scene mutation (see evolve())
-  scTab: 'top', msgs: [], voted: {},
+  scTab: 'top', msgs: [], voted: {}, autoT: 0, theater: false,
 };
 try { S.voted = JSON.parse(localStorage.getItem('sc.voted') || '{}'); } catch {}
 
@@ -120,8 +120,23 @@ function setPower(pw) {
   $$('#powers .power').forEach((c) => c.classList.toggle('on', !!S.power && c.dataset.id === S.power.id));
   const chip = $('#hud-power');
   chip.style.display = S.power ? '' : 'none';
-  if (S.power) chip.textContent = `POWER: ${S.power.name.toUpperCase()}`;
+  // The HUD says what the power is DOING to the system right now — not its
+  // name. A power whose only evidence is a label is not a power.
+  const say = S.power && window.MOTUSVIZ && MOTUSVIZ.POWERS[S.power.id];
+  if (S.power) chip.textContent = `⚡ ${S.power.name.toUpperCase()} — ${say ? say.say : 'active'}`;
+  const live = $('#powerNow');
+  if (live) live.innerHTML = S.power
+    ? `<b>${esc(S.power.name)}</b> is running — ${esc(say ? say.say : '')}. ${esc(S.power.does)}`
+    : 'No power engaged — the system is running at its own pace. Trigger one and the physics on the stage changes with it.';
   if (S.power && S.power.id === 'vibez') S.energy = Math.min(S.energy, .35);
+  // DAUOZI hands stream choice to the agents: they cycle the deck themselves.
+  clearInterval(S.autoT); S.autoT = 0;
+  if (S.power && S.power.id === 'dauozi') {
+    S.autoT = setInterval(() => {
+      const next = P.djs[(P.djs.findIndex((d) => d.id === S.dj.id) + 1) % P.djs.length];
+      setDj(next, false);
+    }, 45000);
+  }
 }
 
 /* ═══ THE CLOCK — bpm + 32-bar phrase envelope, driving CSS too ═══ */
@@ -189,6 +204,10 @@ function vloop(t) {
     t, e: S.energy, drop: S.drop, phrase: S.phrase,
     W: VW, H: VH, hue: S.dj.hue, hue2: S.dj.hue2,
     v: S.evo || (evolve(true), S.evo), DPR, count: COUNT,
+    power: S.power ? S.power.id : '',
+    // DECENTRO maps the ACTUAL broadcast items to nodes — the real work,
+    // distributed, not a decorative count.
+    nodes: Math.max(3, ((S.live && S.live.items) || []).length || 6),
   });
 }
 
@@ -247,7 +266,11 @@ function swloop(t) {
     }
   }
   // ── the gravity swarm: orbital mechanics around what you are reading ──
-  const ax = attractor.x * innerWidth, ay = attractor.y * innerHeight;
+  // On desktop it also NOTICES YOUR CURSOR — hold still near it and part of the
+  // being drifts to you. Presence, not a particle effect.
+  const fresh = S.mt && (t - S.mt) < 2600;
+  const ax = fresh ? S.mx : attractor.x * innerWidth;
+  const ay = fresh ? S.my : attractor.y * innerHeight;
   for (const p of being) {
     const dx = ax - p.x, dy = ay - p.y, d = Math.hypot(dx, dy) || 1;
     const ring = 96 + Math.sin(p.ph + t * .0004) * 48;
@@ -404,6 +427,34 @@ addEventListener('DOMContentLoaded', () => {
     $$('.sc-tab').forEach((x) => x.classList.toggle('on', x === b));
     renderCrowd();
   }));
+
+  /* ═══ DESKTOP — the keyboard IS the deck ═══
+     On a big screen this should feel like an instrument, not a web page:
+     ← → walk the pantheon · 1-9 jump to a DJ · SPACE plays / next drop
+     T theater (the stage fills the screen) · 1..5 with shift fires a power. */
+  const theater = (on) => {
+    S.theater = on === undefined ? !S.theater : on;
+    document.body.classList.toggle('theater', S.theater);
+    const b = $('#theaterBtn'); if (b) b.textContent = S.theater ? '⤡ EXIT THEATER' : '⤢ THEATER';
+    setTimeout(vsize, 340);                       // the stage just changed size
+  };
+  const tBtn = $('#theaterBtn'); if (tBtn) tBtn.addEventListener('click', () => theater());
+  addEventListener('keydown', (ev) => {
+    const tag = (ev.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;      // never steal the composer
+    const i = P.djs.findIndex((d) => d.id === S.dj.id);
+    if (ev.key === 'ArrowRight') { setDj(P.djs[(i + 1) % P.djs.length], true); ev.preventDefault(); }
+    else if (ev.key === 'ArrowLeft') { setDj(P.djs[(i - 1 + P.djs.length) % P.djs.length], true); ev.preventDefault(); }
+    else if (ev.key === ' ') { S.playing ? spin(true) : spin(false); ev.preventDefault(); }
+    else if (ev.key === 't' || ev.key === 'T') theater();
+    else if (ev.key === 'Escape' && S.theater) theater(false);
+    else if (/^[1-9]$/.test(ev.key)) {
+      if (ev.shiftKey) { const pw = P.powers[+ev.key - 1]; if (pw) setPower(pw); }
+      else { const d = P.djs[+ev.key - 1]; if (d) setDj(d, true); }
+    }
+  });
+  // the swarm notices your cursor — the page is aware you are in the room
+  addEventListener('pointermove', (ev) => { S.mx = ev.clientX; S.my = ev.clientY; S.mt = performance.now(); }, { passive: true });
   $('#chat-form').addEventListener('submit', sendCrowd);
   pollLive(); pollCrowd();
   setInterval(pollLive, 9000);

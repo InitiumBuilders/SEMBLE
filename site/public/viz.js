@@ -67,6 +67,7 @@ const P = Array.from({ length: N }, (_, i) => ({
   s: .5 + Math.random() * .9, seed: Math.random(), i,
 }));
 const RINGS = [];                               // Sâv's permanent memory rings
+const FLOCK = [];                               // DaoMode's private boids (see murmuration)
 
 /* every world declares its own trail persistence — the shutter speed */
 const FADE = {
@@ -87,68 +88,192 @@ const WORLDS = {
      of additive bodies on a tilted orbit, Doppler-brightened on the
      approaching side. At the drop the paradigm collapses past its own horizon
      and detonates outward.  MEANING: rung 2 — transcend the frame. */
+  /*  ⬢ THE FLAGSHIP. What makes a black hole read as REAL — and what every
+      "black hole" canvas demo gets wrong — is that you see the accretion disk
+      MORE THAN ONCE. Gravity bends the far side's light up over the top of the
+      shadow and down under the bottom, so a flat disk appears to WRAP the hole
+      vertically. That single effect is the whole Gargantua silhouette. Add
+      Doppler (approaching side blue-white and far brighter, receding side amber
+      and dim), a photon ring at the light-orbit radius, an Einstein ring in the
+      lensed starfield, and frame-dragging twist, and it stops being a circle
+      with a halo and becomes a hole in spacetime.
+
+      Draw order IS the physics here:
+        far-side primary → TOP secondary image → shadow → photon ring
+        → BOTTOM secondary image → near-side primary (in front of everything)  */
   singularity(g, c) {
     const { W, H, t, e, drop, hue, hue2, v } = c;
     const cx = W / 2, cy = H / 2;
-    const Rs = Math.min(W, H) * (.185 + e * .028) * (1 - drop * .5);    // horizon collapses on the drop
-    // ── the lensed sky ──
+    const S0 = Math.min(W, H);
+    const RsBig = S0 * (.185 + e * .028) * (1 - drop * .5);    // the shadow — the bold read
+    const Rph = RsBig * 1.03;                                  // photon ring: light's own orbit
+    const spin = t * .00028 * v.warp;                          // frame dragging
+
+    /* ── 1 · THE LENSED SKY, with a real Einstein ring ─────────────────── */
     for (let i = 0; i < c.count; i++) {
       const p = P[i];
-      p.t += .00016 * (1 + p.seed);
-      const zz = ((p.z + t * .000012 * v.warp) % 1);
-      const k = F / (F + zz * 1700);
-      let sx = cx + p.x * W * .82 * k, sy = cy + p.y * H * .82 * k;
-      const dx = sx - cx, dy = sy - cy;
-      const r = Math.hypot(dx, dy) || 1;
-      // gravitational lensing — the whole reason this reads as a black hole
-      const rl = r + (Rs * Rs) / r;
-      sx = cx + (dx / r) * rl; sy = cy + (dy / r) * rl;
-      if (rl > Math.hypot(W, H)) continue;
-      const near = Math.max(0, 1 - (rl - Rs) / (Rs * 1.9));            // hot near the ring
-      const size = (1 + p.s * 2) * k * c.DPR * (1 + near * 3);
-      dot(g, sx, sy, size, near > .45 ? '#FFFFFF' : (p.seed > .6 ? hue2 : '#BBD6FF'), (.22 + p.s * .4) * k + near * .8);
+      const zz = (p.z + t * .0000085 * v.warp) % 1;
+      const k = F / (F + zz * 1900);
+      const bx = p.x * W * .95 * k, by = p.y * H * .95 * k;
+      const r0 = Math.hypot(bx, by) || 1;
+      // deflection: r' = r + Rs²/r  → everything is pushed outward, and light
+      // that would have passed behind piles up into a ring near the photon orbit
+      const rl = r0 + (Rph * Rph) / r0;
+      if (rl > S0 * 1.15) continue;
+      const ux = bx / r0, uy = by / r0;
+      const sx = cx + ux * rl, sy = cy + uy * rl;
+      // stars close to the ring are magnified AND tangentially smeared into arcs
+      const ring = Math.max(0, 1 - Math.abs(rl - Rph * 1.35) / (RsBig * .62));
+      const mag = 1 + ring * 3.4;
+      if (ring > .28) {                                        // the smear: an arc, not a point
+        const a0 = Math.atan2(uy, ux), arc = .11 * ring;
+        g.globalAlpha = (.1 + p.s * .2) * ring; g.strokeStyle = '#DCEBFF';
+        g.lineWidth = (.8 + ring * 1.8) * c.DPR; g.lineCap = 'round';
+        g.beginPath(); g.arc(cx, cy, rl, a0 - arc, a0 + arc); g.stroke();
+      }
+      dot(g, sx, sy, (.55 + p.s * 1.25) * k * mag * c.DPR,
+        ring > .5 ? '#FFFFFF' : (p.seed > .78 ? hue2 : '#C4D9FF'),
+        (.16 + p.s * .3) * k + ring * .5);
     }
-    // ── the accretion disk: additive bodies on a tilted orbit, biased INWARD
-    //    so the inner edge is a blazing band rather than a thin scatter ──
+
+    /* ── 2 · THE DISK — the bold, blazing band. August picked this geometry
+         over the thin multi-image version: a big shadow, mass piled against the
+         inner edge, and tidal streaks shearing outward. Kept exactly, and now
+         lit by the Doppler/beaming physics and standing in the new lensed sky. */
     const tilt = .28 + Math.sin(t * .00008) * .05;
     for (let i = 0; i < c.count; i++) {
       const p = P[i];
       const bias = Math.pow(p.r, 2.2);                                  // most mass near the hole
-      const orb = Rs * (1.1 + bias * 2.2);
-      const w = (.0018 + .5 / orb) * (1 + e * .8) * v.warp;
-      p.a += w;
-      const ca = Math.cos(p.a + v.drift), sa = Math.sin(p.a + v.drift);
+      const orb = RsBig * (1.1 + bias * 2.2);
+      p.a += (.0018 + .5 / orb) * (1 + e * .8) * v.warp;
+      const th = p.a + v.drift + spin * (RsBig / orb) * 1.1;            // + frame dragging
+      const ca = Math.cos(th), sa = Math.sin(th);
       const sx = cx + ca * orb, sy = cy + sa * orb * tilt;
       const front = sa > 0;
-      // relativistic beaming: the side sweeping toward us is far brighter
+      // relativistic beaming AND Doppler colour — the approaching side is far
+      // brighter and blue-white; the receding side dims to amber.
       const beam = .45 + Math.pow((ca + 1) / 2, 2.2) * 1.8;
-      const hot = orb < Rs * 1.55;
-      dot(g, sx, sy, (1.6 + p.s * 2.6) * c.DPR * (front ? 1.2 : .85),
-        hot ? '#FFF6E2' : (p.seed > .5 ? hue : hue2), (.2 + e * .22) * beam * (front ? 1 : .5));
+      const hot = orb < RsBig * 1.55;
+      const col = hot ? '#FFF6E2' : (ca > .25 ? '#EAF4FF' : ca < -.3 ? '#FFC98A' : (p.seed > .5 ? hue : hue2));
+      dot(g, sx, sy, (1.6 + p.s * 2.6) * c.DPR * (front ? 1.2 : .85), col,
+        (.2 + e * .22) * beam * (front ? 1 : .5));
       if (hot && p.seed > .7) {                                         // inner-edge tidal streaks
-        streak(g, sx, sy, cx + Math.cos(p.a + v.drift - .3) * orb, cy + Math.sin(p.a + v.drift - .3) * orb * tilt,
+        streak(g, sx, sy, cx + Math.cos(th - .3) * orb, cy + Math.sin(th - .3) * orb * tilt,
           1.6 * c.DPR, '#FFE9C0', .18 * beam);
       }
     }
-    // ── the shadow, then the photon ring on top of it ──
+
+    /* ── 3 · THE SHADOW, then the ring blooming on top of it ──────────── */
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1; g.fillStyle = '#000';
+    g.beginPath(); g.arc(cx, cy, RsBig, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'lighter';
+    dot(g, cx, cy, RsBig * 2.5, hue2, .1 + e * .1);                     // the halo it sits in
+    for (let i = 0; i < 3; i++) {
+      g.globalAlpha = [.95, .5, .22][i] * (.75 + e * .45);
+      g.strokeStyle = i === 0 ? '#FFFFFF' : hue2;
+      g.lineWidth = [2.2, 7, 18][i] * c.DPR;
+      g.beginPath(); g.arc(cx, cy, RsBig * 1.03, 0, TAU); g.stroke();
+    }
+
+    /* ── 4 · THE DROP — the paradigm past its own horizon ─────────────── */
+    if (drop > 0) {
+      dot(g, cx, cy, RsBig * (1 + (1 - drop) * 3.4), '#FFFFFF', drop * .28);
+      for (let i = 0; i < 5; i++) {
+        const rr = RsBig + (1 - drop) * S0 * (.2 + i * .3);
+        g.globalAlpha = drop * (.6 - i * .1);
+        g.strokeStyle = i === 1 ? '#E8C46B' : (i % 2 ? hue : hue2);
+        g.lineWidth = (5 - i * .7) * c.DPR;
+        g.beginPath(); g.ellipse(cx, cy, rr, rr * (tilt + .45), 0, 0, TAU); g.stroke();
+      }
+    }
+  },
+
+  /* Retired experiment kept out of the rotation: the thin triple-image
+     (Gargantua) build. More literal, less beautiful at this scale — August
+     chose the bold single-disk read, and taste outranks physics here. */
+  _singularityTriple(g, c) {
+    const { W, H, t, e, drop, hue, hue2, v } = c;
+    const cx = W / 2, cy = H / 2;
+    const S0 = Math.min(W, H);
+    const Rs = S0 * (.148 + e * .016) * (1 - drop * .42);
+    const Rph = Rs * 1.055;
+    const Rin = Rs * 1.32, Rout = Rs * 3.5;
+    const inc = .13 + Math.sin(t * .00006) * .03;
+    const spin = t * .00028 * v.warp;
+    const N = c.count;
+    // Doppler + beaming from the orbital velocity's line-of-sight component.
+    // cos(θ)>0 sweeps toward us: brighter, bluer. <0 recedes: dimmer, amber.
+    const diskBody = (p, orb, th, img) => {
+      const ca = Math.cos(th), sa = Math.sin(th);
+      const vlos = ca * Math.sqrt(Rs / orb) * 2.1;                       // ∝ orbital speed
+      const beam = Math.pow(Math.max(.06, 1 + vlos), 3.1);               // relativistic beaming
+      const kep = Math.pow(Rs / orb, .9);                                // hotter inward
+      const col = vlos > .18 ? '#EAF4FF' : vlos > -.05 ? '#FFF7E4' : '#FFC98A';
+      const hot = kep > .62;
+      // image weights: the primary is the direct view; the secondaries are the
+      // gravity-bent repeats, which are fainter and radially compressed
+      const wgt = img === 0 ? 1 : (img === 1 ? .5 : .3);
+      const px = cx + ca * orb * (img === 0 ? 1 : 1.02);
+      let py;
+      if (img === 0) py = cy + sa * orb * inc;                            // primary: flat band
+      else {
+        // SECONDARY IMAGES — the far side lifted over (img 1) / under (img 2)
+        // the shadow. Radially crushed toward the photon ring, which is what
+        // makes them read as a thin bright halo hugging the hole.
+        const sr = Rph * 1.16 + (orb - Rin) * .085;
+        const side = img === 1 ? -1 : 1;
+        py = cy + side * Math.sqrt(Math.max(0, sr * sr - Math.min(sr * .999, Math.abs(ca * orb)) ** 2)) * (img === 1 ? 1 : .8);
+        if (sa > 0 === (img === 1)) return;                              // each image shows one half
+      }
+      const rad = (img === 0 ? 1.5 + p.s * 2.5 : 1.1 + p.s * 1.5) * c.DPR * (hot ? 1.35 : 1);
+      dot(g, px, py, rad, hot ? '#FFFFFF' : col, (.1 + e * .13) * beam * wgt * (.55 + kep));
+      if (img === 0 && hot && p.seed > .74) {                             // inner-edge shear streaks
+        streak(g, px, py, cx + Math.cos(th - .34) * orb, cy + Math.sin(th - .34) * orb * inc,
+          1.5 * c.DPR, '#FFE7BB', .13 * beam);
+      }
+    };
+    const orbOf = (p) => Rin + (Rout - Rin) * Math.pow(p.r, 2.4);        // mass piles up inward
+    const thOf = (p, orb) => {
+      // Keplerian: inner material laps the outer material. Plus frame dragging.
+      p.a += (.0022 + .62 * Math.pow(Rs / orb, 1.5)) * (1 + e * .55) * v.warp;
+      return p.a + v.drift + spin * (Rs / orb) * 1.6;
+    };
+
+    /* ── 2 · far-side primary (behind the hole) ───────────────────────── */
+    for (let i = 0; i < N; i++) { const p = P[i], orb = orbOf(p), th = thOf(p, orb); if (Math.sin(th) <= 0) diskBody(p, orb, th, 0); }
+    /* ── 3 · TOP secondary image — the far side bent up OVER the shadow ── */
+    for (let i = 0; i < N; i++) { const p = P[i], orb = orbOf(p); diskBody(p, orb, p.a + v.drift + spin * (Rs / orb) * 1.6, 1); }
+
+    /* ── 4 · THE SHADOW — genuinely black, punched through everything ──── */
     g.globalCompositeOperation = 'source-over';
     g.globalAlpha = 1; g.fillStyle = '#000';
     g.beginPath(); g.arc(cx, cy, Rs, 0, TAU); g.fill();
     g.globalCompositeOperation = 'lighter';
-    dot(g, cx, cy, Rs * 2.5, hue2, .1 + e * .1);                        // the halo the hole sits in
-    for (let i = 0; i < 3; i++) {                                       // layered bloom = a real ring
-      g.globalAlpha = [.95, .5, .22][i] * (.75 + e * .45);
-      g.strokeStyle = i === 0 ? '#FFFFFF' : hue2;
-      g.lineWidth = [2.2, 7, 18][i] * c.DPR;
-      g.beginPath(); g.arc(cx, cy, Rs * 1.03, 0, TAU); g.stroke();
+
+    /* ── 5 · THE PHOTON RING — light in orbit. Thin, white, blooming. ──── */
+    for (let i = 0; i < 4; i++) {
+      g.globalAlpha = [1, .62, .3, .14][i] * (.8 + e * .4);
+      g.strokeStyle = i === 0 ? '#FFFFFF' : (i === 1 ? '#EAF4FF' : hue2);
+      g.lineWidth = [1.7, 4.5, 12, 30][i] * c.DPR;
+      g.beginPath(); g.arc(cx, cy, Rph, 0, TAU); g.stroke();
     }
-    // ── THE DROP — lensed shockwaves. Gold appears only here. ──
-    if (drop > 0) for (let i = 0; i < 5; i++) {
-      const rr = Rs + (1 - drop) * Math.min(W, H) * (.2 + i * .3);
-      g.globalAlpha = drop * (.6 - i * .1);
-      g.strokeStyle = i === 1 ? '#E8C46B' : (i % 2 ? hue : hue2);
-      g.lineWidth = (5 - i * .7) * c.DPR;
-      g.beginPath(); g.ellipse(cx, cy, rr, rr * (tilt + .45), 0, 0, TAU); g.stroke();
+
+    /* ── 6 · BOTTOM secondary image — the far side bent down UNDER ─────── */
+    for (let i = 0; i < N; i++) { const p = P[i], orb = orbOf(p); diskBody(p, orb, p.a + v.drift + spin * (Rs / orb) * 1.6, 2); }
+    /* ── 7 · near-side primary — in FRONT of the hole, the brightest pass ─ */
+    for (let i = 0; i < N; i++) { const p = P[i], orb = orbOf(p), th = p.a + v.drift + spin * (Rs / orb) * 1.6; if (Math.sin(th) > 0) diskBody(p, orb, th, 0); }
+
+    /* ── 8 · THE DROP — the paradigm past its own horizon ─────────────── */
+    if (drop > 0) {
+      dot(g, cx, cy, Rs * (1 + (1 - drop) * 4), '#FFFFFF', drop * .3);
+      for (let i = 0; i < 5; i++) {
+        const rr = Rs + (1 - drop) * S0 * (.22 + i * .3);
+        g.globalAlpha = drop * (.55 - i * .09);
+        g.strokeStyle = i === 1 ? '#E8C46B' : (i % 2 ? hue : hue2);
+        g.lineWidth = (5 - i * .7) * c.DPR;
+        g.beginPath(); g.ellipse(cx, cy, rr, rr * (inc + .5), 0, 0, TAU); g.stroke();
+      }
     }
   },
 
@@ -223,47 +348,64 @@ const WORLDS = {
      True flocking in 3D — separation, alignment, cohesion. Nobody leads; the
      shape is emergent, and it leaves trails so you see the collective
      decision happen.  MEANING: rung 5 — emergence & stigmergy. */
+  /*  ⚠ THIS WORLD OWNS ITS STATE. It used to borrow the shared `P` field like
+      every other world, and it rendered BLACK — a single NaN, from whichever
+      world had touched those bodies before it, propagated through the
+      neighbour terms and poisoned the whole flock silently, with no error.
+      Boids are the one world here with body-to-body coupling, so they are the
+      one world where contamination spreads instead of staying local. Private
+      state makes that impossible rather than merely unlikely. */
   murmuration(g, c) {
     const { W, H, t, e, hue, hue2, v } = c;
     const cx = W / 2, cy = H / 2;
+    const n = c.count;
+    if (FLOCK.length < n || !Number.isFinite(FLOCK[0].x)) {
+      FLOCK.length = 0;
+      for (let i = 0; i < n; i++) FLOCK.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * 3, vy: (Math.random() - .5) * 3,
+        ph: Math.random() * TAU, s: .5 + Math.random() * .9, seed: Math.random(),
+      });
+    }
     // TWO wandering attractors on different clocks — a single one collapses
     // the whole flock into a knot, which is not a murmuration, it is a blob.
     const gx = cx + Math.sin(t * .00034 + v.drift) * W * .32;
     const gy = cy + Math.cos(t * .00028) * H * .26;
     const hx = cx + Math.sin(t * .00019 + 2.1) * W * .34;
     const hy = cy + Math.cos(t * .00023 + 1.3) * H * .28;
-    for (let i = 0; i < c.count; i++) {
-      const p = P[i];
-      if (p.px === undefined) {                                         // spread, never stacked
-        p.px = (p.x * .5 + .5) * W; p.py = (p.y * .5 + .5) * H;
-        p.vx = (Math.random() - .5) * 3; p.vy = (Math.random() - .5) * 3;
+    const pull = .1 + e * .16;                                          // gentle: cohesion, not collapse
+    const cap = 2.6 * v.warp * (1 + e * .6);
+    for (let i = 0; i < n; i++) {
+      const p = FLOCK[i];
+      let ax = 0, ay = 0, cnt = 0, avx = 0, avy = 0;
+      for (let k = 1; k <= 6; k++) {                                    // sampled neighbours
+        const q = FLOCK[(i + k * 37) % n];
+        const dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 1;
+        if (d < 74) { ax -= (dx / d) * (74 - d) * .045; ay -= (dy / d) * (74 - d) * .045; }  // separation
+        if (d < 150) { avx += q.vx; avy += q.vy; cnt++; }               // alignment
       }
-      let ax = 0, ay = 0, cnt = 0, sx = 0, sy = 0;
-      for (let n = 1; n <= 6; n++) {                                    // sampled neighbours
-        const q = P[(i + n * 37) % c.count];
-        if (q.px === undefined) continue;
-        const dx = q.px - p.px, dy = q.py - p.py, d = Math.hypot(dx, dy) || 1;
-        if (d < 74) { ax -= dx / d * (74 - d) * .045; ay -= dy / d * (74 - d) * .045; }  // separation, distance-weighted
-        if (d < 150) { sx += q.vx; sy += q.vy; cnt++; }                 // alignment
-      }
-      if (cnt) { ax += (sx / cnt - p.vx) * .14; ay += (sy / cnt - p.vy) * .14; }
+      if (cnt) { ax += (avx / cnt - p.vx) * .14; ay += (avy / cnt - p.vy) * .14; }
       // half the flock follows each idea — the split is what makes the shape
-      const tx = (p.seed > .5 ? gx : hx) - p.px, ty = (p.seed > .5 ? gy : hy) - p.py;
+      const tx = (p.seed > .5 ? gx : hx) - p.x, ty = (p.seed > .5 ? gy : hy) - p.y;
       const td = Math.hypot(tx, ty) || 1;
-      const pull = .1 + e * .16;                                        // gentle: cohesion, not collapse
-      ax += tx / td * pull; ay += ty / td * pull;
-      ax += Math.sin(t * .0007 + p.ph) * .09; ay += Math.cos(t * .0006 + p.ph * 1.7) * .09;  // wander
+      ax += (tx / td) * pull; ay += (ty / td) * pull;
+      ax += Math.sin(t * .0007 + p.ph) * .09; ay += Math.cos(t * .0006 + p.ph * 1.7) * .09;
       p.vx = (p.vx + ax) * .965; p.vy = (p.vy + ay) * .965;
-      const sp = Math.hypot(p.vx, p.vy) || 1, cap = 2.6 * v.warp * (1 + e * .6);
+      const sp = Math.hypot(p.vx, p.vy) || 1;
       if (sp > cap) { p.vx *= cap / sp; p.vy *= cap / sp; }
       if (sp < .7) { p.vx *= 1.5; p.vy *= 1.5; }                        // never stalls
-      const ox = p.px, oy = p.py;
-      p.px += p.vx * c.DPR; p.py += p.vy * c.DPR;
+      const ox = p.x, oy = p.y;
+      p.x += p.vx * c.DPR; p.y += p.vy * c.DPR;
       const m = 40 * c.DPR;                                             // soft wrap keeps the field full
-      if (p.px < -m) p.px = W + m; if (p.px > W + m) p.px = -m;
-      if (p.py < -m) p.py = H + m; if (p.py > H + m) p.py = -m;
-      if (Math.abs(p.px - ox) < W * .5) streak(g, ox, oy, p.px, p.py, 1.5 * c.DPR, p.seed > .78 ? hue2 : hue, .34);
-      dot(g, p.px, p.py, (1.4 + p.s * 1.2) * c.DPR, p.seed > .93 ? '#FFFFFF' : hue, .26);
+      if (p.x < -m) p.x = W + m; else if (p.x > W + m) p.x = -m;
+      if (p.y < -m) p.y = H + m; else if (p.y > H + m) p.y = -m;
+      if (Math.abs(p.x - ox) < W * .5) streak(g, ox, oy, p.x, p.y, 2.4 * c.DPR, p.seed > .78 ? hue2 : hue, .55);
+      dot(g, p.x, p.y, (2.6 + p.s * 2.4) * c.DPR, p.seed > .9 ? '#FFFFFF' : hue, .45);
+      if (i % 6 === 0) {                                                // threads: ONE body, not points
+        const q = FLOCK[(i + 53) % n];
+        const dd = Math.hypot(q.x - p.x, q.y - p.y);
+        if (dd < 120 * c.DPR) streak(g, p.x, p.y, q.x, q.y, 1 * c.DPR, hue2, .16 * (1 - dd / (120 * c.DPR)));
+      }
     }
   },
 
@@ -489,6 +631,8 @@ function sigil(g, c) {
 /* ── the public engine ── */
 M.WORLDS = WORLDS;
 M.FADE = FADE;
+M.P = P;                    // exposed for the pixel/position audit, not for use
+
 M.sigil = sigil;
 M.dot = dot;
 M.markPhrase = (gold) => { RINGS.push({ r: 4, a: .5, gold: !!gold }); if (RINGS.length > 26) RINGS.shift(); };
@@ -497,9 +641,86 @@ M.markPhrase = (gold) => { RINGS.push({ r: 4, a: .5, gold: !!gold }); if (RINGS.
 M.reset = () => {
   for (const p of P) { p.px = p.py = p.fx = p.fy = undefined; p.r = Math.random(); p.a = Math.random() * TAU; }
   RINGS.length = 0;
+  FLOCK.length = 0;                             // the flock is reborn, never inherited
 };
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE WAVE POWERS — operational modes that VISIBLY change the system.
+   A power that only changed a label would be a lie about what it is; each one
+   is the systems behaviour it names, applied to the physics of whatever world
+   is currently running.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const POWERS = {
+  // R+ · reinforcing loop: energy compounds, everything accelerates and swells
+  hype: { e: 1.42, warp: 1.35, density: 1.3, say: 'reinforcing loop — energy compounding' },
+  // B− · balancing loop: the system is pulled back toward baseline
+  vibez: { e: .46, warp: .5, density: .85, say: 'balancing loop — returning to baseline' },
+  // network effect: isolated points become a visible connected swarm
+  crowdrise: { e: 1.1, warp: 1, density: 1.15, say: 'network effect — the crowd becoming one body', overlay: 'crowd' },
+  // autonomous orchestration: the agents choose; a scanning sweep shows them reading
+  dauozi: { e: 1.15, warp: 1.1, density: 1, say: 'autonomous orchestration — the agents are choosing', overlay: 'scan' },
+  // node distribution: the live work broken out and mapped across the field
+  decentro: { e: 1, warp: .95, density: 1, say: 'node distribution — the work, decentralised', overlay: 'nodes' },
+};
+M.POWERS = POWERS;
+
+const OVERLAY = {
+  /* CROWDRISE — points arrive from outside the frame and wire themselves into
+     one connected body. The network effect, drawn. */
+  crowd(g, c) {
+    const { W, H, t, hue2 } = c;
+    const n = 20, pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * TAU + t * .00013;
+      const arrive = Math.min(1, ((t * .00016 + i / n) % 1) * 2.2);     // each one flies in
+      const rr = Math.max(W, H) * (.62 - arrive * .34);
+      pts.push([W / 2 + Math.cos(a) * rr, H / 2 + Math.sin(a) * rr * .62, arrive]);
+    }
+    for (let i = 0; i < n; i++) {
+      const [x, y, a] = pts[i];
+      dot(g, x, y, (2 + a * 3.4) * c.DPR, a > .85 ? '#FFFFFF' : hue2, .2 + a * .45);
+      const [x2, y2, a2] = pts[(i + 1) % n];
+      if (a > .55 && a2 > .55) streak(g, x, y, x2, y2, 1.2 * c.DPR, hue2, .12 + Math.min(a, a2) * .16);
+      if (a > .8 && i % 3 === 0) streak(g, x, y, W / 2, H / 2, 1 * c.DPR, hue2, .07);
+    }
+  },
+  /* DAUOZI — a scanning sweep: the agents reading the room before they choose. */
+  scan(g, c) {
+    const { W, H, t, hue, hue2 } = c;
+    const p = (t * .00028) % 1;
+    const x = p * W;
+    g.globalAlpha = .16; g.strokeStyle = hue2; g.lineWidth = 2.2 * c.DPR;
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke();
+    for (let i = 1; i <= 8; i++) {                                       // the trailing wash
+      g.globalAlpha = .05 * (1 - i / 8); g.lineWidth = (2 + i * 2) * c.DPR; g.strokeStyle = hue;
+      g.beginPath(); g.moveTo(x - i * 9 * c.DPR, 0); g.lineTo(x - i * 9 * c.DPR, H); g.stroke();
+    }
+    dot(g, x, H * (.5 + Math.sin(t * .0016) * .28), 7 * c.DPR, '#FFFFFF', .4);
+  },
+  /* DECENTRO — the live broadcast items, mapped to nodes on a golden-angle
+     spiral and wired to the centre. The work itself, distributed. */
+  nodes(g, c) {
+    const { W, H, t, hue2 } = c;
+    const items = c.nodes || 6;
+    const GA = 2.39996;                                                  // the golden angle
+    for (let i = 0; i < items; i++) {
+      const a = i * GA + t * .00011;
+      const rr = Math.min(W, H) * (.13 + Math.sqrt(i / Math.max(1, items)) * .34);
+      const x = W / 2 + Math.cos(a) * rr, y = H / 2 + Math.sin(a) * rr * .7;
+      const beat = .55 + Math.sin(t * .0022 + i * 1.7) * .45;
+      streak(g, W / 2, H / 2, x, y, 1.1 * c.DPR, hue2, .1 + beat * .12);
+      dot(g, x, y, (3 + beat * 4) * c.DPR, i === 0 ? '#E8C46B' : hue2, .28 + beat * .35);
+    }
+  },
+};
+
 M.render = function render(g, name, c) {
   const world = WORLDS[name] || WORLDS.murmuration;
+  // THE POWER modifies the physics of whichever world is running — it is not a
+  // label, it is a change in how the system behaves.
+  const pw = POWERS[c.power];
+  const ctx = pw
+    ? { ...c, e: Math.min(1, c.e * pw.e), v: { ...c.v, warp: c.v.warp * pw.warp, density: c.v.density * pw.density } }
+    : c;
   // 1 · TRAILS: fade the last frame rather than wiping it
   g.globalCompositeOperation = 'source-over';
   g.globalAlpha = 1;
@@ -507,8 +728,9 @@ M.render = function render(g, name, c) {
   g.fillRect(0, 0, c.W, c.H);
   // 2 · ADDITIVE LIGHT for everything that follows
   g.globalCompositeOperation = 'lighter';
-  world(g, c);
-  sigil(g, c);
+  world(g, ctx);
+  if (pw && pw.overlay && OVERLAY[pw.overlay]) OVERLAY[pw.overlay](g, ctx);
+  sigil(g, ctx);
   g.globalAlpha = 1;
   g.globalCompositeOperation = 'source-over';
 };
