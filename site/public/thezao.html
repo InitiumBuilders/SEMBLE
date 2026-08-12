@@ -94,7 +94,10 @@
         <div class="pc-marks">
           <span class="pc-s">SEMBLE.CC</span>
           <span class="pc-plus" aria-hidden="true">+</span>
-          <span class="pc-z">THE ZAO</span>
+          <!-- the official wordmark, exactly as it appears on the partnership
+               card. The gold text underneath is the fallback: if the image is
+               missing, :has() stops matching and the text returns. -->
+          <span class="pc-z"><img class="pc-zlogo" src="/partners/zao-logo.png" alt="THE ZAO" onerror="this.remove()"><span class="pc-ztext">THE ZAO</span></span>
         </div>
         <div class="pc-kick">P A R T N E R S H I P</div>
         <p class="pc-tag">BUILDING. TOGETHER.<br><span>FOR THE CULTURE. FOR THE FUTURE.</span></p>

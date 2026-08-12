@@ -310,7 +310,21 @@ section > .wrap > .lead { margin-bottom: 26px; max-width: 62ch; }
   font-family: 'Sora'; font-weight: 800; font-size: 1.3rem; color: var(--void);
   background: linear-gradient(135deg, #FF8A5B, var(--zao));
   box-shadow: 0 0 30px -10px var(--zao);
+  overflow: hidden;
 }
+.plogo img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+/* the real wordmark is gold art — it sits on the dark panel, not on the orange
+   gradient it would fight with. The gradient returns with the letter if the
+   image is ever missing. */
+.plogo:has(img) { background: radial-gradient(120% 120% at 30% 20%, #1A2030, var(--deep)); border: 1px solid rgba(232,196,107,.35); }
+.plogo:has(img) .pl-letter { display: none; }
+
+/* the partnership-card wordmark */
+.pc-zlogo {
+  height: clamp(2.2rem, 10vw, 3.7rem); width: auto; display: block;
+  filter: drop-shadow(0 0 20px rgba(232,196,107,.55));
+}
+.pc-z:has(.pc-zlogo) .pc-ztext { display: none; }
 .ptier {
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .14em;
   padding: 5px 11px; border-radius: 999px; color: var(--gold-t);
