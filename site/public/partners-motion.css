@@ -306,6 +306,37 @@ body::before {
 .glass:hover .mk, .pcard:hover .mk { transform: scale(1.12) rotate(-4deg); }
 .mk { transition: transform .32s var(--ease); }
 
+/* ── ⑧ THE RULE DRAWS ITSELF. Each headline's underline is drawn as it enters
+      the viewport — pure CSS view-timeline, per element, zero JS. The headline
+      TEXT is never touched: browsers without view() simply show no rule. ── */
+@supports (animation-timeline: view()) {
+  section > .wrap > h2 { position: relative; }
+  section > .wrap > h2::after {
+    content: ''; position: absolute; left: 0; bottom: -12px; height: 3px; width: 100%;
+    border-radius: 2px; transform: scaleX(0); transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--cyan), var(--violet) 55%, transparent 92%);
+    animation: drawRule linear both;
+    animation-timeline: view();
+    animation-range: entry 15% entry 70%;
+  }
+}
+@keyframes drawRule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ── ⑨ the source tags answer the pointer — invitation, not decoration ── */
+.tag { transition: border-color .28s var(--ease), color .28s var(--ease), transform .28s var(--ease); }
+.tag:hover { border-color: rgba(123,227,234,.55); transform: translateY(-2px); }
+
+/* ── ⑩ the badge breathes gold — the announcement never sits perfectly still ── */
+.badge { animation: badgeBreath 7s var(--ease) infinite; }
+@keyframes badgeBreath {
+  0%, 100% { box-shadow: 0 0 34px -12px rgba(232, 196, 107, .85); }
+  50%      { box-shadow: 0 0 52px -8px rgba(232, 196, 107, 1); }
+}
+
+/* ── ⑪ a face leans in when greeted ── */
+.avatar img { transition: transform .5s var(--ease); }
+.person:hover .avatar img, .pc-who:hover .avatar img { transform: scale(1.07); }
+
 /* ── THE PAUSE GATE. Set by the observer on sections that are off screen.
    ⚠ SCOPED DELIBERATELY, AND THE SCOPE IS THE SAFETY. A blanket
    `.off * { animation-play-state: paused }` would also freeze the ENTRANCE
@@ -315,7 +346,7 @@ body::before {
    So the gate names only the infinite decorative loops. Entrance animations are
    never touched by it, and cannot be. ── */
 .off .mark.s, .off .mark-x, .off .mark.z,
-.off .loop .n, .off .avatar,
+.off .loop .n, .off .avatar, .off .badge,
 .off .pc-glow, .off .pc-plus, .off .pc-plus2 { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -328,6 +359,10 @@ body::before {
   .rail { display: none; }
   body::before,
   .hero .mark.s, .hero .mark-x, .hero .mark.z,
-  .loop .n, .avatar, .pf.landed b { animation: none !important; }
+  .loop .n, .avatar, .pf.landed b, .badge { animation: none !important; }
   .mk, .glass:hover .mk, .pcard:hover .mk { transition: none; transform: none; }
+  /* the rule appears fully drawn — the information (a section boundary) stays */
+  section > .wrap > h2::after { animation: none !important; transform: none; }
+  .tag, .avatar img { transition: none; }
+  .tag:hover, .person:hover .avatar img, .pc-who:hover .avatar img { transform: none; }
 }

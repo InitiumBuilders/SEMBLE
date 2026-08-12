@@ -211,11 +211,15 @@ section > .wrap > .lead { margin-bottom: 26px; max-width: 62ch; }
 .person.z .role { color: var(--zao); }
 .person p { font-size: 14.5px; text-align: left; }
 .person .tag {
-  display: inline-block; margin-top: 11px; font-family: 'IBM Plex Mono', monospace;
+  display: inline-flex; margin-top: 11px; font-family: 'IBM Plex Mono', monospace;
   font-size: 11px; padding: 5px 11px; border-radius: 999px;
   border: 1px solid rgba(255,255,255,.14); color: var(--ink2); text-decoration: none;
 }
 .person .tag:hover { border-color: rgba(123,227,234,.5); color: var(--accent-t); }
+/* a row of source links under a person — centred like the card, tags own no
+   top margin because the row carries it */
+.tags { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+.tags .tag { margin-top: 0; }
 
 /* ── quote ── */
 .quote {
