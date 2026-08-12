@@ -277,7 +277,8 @@ Public. `?node=<id>` claims the next unit that node has not already computed.
   "jobsRunning": true,          // ⚠ COMPUTED from the queue, no longer hard-coded
   "queue": { "open": 2, "verifying": 3, "done": 1, "disputed": 1 },
   "completed": 1, "unitsWorth": 25, "need": 2, "quarantined": 1,
-  "byTask": [ { "task": "Index the Motus corpus", "units": 1, "contributors": 2 } ],
+  "byTask": [ { "task": "Index the Motus corpus", "units": 1, "inFlight": 6, "contributors": 2 } ],
+  "standing": { "on": true, "task": "Standing — …", "kind": "embed", "generated": 42, "what": "…" },
   "verification": "Every unit is computed independently by 3 machines and settles only when their digests agree…",
   "need": 3, "canaryRate": 4,
   "recent": [ { "id": "u…", "kind": "embed", "task": "…", "digest": "edce4537", "by": ["honest", "hones2"] } ]
@@ -289,7 +290,20 @@ Public. `?node=<id>` claims the next unit that node has not already computed.
 ```
 
 ⚠ **The client is never told which units are canaries.** That is the point — a
-probe you can recognise is a probe you can pass.
+probe you can recognise is a probe you can pass. This is strong enough that the
+project's own harness cannot identify them either: it discovers a non-canary
+unit empirically by submitting and seeing whether it settled on the first
+answer, and reports how many it skipped.
+
+⚠ **`byTask` counts in-flight work as well as finished work.** It listed only
+settled units at first, so a task dispatched to the pool showed nothing until
+three machines had agreed — the operator's board said *"the pool is not on
+this"* while the pool was actively on it. *Is it being worked?* and *did it
+finish?* are different questions and both need answering.
+
+⚠ **`standing`** describes the corpus that keeps the pool from ever being idle.
+Configure with `POST {op:"standing", on, task, kind, corpus[]}`. See
+[`DISPATCH.md`](DISPATCH.md#the-standing-queue--why-the-pool-is-never-idle).
 
 A quarantined node gets `{ unit: null, quarantined: true, why: "…" }`.
 
