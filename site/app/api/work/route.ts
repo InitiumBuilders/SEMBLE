@@ -183,16 +183,25 @@ export async function GET(req: Request) {
   }
 
   // public queue view + the work record
+  //
+  // ⚠ byTask counts IN-FLIGHT work as well as finished work. It used to list
+  // only settled units, which meant a task dispatched to the pool showed
+  // nothing at all until three machines had agreed — so the operator's board
+  // said "the pool is not on this" while the pool was actively on it. "Is the
+  // pool working on this?" and "did it finish?" are different questions and
+  // both need answering.
   const done = w.units.filter((u) => u.status === 'done');
-  const byTask = Object.values(done.reduce((acc, u) => {
+  const byTask = Object.values(w.units.reduce((acc, u) => {
     const k = u.task || 'unattributed';
-    acc[k] = acc[k] || { task: k, units: 0, contributors: new Set<string>() };
-    acc[k].units++;
+    acc[k] = acc[k] || { task: k, units: 0, inFlight: 0, contributors: new Set<string>() };
+    if (u.status === 'done') acc[k].units++;
+    else if (u.status === 'open' || u.status === 'verifying') acc[k].inFlight++;
     u.results.forEach((r) => acc[k].contributors.add(r.node));
     return acc;
-  }, {} as Record<string, { task: string; units: number; contributors: Set<string> }>))
-    .map((t) => ({ task: t.task, units: t.units, contributors: t.contributors.size }))
-    .sort((a, b) => b.units - a.units);
+  }, {} as Record<string, { task: string; units: number; inFlight: number; contributors: Set<string> }>))
+    .map((t) => ({ task: t.task, units: t.units, inFlight: t.inFlight, contributors: t.contributors.size }))
+    .filter((t) => t.units || t.inFlight)
+    .sort((a, b) => (b.units + b.inFlight) - (a.units + a.inFlight));
 
   return Response.json({
     // ⚠ THE HEADLINE. Unlike rung 4 this is now COMPUTED, because work really
