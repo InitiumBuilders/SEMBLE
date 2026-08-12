@@ -41,14 +41,16 @@
         <span class="chip mono" id="hud-pow">PARADIGM SHIFT</span>
         <span class="chip power" id="hud-power" style="display:none"></span>
         <span class="spacer"></span>
+        <span class="chip srcnow direct" id="srcNow">▶ DIRECT</span>
       </div>
     </div>
   </div>
   <div class="transport">
     <button class="btn" id="next">⤳ NEXT DROP</button>
-    <button class="btn" id="src">⛨ AD-FREE RELAY</button>
+    <button class="btn" id="src">▶ DIRECT · PLAYS</button>
+    <button class="btn" id="bail" style="display:none">↩ BACK TO DIRECT</button>
     <button class="btn" id="theaterBtn">⤢ THEATER</button>
-    <span class="note" id="tnote">the relay routes through open-source front-ends that strip every ad — if it sleeps, go direct</span>
+    <span class="note" id="tnote">Direct plays straight from YouTube — reliable, with sound. Ad-free routes through volunteer open-source instances: no ads at all when they answer, but they sometimes show a "checking your browser" page and stall.</span>
     <span class="keys" aria-hidden="true"><kbd>←</kbd><kbd>→</kbd> deck · <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>⇧</kbd>+<kbd>1</kbd>–<kbd>5</kbd> power · <kbd>space</kbd> drop · <kbd>T</kbd> theater</span>
   </div>
 
@@ -95,6 +97,14 @@
       </form>
       <div id="msgs"></div>
     </div>
+  </div>
+
+  <!-- LEND YOUR GPU -->
+  <div class="sec gpu-sec">
+    <div class="sec-label">DONATED COMPUTE · RUNG ONE</div>
+    <div class="sec-title">Lend the commons<br>a graphics card.</div>
+    <p class="sec-sub">The cheapest possible way to move with us: one click, no install, no account. Your browser reports what your card can actually do — and you can stop it dead any time.</p>
+    <div class="card gpu-card" id="gpuBody"></div>
   </div>
 
   <div class="foot">

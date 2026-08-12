@@ -146,6 +146,12 @@ body::before {
 .hud .chip.power { color: var(--gold-t); animation: powerpulse 2.8s var(--ease) infinite; }
 @keyframes powerpulse { 0%,100% { box-shadow: 0 0 0 rgba(232,196,107,0) } 50% { box-shadow: 0 0 24px rgba(232,196,107,.38) } }
 .hud .spacer { margin-left: auto; }
+/* WHICH DOOR IS OPEN — the label must never be able to lie about the path the
+   audio is actually taking. Green = proxied and ad-free; amber = straight from
+   YouTube because the open instances were down. */
+.srcnow { font-weight: 700; letter-spacing: .1em; }
+.srcnow.relay { color: #7BF3C0; border-color: rgba(84,230,168,.5) !important; }
+.srcnow.direct { color: var(--gold-t); border-color: rgba(232,196,107,.5) !important; }
 
 /* transport */
 .transport { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 16px 0 0; }
@@ -315,6 +321,19 @@ body.theater .curtain { padding-bottom: 96px; }
 .sc-res { margin-bottom: 16px; }
 .sc-res .k { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .18em; color: var(--label); margin-bottom: 8px; }
 .sc-res .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── LEND YOUR GPU — consent has to LOOK like consent ── */
+.gpu-card { margin-top: 22px; }
+.gpu-read { font-size: 16.5px; line-height: 1.6; color: var(--ink2); margin-bottom: 16px; }
+.gpu-read b { color: var(--ink); }
+.gpu-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.gpu-row .btn.off { opacity: .55; cursor: not-allowed; }
+.gpu-state { font-size: 15px; color: var(--ink2); flex: 1 1 260px; }
+.gpu-state.on { color: var(--gold-t); font-weight: 600; }
+.gpu-fine { margin-top: 16px; font-size: 14.5px; line-height: 1.6; color: var(--ink2);
+  padding: 15px 18px; border-radius: var(--r-sm); background: var(--panel2);
+  border: 1px solid rgba(150,200,220,.13); }
+.gpu-fine b { color: var(--accent-t); }
 
 /* ── footer ── */
 .foot { margin-top: 84px; text-align: center; color: var(--ink2); font-size: 15px; }

@@ -30,13 +30,27 @@ if (RIGHTNOW) document.body.classList.add('rightnow');
 
 /* ═══ STATE ═══ */
 const S = {
-  dj: P.djs[0], power: null, playing: false, mode: 'relay',
+  // ⚠ DIRECT IS THE DEFAULT, DELIBERATELY. The ad-free relay routes through
+  // volunteer Invidious instances, and those sit behind Cloudflare-style
+  // "Checking your browser…" interstitials that HANG FOREVER inside an iframe —
+  // which is exactly what August hit. An API probe cannot see that (the API
+  // answers 200 while the embed is gated), so no amount of probing makes the
+  // relay trustworthy as a default. The product must PLAY MUSIC when you press
+  // play; ad-free is offered as an experiment you can opt into, with the
+  // failure mode named up front instead of discovered.
+  dj: P.djs[0], power: null, playing: false, mode: 'direct',
   // energy starts mid-phrase, not at zero — a universe that fades UP from
   // nothing on load reads as broken for the first ten seconds
   vid: null, rotateT: 0, live: null, energy: .45, phrase: 0, drop: 0, beatFlash: 0,
   evo: null,                    // the current scene mutation (see evolve())
   scTab: 'top', msgs: [], voted: {}, autoT: 0, theater: false,
+  // Set by the first real interaction. Browsers only permit autoplay WITH
+  // SOUND after a user gesture, so this is the difference between a music
+  // stream and a silent one — see embedUrl().
+  gesture: false,
 };
+['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
+  addEventListener(ev, () => { S.gesture = true; }, { once: true, passive: true }));
 try { S.voted = JSON.parse(localStorage.getItem('sc.voted') || '{}'); } catch {}
 
 /* ═══ RESIDENT GUESTS — seeded streams that ride every queue ═══ */
@@ -68,31 +82,84 @@ async function searchIds(query) {
   if (ids.length) localStorage.setItem(key, JSON.stringify({ ts: Date.now(), ids: ids.slice(0, 24) }));
   return ids;
 }
-function embedUrl(id) {
-  if (S.mode === 'relay') {
-    const inst = localStorage.getItem('vibe.inst') || INV[0];
-    return `${inst}/embed/${id}?autoplay=1&local=true`;
+/* ═══ WHICH DOOR IS ACTUALLY OPEN ═══
+   Public Invidious/Piped instances die, rate-limit and 403 constantly — at the
+   time of writing only ONE of four was serving. Hard-coding the first one and
+   hoping is why the relay "worked" until it silently didn't. So: probe, cache
+   the winner for an hour, and if none answer, say so and fall through to
+   DIRECT rather than leaving a dead black frame with a confident label. */
+async function pickInstance() {
+  const cached = localStorage.getItem('vibe.inst');
+  const when = +(localStorage.getItem('vibe.instAt') || 0);
+  if (cached && Date.now() - when < 3600e3) return cached;
+  for (const base of INV) {
+    const ok = await tryJson(`${base}/api/v1/search?q=mix&type=video`, 4000);
+    if (Array.isArray(ok) && ok.length) {
+      localStorage.setItem('vibe.inst', base);
+      localStorage.setItem('vibe.instAt', String(Date.now()));
+      return base;
+    }
   }
-  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&modestbranding=1&rel=0&iv_load_policy=3`;
+  return null;
+}
+function embedUrl(id, inst) {
+  if (S.mode === 'relay' && inst) {
+    // no `local=true`: proxying the video through a volunteer instance is what
+    // makes the relay stutter. Invidious never serves ads either way.
+    return `${inst}/embed/${id}?autoplay=1`;
+  }
+  // ⚠ DIRECT MODE WAS PLAYING MUTED, WHICH FOR A MUSIC STREAM IS "BROKEN".
+  // `mute=1` was there to satisfy autoplay policy — but every path into spin()
+  // is a real user gesture (the play button, NEXT DROP, a DJ card, a key), and
+  // after a gesture the browser allows autoplay WITH SOUND. So we only mute
+  // when we genuinely have no gesture yet, and we say so on screen.
+  const m = S.gesture ? 0 : 1;
+  return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=${m}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1`;
 }
 async function spin(next) {
   const dj = S.dj;
+  note('finding a set…');
+  let inst = null;
+  if (S.mode === 'relay') {
+    inst = await pickInstance();
+    if (!inst) {
+      // HONEST FALLBACK. Every public instance is down — say it plainly and
+      // switch, rather than mounting a dead frame under a confident label.
+      S.mode = 'direct';
+      const b = $('#src'); if (b) b.textContent = '▶ DIRECT';
+      note('every open relay instance is down right now — switched to <b>direct</b> so the music still plays');
+    }
+  }
   const searched = await searchIds(dj.query);
   // the resident guests ride EVERY queue, whatever the mode
   let ids = [...SEEDS.map((s) => s.v), ...searched];
-  if (!searched.length && !ids.length) { note('the open relay instances are asleep — tap SOURCE to go direct'); return; }
   if (next && ids.length > 1) ids = ids.filter((x) => x !== S.vid);
-  // first-ever play welcomes a guest; after that, weighted random over the pool
   const first = !localStorage.getItem('vibe.played');
   S.vid = first ? SEEDS[0].v : ids[Math.floor(Math.random() * Math.min(ids.length, 12))];
   localStorage.setItem('vibe.played', '1');
-  $('#player').src = embedUrl(S.vid);
+  $('#player').src = embedUrl(S.vid, inst);
   $('.curtain').classList.add('gone');
   S.playing = true;
   clearTimeout(S.rotateT);
   S.rotateT = setTimeout(() => spin(true), (dj.setMin || 13) * 60e3);
   const guest = SEEDS.find((s) => s.v === S.vid);
-  note(`now spinning <b>${guest ? guest.who + ' · resident guest' : dj.name}</b> — ${S.mode === 'relay' ? 'ad-free relay' : 'direct'} · next drop in ${dj.setMin} min`);
+  const via = S.mode === 'relay' ? `ad-free relay · ${inst.replace(/^https?:\/\//, '')}` : 'direct from YouTube';
+  const muted = S.mode !== 'relay' && !S.gesture;
+  note(`now spinning <b>${guest ? guest.who + ' · resident guest' : dj.name}</b> — ${via}${searched.length ? '' : ' · search was quiet, playing the residents'} · next drop in ${dj.setMin} min`
+    + (muted ? ' — <b>tap the stage to unmute</b>' : ''));
+  paintSource();
+}
+/* The source indicator tells the truth about which door is actually open. */
+function paintSource() {
+  const el = $('#srcNow');
+  if (el) {
+    el.className = 'srcnow ' + (S.mode === 'relay' ? 'relay' : 'direct');
+    el.textContent = S.mode === 'relay' ? '⛨ AD-FREE (experimental)' : '▶ DIRECT';
+  }
+  const bail = $('#bail');
+  if (bail) bail.style.display = S.mode === 'relay' ? '' : 'none';
+  const b = $('#src');
+  if (b) b.textContent = S.mode === 'relay' ? '⛨ TRYING AD-FREE' : '▶ DIRECT · PLAYS';
 }
 function note(html) { const n = $('#tnote'); if (n) n.innerHTML = html; }
 
@@ -398,6 +465,73 @@ async function sendCrowd(e) {
   else note(r && r.error ? esc(r.error) : 'the crowd is catching its breath — one more try in a moment');
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEND YOUR GPU — donated compute, rung 1: pledge + real probe.
+
+   ⚠ THE HONESTY LAW HERE. This MEASURES hardware; it never estimates from the
+   user-agent, never counts a pledge as capacity that isn't there, and tells a
+   device with no WebGPU that it has none instead of quietly counting it. It
+   also does no work yet — it says so. A counter that inflates itself would be
+   worth less than no counter.
+
+   And it can never make Davara faster: she runs on Claude, in Anthropic's data
+   centres. Donated GPUs run OPEN models, render visuals, and crunch research.
+   Saying otherwise would be a lie, so the copy says exactly that.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const GPU = { probed: false, ok: false, info: null, pledged: false };
+try { GPU.pledged = localStorage.getItem('gpu.pledge') === '1'; } catch {}
+
+async function probeGPU() {
+  GPU.probed = true;
+  if (!navigator.gpu) { GPU.ok = false; GPU.info = { why: 'this browser has no WebGPU' }; return GPU; }
+  try {
+    const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+    if (!adapter) { GPU.ok = false; GPU.info = { why: 'WebGPU is present but no adapter was granted' }; return GPU; }
+    const i = (adapter.info || {});
+    const L = adapter.limits || {};
+    // real numbers off the real adapter — the honest measure of what was lent
+    const buf = Number(L.maxStorageBufferBindingSize || 0);
+    const tier = buf >= 2e9 ? 'workstation' : buf >= 1e9 ? 'desktop' : buf >= 2.5e8 ? 'laptop' : 'light';
+    GPU.ok = true;
+    GPU.info = {
+      vendor: i.vendor || 'unknown', arch: i.architecture || '', device: i.device || '',
+      maxBuffer: buf, maxWorkgroup: Number(L.maxComputeWorkgroupSizeX || 0),
+      maxInvocations: Number(L.maxComputeInvocationsPerWorkgroup || 0), tier,
+    };
+  } catch (e) { GPU.ok = false; GPU.info = { why: (e && e.message) || 'the adapter refused' }; }
+  return GPU;
+}
+function gpuLine() {
+  if (!GPU.probed) return 'checking what this device can actually offer…';
+  if (!GPU.ok) return `<b>No WebGPU here</b> — ${esc((GPU.info || {}).why || 'unavailable')}. Nothing to lend from this device, and it would be dishonest to count it.`;
+  const i = GPU.info;
+  const gb = (i.maxBuffer / 1073741824).toFixed(2);
+  return `<b>${esc(i.vendor)}${i.arch ? ' · ' + esc(i.arch) : ''}</b> — <b>${esc(i.tier)}</b> class · ${gb} GB max buffer · ${i.maxInvocations} invocations/workgroup. That is measured off your actual adapter, not guessed.`;
+}
+async function pledgeGPU() {
+  if (!GPU.probed) await probeGPU();
+  if (!GPU.ok) { renderGPU(); return; }
+  GPU.pledged = !GPU.pledged;
+  try { localStorage.setItem('gpu.pledge', GPU.pledged ? '1' : '0'); } catch {}
+  renderGPU();
+}
+function renderGPU() {
+  const el = $('#gpuBody'); if (!el) return;
+  const i = GPU.info || {};
+  el.innerHTML = `
+    <p class="gpu-read">${gpuLine()}</p>
+    <div class="gpu-row">
+      <button class="btn ${GPU.pledged ? '' : 'prime'} ${GPU.ok ? '' : 'off'}" id="gpuBtn" ${GPU.ok ? '' : 'disabled'}>
+        ${GPU.pledged ? '◼ STOP LENDING' : '⚡ LEND YOUR GPU'}
+      </button>
+      <span class="gpu-state ${GPU.pledged ? 'on' : ''}">${GPU.pledged
+        ? 'Pledged. Nothing is running yet — jobs arrive at rung 2, and you can stop any time.'
+        : 'Opt-in only. Nothing ever runs without this button, and closing the tab ends it.'}</span>
+    </div>
+    <p class="gpu-fine">Lent GPUs run <b>open-weight models</b>, render the MotusLive worlds, and crunch community research — <b>public work only</b>. They cannot speed up Davara: she runs on Claude in Anthropic's data centres, and pretending otherwise would be a lie. No background compute, no auto-start, one click to stop.</p>`;
+  const b = $('#gpuBtn'); if (b) b.onclick = pledgeGPU;
+}
+
 /* ═══ BUILD THE UI ═══ */
 function buildDeck() {
   $('#deck').innerHTML = P.djs.map((d) => `
@@ -441,13 +575,31 @@ addEventListener('DOMContentLoaded', () => {
   vsize(); swsize();
   requestAnimationFrame(vloop);
   requestAnimationFrame(swloop);
-  $('#play').addEventListener('click', () => spin(false));
-  $('#next').addEventListener('click', () => spin(true));
+  // Every one of these IS a user gesture by definition, so mark it here rather
+  // than relying on a pointerdown listener having fired first — that ordering
+  // is the difference between a music stream and a silent one.
+  $('#play').addEventListener('click', () => { S.gesture = true; spin(false); });
+  $('#next').addEventListener('click', () => { S.gesture = true; spin(true); });
   $('#src').addEventListener('click', () => {
     S.mode = S.mode === 'relay' ? 'direct' : 'relay';
-    $('#src').textContent = S.mode === 'relay' ? '⛨ AD-FREE RELAY' : '▶ DIRECT';
-    if (S.playing) spin(false);
+    $('#src').textContent = S.mode === 'relay' ? '⛨ TRYING AD-FREE' : '▶ DIRECT · PLAYS';
+    localStorage.removeItem('vibe.instAt');           // re-probe on an explicit switch
+    paintSource();
+    // ⚠ ALWAYS RE-MOUNT. The old code only re-mounted `if (S.playing)`, so
+    // switching source while a dead relay frame sat there did NOTHING — the
+    // "Checking your browser…" page just stayed on screen, which reads as the
+    // toggle being broken. Switching the source must always change the source.
+    spin(false);
   });
+  // If the relay hangs (an interstitial we cannot see cross-origin), one tap
+  // gets the music back. Shown only while the relay is selected.
+  const bail = $('#bail');
+  if (bail) bail.addEventListener('click', () => {
+    S.mode = 'direct';
+    $('#src').textContent = '▶ DIRECT · PLAYS';
+    paintSource(); spin(false);
+  });
+  paintSource();
   $$('.sc-tab').forEach((b) => b.addEventListener('click', () => {
     S.scTab = b.dataset.tab;
     $$('.sc-tab').forEach((x) => x.classList.toggle('on', x === b));
@@ -482,6 +634,8 @@ addEventListener('DOMContentLoaded', () => {
   // the swarm notices your cursor — the page is aware you are in the room
   addEventListener('pointermove', (ev) => { S.mx = ev.clientX; S.my = ev.clientY; S.mt = performance.now(); }, { passive: true });
   $('#chat-form').addEventListener('submit', sendCrowd);
+  renderGPU();
+  probeGPU().then(renderGPU);          // measure the real adapter, then tell the truth
   pollLive(); pollCrowd();
   setInterval(pollLive, 9000);
   setInterval(pollCrowd, 12000);
