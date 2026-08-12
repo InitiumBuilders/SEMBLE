@@ -497,6 +497,12 @@ async function probeGPU() {
       vendor: i.vendor || 'unknown', arch: i.architecture || '', device: i.device || '',
       maxBuffer: buf, maxWorkgroup: Number(L.maxComputeWorkgroupSizeX || 0),
       maxInvocations: Number(L.maxComputeInvocationsPerWorkgroup || 0), tier,
+      // the adapter's own declared feature set — what it can ACTUALLY run.
+      // shader-f16 in particular decides whether an open-weight model is
+      // viable here at all, so it is worth surfacing rather than averaging away.
+      features: [...(adapter.features || [])].slice(0, 16),
+      maxWorkgroupsPerDim: Number(L.maxComputeWorkgroupsPerDimension || 0),
+      maxStorageBuffers: Number(L.maxStorageBuffersPerShaderStage || 0),
     };
   } catch (e) { GPU.ok = false; GPU.info = { why: (e && e.message) || 'the adapter refused' }; }
   return GPU;
@@ -525,29 +531,180 @@ async function pushPledge(extra = {}) {
     body: JSON.stringify({
       id: GPU.id, tier: 'tab', vendor: i.vendor, arch: i.arch, klass: i.tier,
       maxBufferMB: Math.round((i.maxBuffer || 0) / 1048576), invocations: i.maxInvocations,
+      features: i.features || [],
+      // ATTRIBUTION: every second is credited to the DJ who was on and the mode
+      // it was watched in. Without this the ledger knows how much but not whose
+      // set earned it — and "which world pulled the compute" is the interesting
+      // question, not the total.
+      dj: (S.dj && S.dj.id) || 'unknown',
+      mode: S.theater ? 'theater' : (S.mode || 'direct'),
       dash: GPU.dash, trust: GPU.trust, ...extra,
     }),
   }).then((x) => x.json()).catch(() => null);
+  if (r && r.ok) { GPU.mine = r; renderGPU(); }
   return r;
 }
 async function pollPool() {
   const j = await tryJson(`${API}/api/compute?ts=${Date.now()}`, 8000);
   if (j) { GPU.pool = j; renderPool(); }
 }
+async function pollPayouts() {
+  const j = await tryJson(`${API}/api/payouts?ts=${Date.now()}`, 8000);
+  if (j) { GPU.pay = j; renderPayouts(); }
+}
+async function pollGolem() {
+  const j = await tryJson(`${API}/api/golem?ts=${Date.now()}`, 12000);
+  if (j) { GPU.golem = j; renderGolem(); }
+}
+/* ── number helpers: big numbers stay readable, small ones stay honest ── */
+const nfmt = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + 'B'
+  : n >= 1e6 ? (n / 1e6).toFixed(2) + 'M'
+  : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : String(Math.round(n)));
+const hfmt = (s) => (s >= 3600 ? (s / 3600).toFixed(1) + 'h' : s >= 60 ? Math.round(s / 60) + 'm' : Math.round(s) + 's');
+const djName = (id) => (P.djs.find((d) => d.id === id) || {}).name || (id === 'unknown' ? 'unattributed' : id);
+const djHue = (id) => (P.djs.find((d) => d.id === id) || {}).hue || 'var(--accent)';
+
+/* ── the history bars: pure SVG, no library, theme-aware ──
+   Only ever drawn from bucket.motusSeconds, which the API ACCUMULATES per beat.
+   Deriving it as seconds×capability over-counted 3.4x — the chart and the
+   payout engine must read the same number or the chart is a lie. */
+function historyBars(hist) {
+  if (!hist || !hist.length) return '<p class="pool-empty">No history yet — the first hour of contribution starts the record.</p>';
+  const max = Math.max(...hist.map((h) => h.motusSeconds), 1);
+  const W = 100, H = 34, n = hist.length;
+  const bw = W / n;
+  const bars = hist.map((h, i) => {
+    const hh = Math.max(0.6, (h.motusSeconds / max) * H);
+    const top = hist.slice().sort((a, b) => b.motusSeconds - a.motusSeconds)[0] === h;
+    return `<rect x="${(i * bw).toFixed(3)}" y="${(H - hh).toFixed(2)}" width="${(bw * 0.72).toFixed(3)}" height="${hh.toFixed(2)}"
+      rx="${Math.min(0.5, bw * 0.3).toFixed(2)}" class="hb${top ? ' peak' : ''}"><title>${new Date(h.t).toLocaleString()} — ${nfmt(h.motusSeconds)} MOTUS-s · ${h.nodes} node(s)</title></rect>`;
+  }).join('');
+  const first = new Date(hist[0].t), last = new Date(hist[hist.length - 1].t);
+  return `<svg class="hist" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
+      aria-label="Contributed compute per hour, ${hist.length} hours">${bars}</svg>
+    <div class="hist-ax"><span>${first.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${first.getHours()}:00</span>
+      <span>peak ${nfmt(max)} MOTUS-s/h</span>
+      <span>${last.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${last.getHours()}:00</span></div>`;
+}
+
 function renderPool() {
   const el = $('#poolBody'); if (!el || !GPU.pool) return;
-  const p = GPU.pool;
+  const p = GPU.pool, m = p.motus || {};
   const hrs = (p.seconds / 3600).toFixed(1);
+
+  // ── per-DJ record: which set actually pulled the compute ──
+  const djRows = (p.byDj || []).filter((d) => d.seconds > 0).map((d) => `
+    <tr style="--c:${djHue(d.dj)}">
+      <td class="dj"><i class="dot"></i>${esc(djName(d.dj))}</td>
+      <td class="num">${hfmt(d.seconds)}</td>
+      <td class="num">${d.nodes}</td>
+      <td class="num">${d.capability}</td>
+      <td class="bar"><span style="width:${Math.max(2, d.share)}%"></span><b>${d.share}%</b></td>
+    </tr>`).join('') || '<tr><td colspan="5" class="empty">No attributed compute yet.</td></tr>';
+
+  const modeRows = (p.byMode || []).map((x) => `
+    <li><b>${esc(x.mode)}</b> <span>${hfmt(x.seconds)} · ${x.nodes} node${x.nodes === 1 ? '' : 's'}</span></li>`).join('');
+
+  const tierRows = (p.byTier || []).filter((t) => t.count > 0).map((t) => `
+    <li><b>${esc(t.tier)}</b> <span>${t.count} × · cap ${t.capability} · ${hfmt(t.seconds)}</span></li>`).join('')
+    || '<li class="empty">nothing pledged yet</li>';
+
   el.innerHTML = `
     <div class="pool-grid">
       <div class="pool-stat"><span class="k">LIVE NOW</span><b>${p.live}</b><i>node${p.live === 1 ? '' : 's'} pledged and awake</i></div>
-      <div class="pool-stat"><span class="k">POOL CAPABILITY</span><b>${p.liveCapability}</b><i>tab-equivalents — a relative measure of what is pledged</i></div>
-      <div class="pool-stat"><span class="k">ALL TIME</span><b>${p.pledged}</b><i>machines have lent, ${hrs}h pledged</i></div>
-      <div class="pool-stat"><span class="k">PAYABLE</span><b>${p.withDash + p.withTrust}</b><i>${p.withDash} with a $DASH address · ${p.withTrust} with $TRUST</i></div>
+      <div class="pool-stat"><span class="k">POOL CAPABILITY</span><b>${p.liveCapability}</b><i>tab-equivalents — relative pledged capability, never a FLOPS claim</i></div>
+      <div class="pool-stat"><span class="k">TOTAL CONTRIBUTED</span><b>${nfmt(m.accrued || 0)}</b><i>MOTUS-seconds — 1s of capability-1.0 compute</i></div>
+      <div class="pool-stat"><span class="k">ALL TIME</span><b>${p.pledged}</b><i>machines have lent · ${hrs}h wall-clock</i></div>
     </div>
+
+    <div class="pool-sub">
+      <div class="ps-card">
+        <div class="k">CONTRIBUTED PER HOUR</div>
+        ${historyBars(p.history)}
+      </div>
+    </div>
+
+    <div class="pool-two">
+      <div class="ps-card">
+        <div class="k">PER-DJ COMPUTE RECORD</div>
+        <table class="djtab">
+          <thead><tr><th>DJ</th><th class="num">time</th><th class="num">nodes</th><th class="num">cap</th><th>share</th></tr></thead>
+          <tbody>${djRows}</tbody>
+        </table>
+      </div>
+      <div class="ps-card">
+        <div class="k">BY MODE</div><ul class="kv">${modeRows || '<li class="empty">no mode data yet</li>'}</ul>
+        <div class="k" style="margin-top:14px">BY TIER</div><ul class="kv">${tierRows}</ul>
+      </div>
+    </div>
+
+    <div class="pool-ledger">
+      <div class="k">THE ACCRUAL — what is owed, and why it has not been sent</div>
+      <div class="acc-row">
+        <div><b>${nfmt(m.open || 0)}</b><span>MOTUS-s open</span></div>
+        <div><b>${(m.owedDash || 0).toFixed(6)}</b><span>$DASH owed</span></div>
+        <div><b>$${(m.owedUsd || 0).toFixed(2)}</b><span>at $${m.dashUsd}/DASH</span></div>
+        <div class="${m.settleable ? 'go' : 'hold'}"><b>${m.settleable ? 'CLEARS' : 'HOLDING'}</b><span>floor $${m.settleFloorUsd}</span></div>
+      </div>
+      <p class="acc-why">${esc(m.why || '')} Balances accrue until they clear the floor — they never expire and they are never rounded away.</p>
+    </div>
+
     <p class="pool-note">${p.jobsRunning
       ? 'Jobs are running.'
-      : '<b>No jobs are dispatched yet.</b> This is the ledger, running honestly ahead of the work: pledges and payout addresses are recorded so the accounting exists before the first job does. Nothing is executing on your machine.'}</p>`;
+      : '<b>No jobs are dispatched yet.</b> This is the ledger, running honestly ahead of the work: pledges, attribution and accrual are recorded so the accounting exists before the first job does. Nothing is executing on your machine.'}</p>`;
+}
+
+/* ── the public payout ledger — every batch, every DJ, every rail ── */
+function renderPayouts() {
+  const el = $('#payBody'); if (!el || !GPU.pay) return;
+  const j = GPU.pay, s = j.summary || {};
+  const rows = (j.log || []).slice(0, 12).map((p) => `
+    <tr class="st-${p.status}">
+      <td>${new Date(p.ts).toLocaleDateString([], { month: 'short', day: 'numeric' })}</td>
+      <td><span class="rail ${p.rail}">${p.rail.toUpperCase()}</span></td>
+      <td>${esc(djName(p.dj) || 'all')}</td>
+      <td class="num">${p.recipients}</td>
+      <td class="num">${p.rail === 'dash' ? p.amount.toFixed(6) : '—'}</td>
+      <td><span class="st">${p.status}</span></td>
+    </tr>`).join('') || `<tr><td colspan="6" class="empty">No payout batches yet — nothing has been armed and no money has moved.</td></tr>`;
+
+  const djPay = (j.byDj || []).map((d) => `
+    <li style="--c:${djHue(d.dj)}"><i class="dot"></i><b>${esc(djName(d.dj))}</b>
+      <span>${d.amount.toFixed(6)} DASH · ${d.recipients} paid · ${d.batches} batch${d.batches === 1 ? '' : 'es'}</span></li>`).join('')
+    || '<li class="empty">No DJ has paid out yet.</li>';
+
+  el.innerHTML = `
+    <div class="pay-head">
+      <div class="pay-stat"><span class="k">MONEY MOVED</span><b class="${j.moneyMoved ? 'go' : ''}">${j.moneyMoved ? 'YES' : 'NOT YET'}</b><i>${s.sent || 0} batch${s.sent === 1 ? '' : 'es'} sent</i></div>
+      <div class="pay-stat"><span class="k">$DASH SENT</span><b>${(s.dashSent || 0).toFixed(6)}</b><i>${s.recipientsPaid || 0} recipient(s) all time</i></div>
+      <div class="pay-stat"><span class="k">OPEN</span><b>$${(s.openOwedUsd || 0).toFixed(2)}</b><i>${nfmt(s.motusSecondsOpen || 0)} MOTUS-s accrued, unsettled</i></div>
+      <div class="pay-stat"><span class="k">$TRUST</span><b>${s.trustAttestations || 0}</b><i>attestations — receipts, never a reward</i></div>
+    </div>
+    <p class="pay-custody">🔑 ${esc(j.custody || '')}</p>
+    <div class="pool-two">
+      <div class="ps-card"><div class="k">PAYOUT LOG</div>
+        <table class="djtab paytab">
+          <thead><tr><th>when</th><th>rail</th><th>dj</th><th class="num">to</th><th class="num">DASH</th><th>state</th></tr></thead>
+          <tbody>${rows}</tbody></table></div>
+      <div class="ps-card"><div class="k">PAID BY DJ</div><ul class="kv djpay">${djPay}</ul>
+        <p class="pay-fine"><b>$TRUST is the receipt, never the reward.</b> Contributors cannot earn $TRUST for off-chain work — emissions go to veTRUST bonders. Rewards are $DASH; the attestation is the permanent record that you contributed.</p></div>
+    </div>`;
+}
+
+/* ── the Golem gauge: measured on every load, never a stored claim ── */
+function renderGolem() {
+  const el = $('#golemBody'); if (!el || !GPU.golem) return;
+  const g = GPU.golem, s = g.supply || {}, v = g.verdict || {};
+  const rt = Object.entries(s.runtimes || {}).map(([k, n]) => `<li><b>${esc(k)}</b><span>${n}</span></li>`).join('');
+  el.innerHTML = `
+    <div class="gol-grid">
+      <div class="pool-stat"><span class="k">PROVIDERS ONLINE</span><b>${s.providers || 0}</b><i>measured just now from Golem's own API</i></div>
+      <div class="pool-stat ${s.gpus ? '' : 'zero'}"><span class="k">GPUs ONLINE</span><b>${s.gpus || 0}</b><i>${s.gpus ? 'GPU rental is possible' : 'no GPU supply exists on the network'}</i></div>
+      <div class="pool-stat"><span class="k">ADAPTER</span><b>${g.adapter && g.adapter.configured ? 'WIRED' : 'STANDBY'}</b><i>requestor path${g.adapter && g.adapter.configured ? ' configured' : ' — one env var from live'}</i></div>
+    </div>
+    <ul class="kv gol-rt">${rt || '<li class="empty">no runtimes reported</li>'}</ul>
+    <p class="gol-note"><b>Viewers cannot contribute through Golem.</b> ${esc(v.whyNot || '')}</p>
+    <p class="gol-note dim">${esc(v.rentNote || '')} <b>This gauge re-measures every time you load the page</b> — if supply ever appears, this panel says so on its own.</p>`;
 }
 
 async function pledgeGPU() {
@@ -598,6 +755,18 @@ function renderGPU() {
         : 'Opt-in only. Nothing ever runs without this button, and closing the tab ends it.'}</span>
     </div>
     <p class="gpu-fine">Lent GPUs run <b>open-weight models</b>, render the MotusLive worlds, and crunch community research — <b>public work only</b>. They cannot speed up Davara: she runs on Claude in Anthropic's data centres, and pretending otherwise would be a lie. No background compute, no auto-start, one click to stop.</p>
+    ${GPU.mine && GPU.pledged ? `
+    <div class="mine">
+      <div class="k">YOUR RECORD — this device, on this ledger</div>
+      <div class="mine-row">
+        <div><b>${nfmt(GPU.mine.accrued || 0)}</b><span>MOTUS-s contributed</span></div>
+        <div><b>${(GPU.mine.owedDash || 0).toFixed(6)}</b><span>$DASH accrued</span></div>
+        <div><b>${GPU.mine.capability}</b><span>your capability</span></div>
+        <div class="${GPU.mine.settleable ? 'go' : 'hold'}"><b>${GPU.mine.settleable ? 'CLEARS' : 'BUILDING'}</b><span>toward the $5 floor</span></div>
+      </div>
+      ${(GPU.info && GPU.info.features || []).length ? `<p class="mine-feat">Adapter features: ${(GPU.info.features).map((f) => `<code>${esc(f)}</code>`).join(' ')}</p>` : ''}
+      <p class="mine-fine">Attributed to <b>${esc((S.dj && S.dj.name) || 'unknown')}</b> in <b>${esc(S.theater ? 'theater' : S.mode)}</b> mode. Your balance accrues until it clears the off-ramp floor — it never expires and it is never rounded away.</p>
+    </div>` : ''}
     <div class="gpu-wallets">
       <div class="k">WHERE TO PAY YOU — optional, and only ever your RECEIVING address</div>
       <div class="gpu-w-row">
@@ -724,6 +893,11 @@ addEventListener('DOMContentLoaded', () => {
     }
   });
   pollPool(); setInterval(pollPool, 20000);
+  // The payout ledger and the Golem gauge change on human timescales, not
+  // per-frame ones — polling them hard would burn a phone battery to re-render
+  // numbers that did not move. Golem's API is also somebody else's server.
+  pollPayouts(); setInterval(pollPayouts, 60000);
+  pollGolem(); setInterval(pollGolem, 300000);
   pollLive(); pollCrowd();
   setInterval(pollLive, 9000);
   setInterval(pollCrowd, 12000);

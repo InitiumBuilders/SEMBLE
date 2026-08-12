@@ -74,24 +74,58 @@ Requires `x-live-secret`. → `401 not the moderator`.
 
 ---
 
-## `GET /api/compute` — MotusCompute pool
+## `GET /api/compute` — MotusCompute telemetry
 
-Public. The pledge ledger.
+Public. The full ledger: pledges, attribution, hourly history and accrual.
 
 ```jsonc
 {
   "jobsRunning": false,
-  "note": "Rung 2: pledges and payout addresses are recorded. No jobs are dispatched yet.",
+  "note": "Telemetry rung: … No jobs are dispatched and no payment has been sent.",
   "pledged": 2, "live": 2,
   "capability": 8.85, "liveCapability": 8.85,
-  "seconds": 0, "sessions": 2,
-  "byTier": [ { "tier": "tab", "count": 2, "capability": 8.85 }, … ],
+  "seconds": 3600, "hours": 1.0, "sessions": 2,
+
+  "motus": {
+    "unit": "MOTUS-second = 1s of capability-1.0 compute",
+    "accrued": 16057.5, "paid": 0, "open": 16057.5,
+    "owedDash": 0.0064230, "owedUsd": 0.19,
+    "rate": 0.0000004, "dashUsd": 30.30,
+    "settleFloorUsd": 5, "settleable": false,
+    "why": "The floor is the OFF-RAMP, not the fee. A contributor cannot exit $0.42."
+  },
+
+  "byDj":   [ { "dj": "daoz", "seconds": 750, "hours": 0.21, "nodes": 3,
+                "sessions": 1, "capability": 12.45, "share": 32.1 } ],
+  "byMode": [ { "mode": "theater", "seconds": 90, "hours": 0.03, "nodes": 1 } ],
+  "byTier": [ { "tier": "tab", "count": 2, "capability": 8.85, "seconds": 600 } ],
+
+  "history": [ { "t": 1755014400000, "seconds": 600, "nodes": 4,
+                 "capability": 18.35, "motusSeconds": 8939,
+                 "byDj": { "daoz": 240 } } ],
+
   "withDash": 1, "withTrust": 0,
-  "recent": [ { "id": "a1b2c3", "tier": "tab", "klass": "…", "vendor": "…",
-                "cap": 2.95, "seconds": 0,
-                "dash": "Xk4f2p…9dLm", "trust": "" } ]
+  "recent": [ { "id": "a1b2c3", "tier": "tab", "klass": "desktop", "vendor": "nvidia",
+                "arch": "ada", "cap": 2.95, "seconds": 120,
+                "maxBufferMB": 2048, "invocations": 1024,
+                "features": ["shader-f16"], "accrued": 354,
+                "dash": "Xk4f2p…9dLm", "trust": "", "topDj": "daoz" } ],
+  "payouts": { "count": 0, "sent": 0, "dryRuns": 0, "lastTs": 0, "totalDashSent": 0 }
 }
 ```
+
+⚠ **`history[].motusSeconds` is ACCUMULATED at write time, never derived.**
+Computing it as `seconds × capability` over-counted by 3.4× (11,010 vs a true
+3,225), because bucket capability is the whole live pool while bucket seconds
+belong to individual beats. It is a headline number and it must equal what the
+payout engine would actually pay on. The `--airtest` harness asserts
+`Σ history.motusSeconds ≤ motus.accrued` on every run.
+
+### `GET /api/compute?node=<id>` — audit one machine
+
+Returns that node's full record: `byDj`, `byMode`, `accrued`, `paid`, `open`,
+`owedDash`, `settleable`, and its declared WebGPU `features`. A contributor can
+always audit exactly what they are owed and which sets they earned it during.
 
 **`jobsRunning: false` is hard-coded and always present.** It is not a status
 flag that might flip on its own — it is a standing statement that this rung
@@ -116,8 +150,11 @@ tierMul:  tab 1  ·  node 3  ·  pool 6  ·  rented 12
 ```jsonc
 { "id": "…", "tier": "tab|node|rented|pool",
   "vendor": "…", "arch": "…", "klass": "…",
-  "maxBufferMB": 2048, "invocations": 1024,
-  "seconds": 30, "dash": "X…", "trust": "0x…" }
+  "maxBufferMB": 2048, "invocations": 1024, "features": ["shader-f16"],
+  "seconds": 30,
+  "dj": "daoz",                 // who was live — drives per-DJ attribution
+  "mode": "direct|relay|theater",
+  "dash": "X…", "trust": "0x…" }
 ```
 
 **Validation, in order — the refusals matter more than the accepts:**
@@ -143,6 +180,88 @@ you can lend a machine and take the receipt without ever naming a wallet.
 ## `DELETE /api/compute` — operator only
 
 Requires `x-live-secret`. Wipes the ledger. → `401 not the operator`.
+
+---
+
+## `GET /api/payouts` — the public audit log
+
+Public. Every batch, every DJ, every rail. Addresses truncated.
+
+```jsonc
+{
+  "custody": "This service never holds a private key. It plans, arms and audits; the operator's own node signs.",
+  "moneyMoved": false,
+  "summary": { "batches": 0, "sent": 0, "dryRuns": 0, "armed": 0, "failed": 0,
+               "dashSent": 0, "trustAttestations": 0, "recipientsPaid": 0,
+               "motusSecondsSettled": 0, "motusSecondsOpen": 16057.5,
+               "openOwedDash": 0.006423, "openOwedUsd": 0.19 },
+  "byDj":   [ { "dj": "daoz", "batches": 1, "amount": 10.62, "recipients": 2, "motusSeconds": 1062 } ],
+  "byRail": [ { "rail": "dash",  "batches": 1, "sent": 1, "amount": 10.62, "note": "…" },
+              { "rail": "trust", "batches": 0, "sent": 0, "amount": 0,
+                "note": "TRUST is the RECEIPT, never the reward. … Amount is always 0 by design." } ],
+  "log": [ { "id", "batchId", "ts", "rail", "status", "recipients", "amount",
+             "motusSeconds", "rate", "dashUsd", "dj", "mode", "txid", "note" } ]
+}
+```
+
+Filterable: `?rail=dash|trust` · `?dj=<id>`.
+
+**`moneyMoved` is derived from batches actually settled.** It is `false` today
+and flips only when a real batch settles.
+
+## `POST /api/payouts` — operator only
+
+Requires `x-live-secret`; **fails closed with `401` if `LIVE_SECRET` is unset.**
+
+| `op` | What it does | State change |
+|---|---|---|
+| `plan` | dry run — who clears the floor, what it costs, emits a `sendmany` | none |
+| `arm` | freezes an immutable batch and returns the spec to sign | creates batch |
+| `settle` | records the txid; marks contributors paid — **idempotent** | marks paid |
+| `fail` | releases a batch; nothing is marked paid | releases |
+| `record-dry-run` | logs a plan to the audit trail without arming it | logs only |
+
+Body: `{ op, rail: "dash"|"trust", rate?, dashUsd?, dj?, mode?, batchId?, txid? }`
+
+**This service cannot sign.** `arm` returns:
+
+```jsonc
+{ "batchId": "b…", "recipients": 2, "total": 10.62,
+  "sendmany": { "Xk4f…": 7.08, "Xuxz…": 3.54 },
+  "next": "Sign this sendmany on YOUR node, then POST {op:\"settle\", batchId, txid}. This service cannot sign it." }
+```
+
+⚠ **Replaying `settle` returns `{ ok: true, already: true }` and re-credits
+nothing.** A retried request is normal; a payout system that pays twice on retry
+is one that drains. Verified live — see [`PAYOUTS.md`](PAYOUTS.md#-idempotency-is-the-property-that-matters-most).
+
+A settled batch **cannot** be retroactively failed → `409 already sent`.
+
+---
+
+## `GET /api/golem` — adapter + live supply gauge
+
+Public. **Re-measures Golem's own stats API on every request** — this is not a
+cached opinion.
+
+```jsonc
+{
+  "adapter": { "role": "requestor", "configured": false, "appkeyPresent": false,
+               "api": "http://127.0.0.1:7465", "subnet": "public",
+               "requires": "a local yagna daemon … No hosted gateway exists." },
+  "chain":   { "network": "polygon", "chainId": 137, "glm": "0x0B22…", "deposits": "0x57ff…" },
+  "supply":  { "measuredAt": …, "reachable": true, "providers": 370, "gpus": 0,
+               "runtimes": { "vm": 339, "wasmtime": 337 } },
+  "verdict": { "viewersCanContribute": false, "whyNot": "…", "canRentGpu": false, "rentNote": "…" }
+}
+```
+
+⚠ **The app-key is wallet control and is never echoed** — only `appkeyPresent`.
+`canRentGpu` is computed from the live probe, so if Golem ever grows GPU supply
+it flips on its own.
+
+`POST /api/golem` (operator only) dry-runs a requestor demand and reports
+whether it could be matched against live supply. It never signs.
 
 ---
 

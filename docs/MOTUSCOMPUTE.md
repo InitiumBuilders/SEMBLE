@@ -10,7 +10,8 @@ streamed — and a document that is equally clear about what it does **not** do.
 
 ## ⚠ Status, first, in plain words
 
-**Rung 2 of 5. Pledges are recorded. No jobs are dispatched. Nothing is paid.**
+**Rung 4 of 5. Contribution is measured, attributed and accrued. The payout
+engine is built and tested. No jobs are dispatched. No money has been sent.**
 
 `GET /api/compute` returns `jobsRunning: false` in every single response. That
 field is hard-coded, not computed, so no surface anywhere can imply work is
@@ -34,9 +35,14 @@ to avoid.
 |---|---|---|
 | 1 | Capability probe — measure what the browser can actually do | ✅ live |
 | 2 | Pledge ledger — record contributions and payout addresses | ✅ live |
-| **3** | **Dispatch — real WASM/WebGPU work units, verified** | 🔨 next |
-| 4 | Settlement — $DASH payouts above the practical floor | ⏳ designed |
-| 5 | Attestation — permanent public record on Intuition | ⏳ designed |
+| 3 | Telemetry — per-DJ/per-mode attribution, hourly history, accrual | ✅ live |
+| 4 | Settlement — plan → arm → settle, idempotent, publicly audited | ✅ **live, unarmed** |
+| **5** | **Dispatch — real WASM/WebGPU work units, verified** | 🔨 **next** |
+
+**Rung 4 before rung 5 is deliberate.** The accounting exists before the work
+does, so that when the first job runs there is already a tested, auditable,
+replay-safe path for paying for it. Building dispatch first and bolting
+accounting on afterwards is how you end up unable to prove what anyone is owed.
 
 ---
 

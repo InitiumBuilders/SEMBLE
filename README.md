@@ -18,13 +18,17 @@ working model of the system concept its DJ is named for.
 
 ## Read these in order
 
+**→ New here? [`docs/INTRO.md`](docs/INTRO.md) is the 60-second orientation.**
+
 | Doc | What it answers |
 |---|---|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How the four moving parts fit, and why there is no database |
+| [`docs/INTRO.md`](docs/INTRO.md) | **Start here.** What this is, the units, the five rungs, what we refuse to do |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How the moving parts fit, and why there is no database |
 | [`docs/PANTHEON.md`](docs/PANTHEON.md) | The eleven DJs, five powers, and what each one *means* |
 | [`docs/VISUALS.md`](docs/VISUALS.md) | The render engine, all eleven worlds, and how to add one |
 | [`docs/API.md`](docs/API.md) | Every endpoint, every field, every limit |
 | [`docs/MOTUSCOMPUTE.md`](docs/MOTUSCOMPUTE.md) | The shared-compute protocol — including what it does **not** do yet |
+| [`docs/PAYOUTS.md`](docs/PAYOUTS.md) | How compute becomes money, and why we made that harder on purpose |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | The threat model, the privacy model, and the scrub gate |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to add a world, a DJ, or a fix |
 
@@ -39,13 +43,21 @@ site/
 │  └─ api/
 │     ├─ live/route.ts         broadcast state  (operator writes, world reads)
 │     ├─ chat/route.ts         SourceCrowd thread + votes
-│     ├─ compute/route.ts      MotusCompute pledge ledger
+│     ├─ compute/route.ts      the MotusCompute ledger: pledges, attribution,
+│     │                        hourly history, accrual
+│     ├─ payouts/route.ts      the payout engine: plan → arm → settle, idempotent
+│     ├─ golem/route.ts        Golem requestor adapter + LIVE supply gauge
+│     ├─ _motus.ts             shared model: types, units, accrual math
 │     └─ _blob.ts              fresh-path Blob storage (see ARCHITECTURE §3)
 └─ public/
    ├─ pantheon.js              the canon: 11 DJs, 5 powers   (data, no logic)
    ├─ viz.js                   the render engine: 11 worlds + overlays
-   └─ live.js                  the vibe engine: stream cycler, state, UI
+   └─ live.js                  the vibe engine: stream cycler, state, telemetry UI
 ```
+
+**`_motus.ts` is the single source of truth for units and money math.** The
+ledger, the payout engine and every dashboard import from it, so they cannot
+disagree about what a MOTUS-second is worth.
 
 Three of those files are the whole product. `pantheon.js` is pure data,
 `viz.js` is pure rendering, `live.js` is everything that changes over time.
@@ -89,14 +101,23 @@ in [`docs/SECURITY.md`](docs/SECURITY.md).
 ## Honest status
 
 - ✅ **Live and working:** the pantheon, all eleven worlds, the stream cycler,
-  broadcast, SourceCrowd, the compute *pledge* ledger, the CortexInsight bridge.
-- 🔨 **Recorded but not dispatched:** MotusCompute jobs. The ledger accepts
-  pledges and payout addresses; **no work is dispatched and nothing is paid yet.**
-  The API says so itself — `GET /api/compute` returns `jobsRunning: false` in
-  every response, by design, so no surface can imply otherwise.
-- ❌ **Ruled out after measurement:** Golem as a compute rail — zero GPUs exist
-  on that network. The receipts are in
+  broadcast, SourceCrowd, the CortexInsight bridge, and the full MotusCompute
+  telemetry rail — per-DJ and per-mode attribution, hourly history, accrual in
+  MOTUS-seconds, and a public payout audit log.
+- ✅ **Built, tested, and deliberately unarmed:** the payout engine. plan → arm
+  → settle is complete and **verified end to end against production, including
+  replay-safety** (a repeated `settle` cannot double-credit). **No money has been
+  sent.** `moneyMoved: false` on `/api/payouts` is the live proof.
+- 🔨 **Not built:** job dispatch (rung 5). **No work is dispatched.**
+  `GET /api/compute` returns `jobsRunning: false` in every response — hard-coded,
+  not computed — so no surface can drift into implying otherwise.
+- ⚠ **Wired but structurally unusable:** Golem. The requestor adapter is real and
+  a **live gauge measures Golem's own API on every request**. It reports what is
+  actually there: ~370 providers and **zero GPUs**. A livestream viewer cannot
+  contribute through Golem at all. Receipts in
   [`docs/MOTUSCOMPUTE.md`](docs/MOTUSCOMPUTE.md#-what-we-ruled-out-and-why).
+- ❌ **Corrected and removed:** any suggestion that contributors can earn $TRUST.
+  Emissions go to veTRUST bonders. **TRUST is the receipt; DASH is the reward.**
 
 Part of the [Motus](https://www.motusmoves.us) ecosystem · with
 [Davara](https://www.motusmoves.us/davara), the systems mind.

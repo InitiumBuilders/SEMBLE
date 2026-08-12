@@ -144,7 +144,59 @@ app is a convenience, not a dependency — a fork can drive `/api/live` with `cu
 
 ---
 
-## 6 · What is deliberately absent
+## 6 · The money path, and where it deliberately stops
+
+```
+  browser ──POST /api/compute──►  ledger (attribution + accrual)
+                                      │
+  operator ──POST /api/payouts──►  plan → arm ──► sendmany spec
+                                                       │
+                              ┌────────────────────────┘
+                              ▼
+                    ⚡ SIGNED ON THE OPERATOR'S OWN NODE ⚡
+                       (this service is not able to do this)
+                              │
+  operator ──POST settle──►  txid recorded · contributors marked paid
+```
+
+**The break in that chain is the security model.** `/api/payouts` can compute a
+payment and prove one happened; it can never make one happen. A web service on
+shared infrastructure holding spend authority is the failure mode that ends
+projects, so the capability simply is not there to be stolen.
+
+Full detail, including the idempotency proof and why the settlement floor is the
+off-ramp rather than the fee: [`PAYOUTS.md`](PAYOUTS.md).
+
+---
+
+## 7 · Two lessons this codebase paid for
+
+**① A green deploy is not a live deploy.**
+`deploy-semble.sh` hard-coded `--project v0-deploy-html-file`. After the Vercel
+project was renamed, that flag made the CLI link to a *different, empty project
+of that name*. The deploy reported `✓ Ready`, aliased cleanly, and **semble.cc
+never moved** — new API routes 404'd in production while working perfectly on
+the deployment URL.
+
+The fix is two rules, both now in the script: **pin by `projectId`** (a rename
+cannot change it) and **verify against the real domain** before claiming success.
+The verify step retries with backoff, because a fresh route needs a moment to
+reach every edge and a single check after a fixed sleep produced a false 404 on
+a route that was fine.
+
+**② A derived metric drifts from the thing it claims to measure.**
+The hourly history bucket originally computed `motusSeconds` as
+`bucket.seconds × bucket.capability`. That reported **11,010** where true accrual
+was **3,225** — a 3.4× over-count — because bucket capability is the whole live
+pool while bucket seconds belong to individual beats.
+
+It is now **accumulated at write time** from each beat's real accrual, and the
+harness asserts `Σ history.motusSeconds ≤ motus.accrued` every run. The chart and
+the payout engine must read the same number, or the chart is decoration.
+
+---
+
+## 8 · What is deliberately absent
 
 - **No user accounts.** Contributors are recognised by a self-generated id, not
   by identity. Nobody has to sign up to move.

@@ -322,6 +322,31 @@ body.theater .curtain { padding-bottom: 96px; }
 .sc-res .k { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .18em; color: var(--label); margin-bottom: 8px; }
 .sc-res .row { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ── THE POOL — real numbers, or none ── */
+.pool-card { margin-top: 22px; margin-bottom: 16px; }
+.pool-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.pool-stat {
+  padding: 18px 16px; border-radius: var(--r-sm); background: var(--panel2);
+  border: 1px solid rgba(150,200,220,.13); text-align: center;
+}
+.pool-stat .k { display: block; font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: .16em; color: var(--label); }
+.pool-stat b { display: block; font-family: 'Sora'; font-weight: 800; font-size: 2.1rem; color: var(--gold-t); margin: 6px 0 4px; }
+.pool-stat i { font-style: normal; font-size: 13px; color: var(--ink2); line-height: 1.45; display: block; }
+.pool-note { margin-top: 16px; font-size: 15px; line-height: 1.6; color: var(--ink2); }
+.pool-note b { color: var(--accent-t); }
+@media (max-width: 900px) { .pool-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── the wallet row: an ADDRESS, never a key ── */
+.gpu-wallets { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(150,200,220,.12); }
+.gpu-wallets .k { font-family: 'IBM Plex Mono'; font-size: 11.5px; letter-spacing: .16em; color: var(--label); margin-bottom: 10px; }
+.gpu-w-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.gpu-w-row .om-in { flex: 1 1 240px; }
+.gpu-msg { font-size: 14px; margin-top: 9px; min-height: 18px; }
+.gpu-msg.ok { color: #7BF3C0; }
+.gpu-msg.bad { color: var(--gold-t); }
+.gpu-warn { margin-top: 10px; font-size: 13.5px; line-height: 1.55; color: var(--ink2); }
+.gpu-warn b { color: var(--gold-t); }
+
 /* ── LEND YOUR GPU — consent has to LOOK like consent ── */
 .gpu-card { margin-top: 22px; }
 .gpu-read { font-size: 16.5px; line-height: 1.6; color: var(--ink2); margin-bottom: 16px; }
@@ -460,3 +485,179 @@ body.rightnow .witem .t { font-size: 18px; }
   #swarm, #viz { display: none; }
   body::before { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOTUSCOMPUTE TELEMETRY — history, per-DJ record, payout ledger, Golem gauge
+
+   Design law applied here: squircles only (r-xs/r-sm, never a plain box), no
+   grey body text (hierarchy comes from size/weight/width — every value is --ink
+   or a verified tint), glow rather than hard highlight, and every table becomes
+   a stack at 760px rather than a horizontally-scrolling stub.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pool-sub, .pool-two { margin-top: 16px; }
+.pool-two { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; }
+.ps-card {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid rgba(123, 227, 234, .13); border-radius: var(--r-sm);
+  padding: 16px 18px 18px;
+}
+.ps-card .k {
+  font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: .16em;
+  color: var(--label); display: block; margin-bottom: 12px;
+}
+
+/* ── the history bars ── */
+.hist { width: 100%; height: 92px; display: block; overflow: visible; }
+.hist .hb { fill: var(--cyan); opacity: .55; transition: opacity .25s var(--ease); }
+.hist .hb:hover { opacity: 1; }
+.hist .hb.peak { fill: var(--gold); opacity: .95; filter: drop-shadow(0 0 3px rgba(232,196,107,.55)); }
+.hist-ax {
+  display: flex; justify-content: space-between; margin-top: 8px;
+  font-family: 'IBM Plex Mono'; font-size: 11px; color: var(--label);
+}
+.pool-empty, .djtab .empty, .kv .empty {
+  font-size: 14px; color: var(--ink2); font-style: normal; padding: 10px 0;
+}
+
+/* ── per-DJ / payout tables ── */
+.djtab { width: 100%; border-collapse: collapse; font-size: 14px; }
+.djtab th {
+  text-align: left; font-family: 'IBM Plex Mono'; font-size: 10.5px;
+  letter-spacing: .14em; color: var(--label); font-weight: 500;
+  padding: 0 8px 8px 0; border-bottom: 1px solid rgba(123,227,234,.12);
+}
+.djtab td { padding: 9px 8px 9px 0; color: var(--ink); border-bottom: 1px solid rgba(255,255,255,.05); }
+.djtab .num { text-align: right; font-family: 'IBM Plex Mono'; font-size: 13px; }
+.djtab th.num { text-align: right; }
+.djtab td.dj { font-weight: 600; white-space: nowrap; }
+.djtab .dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c, var(--cyan)); margin-right: 8px; vertical-align: middle;
+  box-shadow: 0 0 8px var(--c, var(--cyan));            /* glow, never highlight */
+}
+.djtab td.bar { position: relative; min-width: 96px; }
+.djtab td.bar span {
+  display: inline-block; height: 7px; border-radius: 4px; vertical-align: middle;
+  background: linear-gradient(90deg, var(--c, var(--cyan)), transparent);
+  box-shadow: 0 0 10px -2px var(--c, var(--cyan));
+}
+.djtab td.bar b { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--ink2); margin-left: 8px; }
+
+.kv { list-style: none; margin: 0; padding: 0; }
+.kv li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 14px;
+}
+.kv li b { color: var(--ink); font-weight: 600; }
+.kv li span { font-family: 'IBM Plex Mono'; font-size: 12.5px; color: var(--ink2); }
+.kv.djpay li { display: block; }
+.kv.djpay li span { display: block; margin-top: 3px; }
+
+/* ── the accrual strip ── */
+.pool-ledger {
+  margin-top: 16px; padding: 16px 18px; border-radius: var(--r-sm);
+  background: radial-gradient(120% 140% at 0% 0%, rgba(34,211,238,.08), transparent 60%), var(--panel2);
+  border: 1px solid rgba(232,196,107,.16);
+}
+.pool-ledger .k { font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: .16em; color: var(--label); }
+.acc-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12px 0 10px; }
+.acc-row > div b { display: block; font-family: 'Sora'; font-weight: 800; font-size: 1.5rem; color: var(--ink); }
+.acc-row > div span { font-size: 12.5px; color: var(--ink2); }
+.acc-row .go b { color: var(--gold-t); text-shadow: 0 0 14px rgba(232,196,107,.4); }
+.acc-row .hold b { color: var(--accent-t); }
+.acc-why { font-size: 14px; line-height: 1.6; color: var(--ink2); margin: 0; }
+
+/* ── payouts ── */
+.pay-head { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.pay-stat {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid rgba(123,227,234,.13); border-radius: var(--r-sm); padding: 14px 16px;
+}
+.pay-stat .k { display: block; font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: .16em; color: var(--label); }
+.pay-stat b { display: block; font-family: 'Sora'; font-weight: 800; font-size: 1.8rem; color: var(--ink); margin: 6px 0 4px; }
+.pay-stat b.go { color: var(--gold-t); text-shadow: 0 0 16px rgba(232,196,107,.45); }
+.pay-stat i { font-style: normal; font-size: 13px; color: var(--ink2); line-height: 1.45; display: block; }
+.pay-custody {
+  margin: 14px 0 0; padding: 12px 16px; border-radius: var(--r-xs);
+  background: rgba(34,211,238,.07); border: 1px solid rgba(34,211,238,.2);
+  font-size: 14px; line-height: 1.55; color: var(--ink);
+}
+.paytab .rail {
+  font-family: 'IBM Plex Mono'; font-size: 10.5px; letter-spacing: .1em;
+  padding: 3px 8px; border-radius: 999px; border: 1px solid currentColor;
+}
+.paytab .rail.dash { color: var(--accent-t); }
+.paytab .rail.trust { color: var(--signal-t); }
+.paytab .st { font-family: 'IBM Plex Mono'; font-size: 12px; color: var(--ink2); }
+.paytab .st-sent .st { color: var(--gold-t); }
+.paytab .st-failed .st { color: var(--ember); }
+.pay-fine { font-size: 13.5px; line-height: 1.6; color: var(--ink2); margin: 14px 0 0; }
+.pay-fine b { color: var(--signal-t); }
+
+/* ── Golem gauge ── */
+.gol-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.gol-grid .pool-stat.zero b { color: var(--ember); text-shadow: 0 0 16px rgba(232,121,201,.35); }
+.gol-rt { margin-top: 14px; }
+.gol-note { font-size: 14.5px; line-height: 1.65; color: var(--ink2); margin: 14px 0 0; }
+.gol-note b { color: var(--accent-t); }
+.gol-note.dim b { color: var(--ink); }
+
+/* ── MOBILE: tables become stacks; nothing scrolls sideways ── */
+@media (max-width: 900px) {
+  .pool-two { grid-template-columns: 1fr; }
+  .pay-head, .acc-row { grid-template-columns: repeat(2, 1fr); }
+  .gol-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .djtab thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .djtab, .djtab tbody, .djtab tr, .djtab td { display: block; width: 100%; }
+  .djtab tr { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .djtab td { border: 0; padding: 2px 0; text-align: left !important; }
+  .djtab td.num::before { content: attr(data-l); }
+  .djtab td.bar span { max-width: 60%; }
+  .hist { height: 74px; }
+}
+
+/* ── your own record on the ledger ── */
+.mine {
+  margin-top: 16px; padding: 14px 16px; border-radius: var(--r-sm);
+  background: radial-gradient(120% 140% at 100% 0%, rgba(167,139,255,.10), transparent 62%), var(--panel2);
+  border: 1px solid rgba(167,139,255,.22);
+}
+.mine .k { font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: .16em; color: var(--label); }
+.mine-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 10px 0 8px; }
+.mine-row > div b { display: block; font-family: 'Sora'; font-weight: 800; font-size: 1.35rem; color: var(--ink); }
+.mine-row > div span { font-size: 12.5px; color: var(--ink2); }
+.mine-row .go b { color: var(--gold-t); text-shadow: 0 0 14px rgba(232,196,107,.4); }
+.mine-row .hold b { color: var(--signal-t); }
+.mine-feat { margin: 8px 0; font-size: 13px; color: var(--ink2); line-height: 1.9; }
+.mine-feat code {
+  font-family: 'IBM Plex Mono'; font-size: 11.5px; color: var(--accent-t);
+  background: rgba(34,211,238,.10); border: 1px solid rgba(34,211,238,.2);
+  padding: 2px 7px; border-radius: 999px;
+}
+.mine-fine { margin: 6px 0 0; font-size: 13.5px; line-height: 1.6; color: var(--ink2); }
+.mine-fine b { color: var(--ink); }
+@media (max-width: 760px) { .mine-row { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── MOBILE OVERFLOW FIX (measured at 375px, 2026-08-12) ──
+   .pay-head's big Sora numerals (e.g. "0.000000" at 1.8rem/800) could not fit a
+   148px half-column, so the grid pushed 335px into a 310px box and the whole
+   page scrolled sideways. Long numbers are the cause, so the fix is applied to
+   the numbers rather than by letting the container scroll: step the type down,
+   allow a break, and use tabular figures so columns still line up. */
+@media (max-width: 760px) {
+  .pay-stat b, .pool-stat b { font-size: 1.32rem; line-height: 1.15; overflow-wrap: anywhere; }
+  .acc-row > div b, .mine-row > div b { font-size: 1.12rem; overflow-wrap: anywhere; }
+  .pay-stat, .pool-stat { padding: 12px 13px; min-width: 0; }
+  .pay-head, .pool-grid, .acc-row, .mine-row, .gol-grid { min-width: 0; }
+  .pay-head > *, .pool-grid > *, .acc-row > *, .mine-row > * { min-width: 0; }
+  .djtab td.bar span { max-width: 55%; }
+}
+/* tabular figures everywhere a number is compared to another number */
+.pay-stat b, .pool-stat b, .acc-row b, .mine-row b, .djtab .num {
+  font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+}
+/* belt and braces: a stat card may shrink, but the page never scrolls sideways */
+.sec > .card { max-width: 100%; overflow-x: clip; }

@@ -130,6 +130,54 @@ of them refusal patterns" is a pass; "3 hits" alone is not a review.
 
 ---
 
+## Money: the capability is absent, not merely guarded
+
+`/api/payouts` **cannot sign a transaction.** There is no key in the service, no
+key in its environment, and no code path that would use one. It plans, arms and
+audits; the operator signs on their own node from a capped hot wallet.
+
+This is deliberately stronger than "the key is protected." A guarded key can be
+stolen. An absent capability cannot.
+
+Supporting controls:
+
+| Control | Why |
+|---|---|
+| **Idempotent `settle`** | A replayed settle returns `already: true` and re-credits nothing. Retries are normal; double-paying on retry is how a treasury drains. |
+| **A settled batch cannot be failed** | → `409`. History is append-only in the direction that matters. |
+| **Amounts frozen at `arm`** | The batch stores its own `rate` and `dashUsd`, so a later rate change cannot retroactively alter what was owed. |
+| **Aggregation by address** | One contributor with several machines is paid once, not N times below the floor. |
+| **Fail-closed auth** | No `LIVE_SECRET` ⇒ `401` on every op, including `plan`. Balance-per-address is operational detail, not public data. |
+| **Explicit confirm in CortexInsight** | `arm` and `settle` reject unless the client passes `confirmed`, so a stray click in a dashboard cannot freeze or settle a batch. |
+
+⚠ **Address poisoning is the obvious attack on a public livestream.** Never
+accept a payout address pasted into stream chat without out-of-band
+confirmation.
+
+---
+
+## ⚠ Testing a money rail against production writes public claims
+
+On 2026-08-12 the payout lifecycle test ran against production and left
+**`moneyMoved: true · 10.62 DASH sent`** on the live public page. No money had
+moved. A test fixture had become a false public statement, visible to anyone.
+
+It was caught and retracted within minutes, and the test now cleans up via an
+`EXIT` trap so an interrupted run still retracts. But the general lesson is
+worth more than the fix:
+
+> **A test that writes to a public surface is a publication.** Treat its output
+> with the same care as a claim you make deliberately — because to a reader,
+> there is no difference.
+
+If you run any test against production, verify the retraction afterwards:
+
+```bash
+curl -s https://www.semble.cc/api/payouts | grep -o '"moneyMoved":[a-z]*'
+```
+
+---
+
 ## Known limits — stated, not hidden
 
 - **Rate limiting is per-voice**, which a determined actor can rotate. It stops
