@@ -1,7 +1,8 @@
 # API
 
-Three routes. All CORS-open for `GET` (both domains read them), all
-operator-gated for privileged writes, all `no-store`.
+Seven routes: `live` · `chat` · `compute` · `work` · `receipts` · `payouts` ·
+`golem`. All CORS-open for `GET` (every surface reads them), all operator-gated
+for privileged writes, all `no-store`.
 
 **Auth:** privileged operations require the header `x-live-secret`, matched
 against `process.env.LIVE_SECRET`. If the env var is unset, those operations
@@ -127,10 +128,11 @@ Returns that node's full record: `byDj`, `byMode`, `accrued`, `paid`, `open`,
 `owedDash`, `settleable`, and its declared WebGPU `features`. A contributor can
 always audit exactly what they are owed and which sets they earned it during.
 
-**`jobsRunning: false` is hard-coded and always present.** It is not a status
-flag that might flip on its own — it is a standing statement that this rung
-records pledges and dispatches nothing. No surface can accidentally imply work
-is happening.
+⚠ **`jobsRunning` on this route is a legacy constant `false`; the live one lives
+on [`/api/work`](#get-apiwork--the-dispatch-queue) and is COMPUTED from the
+queue.** Through rungs 1–4 it was hard-coded here so no surface could imply work
+was happening while dispatch was unbuilt. Now that dispatch exists, read
+`/api/work` for the real answer — and prefer it in any client you write.
 
 `live` = seen within 5 minutes. `recent` is capped at 24 entries and **addresses
 are truncated** (`Xk4f2p…9dLm`) — enough to recognise yourself, never enough to
@@ -276,7 +278,8 @@ Public. `?node=<id>` claims the next unit that node has not already computed.
   "queue": { "open": 2, "verifying": 3, "done": 1, "disputed": 1 },
   "completed": 1, "unitsWorth": 25, "need": 2, "quarantined": 1,
   "byTask": [ { "task": "Index the Motus corpus", "units": 1, "contributors": 2 } ],
-  "verification": "Every unit is computed independently by 2 machines and settles only when their digests agree…",
+  "verification": "Every unit is computed independently by 3 machines and settles only when their digests agree…",
+  "need": 3, "canaryRate": 4,
   "recent": [ { "id": "u…", "kind": "embed", "task": "…", "digest": "edce4537", "by": ["honest", "hones2"] } ]
 }
 
@@ -303,7 +306,7 @@ A quarantined node gets `{ unit: null, quarantined: true, why: "…" }`.
 | `{ already: true }` | duplicate submission — ignored, never double-credited |
 
 **Enqueue** (operator, `x-live-secret`):
-`{ op: "enqueue", task, kind: "embed"|"score", chunks: [ … ] }`
+`{ op: "enqueue", task, kind: "embed"|"score"|"matmul", chunks: [ … ] }`
 → `{ enqueued, canaries, queue }`. Seeds are derived from content and index,
 never random, so the ledger is reproducible from its own contents.
 

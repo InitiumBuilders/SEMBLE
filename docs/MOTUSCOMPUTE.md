@@ -137,8 +137,8 @@ never a speed-up of her. Anyone claiming otherwise is selling something.
 garbage, or nothing, and claim payment. This is *the* problem of volunteer
 computing, older than crypto. Redundant execution with agreement checks and
 spot-audited canary units is the answer; paying for unverified work is a fraud
-faucet. **This is now built** — every unit is computed twice and settles only on
-agreement, and ~1 in 6 is a known-answer canary the client cannot identify. See
+faucet. **This is now built** — every unit is computed by 3 machines and settles only on
+agreement, and ~1 in 4 is a known-answer canary the client cannot identify. See
 [`DISPATCH.md`](DISPATCH.md), which also lists where it is still thin.
 
 **③ You cannot send private work to strangers' machines.** Published attacks

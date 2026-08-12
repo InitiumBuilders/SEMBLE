@@ -114,11 +114,16 @@ Full design, including everything about it that is still weak:
 
 ## And the one thing we refuse to pay for
 
-**Unverified work.** Every unit is computed by two independent machines and
-settles only when they agree; a disagreement credits **nobody**. Roughly 1 unit
-in 6 is a known-answer canary the client cannot identify, and failing one
-quarantines the node on the spot. Details, including where this is still thin:
-[`DISPATCH.md`](DISPATCH.md).
+**Unverified work.** Every unit is computed by **3 independent machines** and
+settles only when they agree; a disagreement credits **nobody**. Roughly **1
+unit in 4** is a known-answer canary the client cannot identify, and failing one
+quarantines the node — by id *and* by a coarse hardware fingerprint, so a reload
+is not an escape.
+
+And a subtler one we learned the hard way: **consensus proves agreement, not
+correctness.** A deterministic kernel can be confidently, verifiably wrong —
+ours was, twice, until a known-answer conformance test caught it. Details, and
+where this is still thin: [`DISPATCH.md`](DISPATCH.md).
 
 ---
 
