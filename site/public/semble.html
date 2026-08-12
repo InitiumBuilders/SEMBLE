@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semble.CC — Get Paid to Grow</title>
+<meta name="description" content="An open-source school for systems thinking. A movement to learn, teach, and build together — and get paid to grow.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF2F0;--bg2:#E3EBE8;--surf:#F7FAF9;--ink:#0E1A17;--ink2:#46554F;--ink3:#7E8C86;
+--green:#0E6B54;--green2:#13886A;--blue:#1E5F8C;--blue2:#2D7DB0;--mint:#1FB892;--sky:#3F9FD8;
+--line:rgba(14,26,23,.13);--line2:rgba(14,26,23,.26);--dark:#0B1714;--dark2:#11201B;--dcard:#1B2C26;
+--dink:#E8EFEB;--dink2:#8FA69D;--dline:rgba(232,239,235,.12);--gm:#3FE0B5;
+--rad:14px;--radl:22px;--mw:1180px;--fd:'Fraunces',Georgia,serif;--fb:'Hanken Grotesk',system-ui,sans-serif;
+--fm:'Spline Sans Mono',monospace;--grad:linear-gradient(105deg,#0E6B54,#1E5F8C);--gradb:linear-gradient(105deg,#1FB892,#3F9FD8);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--fd);font-weight:500;line-height:1.1;letter-spacing:-.018em}
+a{color:inherit}::selection{background:var(--mint);color:#04241C}
+.wrap{max-width:var(--mw);margin:0 auto;padding:0 22px}
+.eb{font-family:var(--fm);font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--green);display:inline-flex;align-items:center;gap:10px}
+.eb::before{content:"";width:22px;height:1.5px;background:var(--grad)}
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gtb{background:var(--gradb);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root{--iris:#7B6CF0;--iris2:#9D8DF5;--gradi:linear-gradient(105deg,#1E5F8C,#7B6CF0)}
+.gti{background:var(--gradi);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+section{position:relative}
+.page{display:none}.page.active{display:block}
+nav{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(237,242,240,.86);border-bottom:1px solid var(--line)}
+.nin{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;max-width:var(--mw);margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-size:21px;font-weight:600;letter-spacing:-.02em;text-decoration:none}
+.brand svg{width:28px;height:28px;flex:none}
+.nlx{display:none;gap:24px;font-size:14px;font-family:var(--fm);letter-spacing:.03em}
+.nlx a{text-decoration:none;color:var(--ink2);transition:color .2s}.nlx a:hover,.nlx a.cur{color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:13.5px;font-weight:500;letter-spacing:.03em;padding:11px 21px;border-radius:999px;text-decoration:none;cursor:pointer;border:1.5px solid transparent;transition:all .22s}
+.bf{background:var(--grad);color:#fff}.bf:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px rgba(14,107,84,.7)}
+.bg-{border-color:var(--green);color:var(--green)}.bg-:hover{background:var(--green);color:#fff;transform:translateY(-2px)}
+nav .btn{padding:9px 19px}
+.hero{position:relative;background:var(--dark);color:var(--dink);overflow:hidden;padding:90px 0 94px;min-height:80vh;display:flex;align-items:center}
+.netcv{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero::after{content:"";position:absolute;left:-8%;top:-18%;width:58%;height:78%;background:radial-gradient(circle,rgba(31,184,146,.16),transparent 68%);z-index:1}
+.hin{position:relative;z-index:3;max-width:880px}
+.hero .eb{color:var(--gm)}
+.hero h1{font-size:clamp(3rem,12vw,7rem);margin:20px 0 0;letter-spacing:-.04em;color:var(--dink)}
+.hero h1 em{font-style:italic}.hero h1 em.g{background:var(--gradb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.slo{margin:26px 0 6px;display:flex;flex-direction:column;gap:5px}
+.slo span{font-family:var(--fd);font-size:clamp(1.05rem,3.6vw,1.45rem);font-style:italic;color:var(--dink2);padding-left:24px;position:relative}
+.slo span::before{content:"";position:absolute;left:0;top:.56em;width:11px;height:11px;border-radius:50%;border:1.6px solid var(--mint)}
+.slo span.ld::before{background:var(--mint);box-shadow:0 0 12px var(--gm)}
+.hero .lede{font-size:clamp(1.05rem,2.4vw,1.24rem);color:var(--dink2);max-width:560px;margin:24px 0 32px}
+.hcta{display:flex;gap:14px;flex-wrap:wrap}
+.hero .bg-{border-color:rgba(232,239,235,.4);color:var(--dink)}
+.hero .bg-:hover{background:rgba(232,239,235,.1);color:#fff;border-color:rgba(232,239,235,.55)}
+.cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;font-family:var(--fm);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dink2);display:flex;flex-direction:column;align-items:center;gap:8px}
+.cue .ln{width:1.5px;height:32px;background:linear-gradient(var(--mint),transparent);animation:sl 2.4s ease-in-out infinite}
+@keyframes sl{0%,100%{opacity:.2;transform:scaleY(.4);transform-origin:top}50%{opacity:1;transform:scaleY(1)}}
+.sec{padding:84px 0}
+.sh{max-width:760px;margin-bottom:44px}
+.sh h2{font-size:clamp(2.05rem,6vw,3.4rem);margin:14px 0 16px}
+.sh p{font-size:1.11rem;color:var(--ink2)}
+.kick{font-family:var(--fd);font-style:italic;color:var(--green);font-size:1.15rem}
+.dk{background:var(--dark);color:var(--dink)}.dk .sh p{color:var(--dink2)}.dk .eb{color:var(--gm)}.dk .kick{color:var(--gm)}
+.lg{display:grid;gap:36px}
+.lsvg,.csvg,.losvg,.rsvg,.cosvg,.rfsvg,.ibsvg{width:100%;height:auto;display:block}
+.lnote{background:var(--surf);border:1px solid var(--line);border-radius:var(--radl);padding:30px 26px}
+.lnote .q{font-family:var(--fd);font-size:clamp(1.3rem,3.8vw,1.75rem);font-style:italic;line-height:1.32}
+.lnote .ci{font-family:var(--fm);font-size:12.5px;letter-spacing:.05em;color:var(--ink3);margin-top:13px}
+.stb{background:var(--dark2);border-radius:var(--radl);padding:40px 24px;color:var(--dink)}
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.st{background:var(--dcard);border:1px solid var(--dline);border-radius:var(--rad);padding:23px 19px}
+.st .b{font-family:var(--fd);font-size:clamp(2.2rem,8vw,3.1rem);line-height:1;background:var(--gradb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.st .l{font-size:.9rem;color:var(--dink2);margin-top:8px}
+.stf{margin-top:26px;font-family:var(--fd);font-style:italic;font-size:clamp(1.15rem,3.6vw,1.6rem);text-align:center;color:var(--dink)}
+.pan{background:var(--surf);border:1px solid var(--line);border-radius:var(--radl);padding:30px 22px}
+.hg{display:grid;gap:42px;align-items:center}
+.losvg{max-width:510px;margin:0 auto}
+.orb{transform-origin:300px 300px;animation:spin 24s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:17px;padding:18px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:none}
+.step .n{font-family:var(--fm);font-size:13px;color:#fff;background:var(--grad);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.step h4{font-size:1.3rem;margin-bottom:3px}.step p{color:var(--ink2);font-size:.98rem}
+.mg{display:grid;gap:15px}
+.mc{background:var(--surf);border:1px solid var(--line);border-radius:var(--rad);padding:25px 21px;transition:transform .25s,box-shadow .25s}
+.mc:hover{transform:translateY(-4px);box-shadow:0 18px 38px -22px rgba(14,107,84,.5)}
+.mc .mi{width:44px;height:44px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.mc .mi svg{width:23px;height:23px}
+.mc h4{font-size:1.27rem;margin-bottom:6px}.mc p{color:var(--ink2);font-size:.97rem}
+.mc .tg{font-family:var(--fm);font-size:11.5px;letter-spacing:.04em;color:var(--green);margin-top:11px;display:block}
+.tg-{display:grid;gap:14px}
+.tk{background:var(--surf);border:1px solid var(--line);border-radius:var(--rad);padding:23px 21px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.tk:hover{transform:translateY(-5px);border-color:var(--mint);box-shadow:0 16px 36px -20px rgba(31,184,146,.55)}
+.tk .ti{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tk .dt{width:13px;height:13px;border-radius:50%;flex:none}
+.tk h4{font-size:1.22rem}.tk p{color:var(--ink2);font-size:.95rem}
+.tk .rt{font-family:var(--fm);font-size:11.5px;color:var(--green);margin-top:10px;letter-spacing:.03em}
+.pil{display:grid;gap:13px}
+.pl{background:var(--dcard);border:1px solid var(--dline);border-radius:var(--rad);padding:24px 21px;border-left:3px solid var(--mint)}
+.pl h4{font-size:1.22rem;color:var(--dink);margin-bottom:5px}
+.pl p{color:var(--dink2);font-size:.96rem}
+.pl .s{font-family:var(--fm);font-size:11px;color:var(--gm);margin-top:10px;letter-spacing:.04em}
+.bud{background:var(--surf);border:1px solid var(--line);border-radius:var(--radl);padding:30px 22px}
+.bt{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap}
+.bt .a{font-family:var(--fd);font-size:clamp(2.5rem,9vw,3.5rem)}
+.bt .l{font-family:var(--fm);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.bars{margin-top:24px;display:flex;flex-direction:column;gap:16px}
+.btp{display:flex;justify-content:space-between;font-size:.91rem;margin-bottom:6px;gap:10px}
+.btp .v{font-family:var(--fm);color:var(--ink2);font-size:12px;flex:none}
+.btr{height:12px;background:var(--bg2);border-radius:999px;overflow:hidden}
+.bfl{height:100%;width:0;border-radius:999px;transition:width 1.3s cubic-bezier(.2,.7,.2,1)}
+.fn{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);font-size:.96rem;color:var(--ink2)}
+.pp{display:grid;gap:13px;grid-template-columns:1fr 1fr}
+.ppc{background:var(--surf);border:1px dashed var(--line2);border-radius:var(--rad);padding:18px 16px;text-align:center}
+.ppc .n{font-family:var(--fd);font-size:1.02rem;font-weight:600}
+.ppc .s{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue2);margin-top:5px}
+.fnd{display:grid;gap:17px}
+.fc{background:var(--dcard);border:1px solid var(--dline);border-radius:var(--radl);padding:30px 25px}
+.fc .av{width:56px;height:56px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:14px}
+.fc h3{font-size:1.5rem;color:var(--dink);margin-bottom:3px}
+.fc .ro{font-family:var(--fm);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gm);margin-bottom:12px}
+.fc p{color:var(--dink2);font-size:.98rem}
+.fc .nt{color:var(--gm);font-family:var(--fm);font-size:11.5px;margin-top:10px}
+.join,.cta{position:relative;background:var(--grad);color:#fff;border-radius:var(--radl);padding:54px 28px;text-align:center;overflow:hidden}
+.join h2,.cta h2{color:#fff;font-size:clamp(2rem,6.8vw,3.2rem);margin-bottom:14px}
+.join p,.cta p{color:rgba(255,255,255,.86);max-width:500px;margin:0 auto 26px;font-size:1.06rem}
+.join .bf,.cta .bf{background:#fff;color:var(--green)}
+.join .bg-,.cta .bg-{border-color:rgba(255,255,255,.55);color:#fff}
+.join .bg-:hover,.cta .bg-:hover{background:rgba(255,255,255,.14);color:#fff}
+.ctacv{position:absolute;inset:0;opacity:.3}
+.rf{display:grid;gap:36px;align-items:center}
+.rfsvg{max-width:520px;margin:0 auto}
+.rf .q{font-family:var(--fd);font-size:clamp(1.4rem,4.2vw,2rem);font-style:italic;line-height:1.3}
+.rf .qp{color:var(--ink2);margin-top:16px;font-size:1.03rem}
+.sd{display:grid;gap:15px}
+.sdc{background:var(--surf);border:1px solid var(--line);border-radius:var(--rad);padding:26px 22px;text-align:center}
+.sdc .ic{width:54px;height:54px;margin:0 auto 13px}
+.sdc h4{font-size:1.25rem;margin-bottom:6px}.sdc p{color:var(--ink2);font-size:.96rem}
+.bbg{display:grid;gap:15px}
+.bb{background:var(--surf);border:1px solid var(--line);border-radius:var(--rad);padding:24px 21px;transition:transform .25s,box-shadow .25s}
+.bb:hover{transform:translateY(-4px);box-shadow:0 16px 36px -22px rgba(14,107,84,.5)}
+.bb .bv{height:84px;margin-bottom:13px;display:flex;align-items:center;justify-content:center}
+.bb .bv svg{height:100%;width:auto}
+.bb h4{font-size:1.22rem;margin-bottom:5px}.bb p{color:var(--ink2);font-size:.95rem}
+.bb .tg{font-family:var(--fm);font-size:11px;letter-spacing:.04em;color:var(--green);margin-top:9px;display:block}
+.ibg{display:grid;gap:36px;align-items:center}
+.ibsvg{max-width:460px;margin:0 auto}
+.ibl{display:flex;flex-direction:column;gap:14px}
+.ibrow{border-left:3px solid var(--mint);padding:4px 0 4px 16px}
+.ibrow h4{font-size:1.15rem}.ibrow p{color:var(--ink2);font-size:.95rem}
+.ibrow .lv{font-family:var(--fm);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue2)}
+.lvtabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.lvtab{flex:1;min-width:150px;background:var(--surf);border:1.5px solid var(--line);border-radius:var(--rad);padding:18px 16px;cursor:pointer;text-align:left;transition:all .22s;font-family:var(--fb)}
+.lvtab .tn{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.lvtab .tt{font-family:var(--fd);font-size:1.3rem;margin:5px 0 3px;color:var(--ink);display:block}
+.lvtab .td{font-size:.86rem;color:var(--ink2);display:block}
+.lvtab.on{border-color:var(--mint);background:var(--dcard);box-shadow:0 14px 30px -18px rgba(31,184,146,.6)}
+.lvtab.on .tn{color:var(--gm)}.lvtab.on .tt{color:#fff}.lvtab.on .td{color:var(--dink2)}
+.lvpanel{display:none}.lvpanel.on{display:block;animation:fade .5s ease}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.lvhead{background:var(--dark);color:var(--dink);border-radius:var(--radl);padding:30px 26px;margin-bottom:20px}
+.lvhead .lt{font-family:var(--fm);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gm)}
+.lvhead h3{font-size:clamp(1.5rem,4.5vw,2.2rem);margin:8px 0 10px;color:var(--dink)}
+.lvhead p{color:var(--dink2);font-size:1.02rem}
+.lvhead .goal{margin-top:14px;padding-top:14px;border-top:1px solid var(--dline);font-family:var(--fd);font-style:italic;color:var(--gm);font-size:1.05rem}
+.cg{display:grid;gap:13px}
+.cc{background:var(--surf);border:1px solid var(--line);border-radius:var(--rad);padding:21px 19px}
+.cc .cn{font-family:var(--fm);font-size:11px;color:var(--blue2);letter-spacing:.05em}
+.cc h4{font-size:1.16rem;margin:4px 0 5px}.cc p{color:var(--ink2);font-size:.94rem}
+.qg{display:grid;gap:15px}
+.qc{background:var(--dcard);border:1px solid var(--dline);border-radius:var(--rad);padding:26px 22px;border-top:3px solid var(--mint)}
+.qc .qq{font-family:var(--fd);font-style:italic;font-size:1.16rem;line-height:1.4;color:var(--dink)}
+.qc .qa{font-family:var(--fm);font-size:12px;color:var(--gm);margin-top:13px;letter-spacing:.03em}
+.qc .qr{font-size:11.5px;color:var(--dink2);margin-top:2px}
+.cosvg{max-width:560px;margin:0 auto}
+.banner{background:var(--dcard);border:1px solid var(--dline);border-left:3px solid var(--mint);border-radius:var(--rad);padding:22px;color:var(--dink2);font-size:.99rem}
+.banner strong{color:var(--dink);font-weight:600}
+.pgrid{display:flex;flex-direction:column;gap:20px}
+.pc{background:var(--surf);border:1px solid var(--line);border-radius:var(--radl);padding:30px 26px}
+.pc .ph{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:6px}
+.pc .pdot{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:600;color:#fff;font-size:1.15rem;flex:none}
+.pc h3{font-size:1.55rem}
+.pc .stat{font-family:var(--fm);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:var(--bg2);color:var(--blue2);border:1px dashed var(--line2)}
+.pc .who{color:var(--ink2);font-size:1rem;margin:10px 0 18px}
+.prop{background:var(--bg);border-radius:var(--rad);padding:18px;margin-bottom:12px}
+.prop .plbl{font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.prop p{font-size:.96rem;color:var(--ink2)}
+.prop ul{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.prop li{font-size:.94rem;color:var(--ink2);padding-left:18px;position:relative}
+.prop li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--grad)}
+.statusline{display:flex;align-items:center;gap:9px;font-family:var(--fm);font-size:12px;color:var(--ink3);margin-top:4px}
+.statusline .dot{width:9px;height:9px;border-radius:50%;background:var(--blue2);flex:none}
+footer{background:var(--dark);color:var(--dink);padding:56px 0 42px}
+.fsl{font-family:var(--fd);font-size:clamp(1.35rem,4.4vw,2rem);font-style:italic;line-height:1.32;max-width:760px;margin:16px 0}
+.fbd{color:var(--dink2);max-width:620px;font-size:1rem}
+.fr{display:flex;flex-wrap:wrap;gap:13px 24px;margin-top:26px;padding-top:24px;border-top:1px solid var(--dline);font-family:var(--fm);font-size:13px}
+.fr a{color:var(--dink2);text-decoration:none;cursor:pointer;transition:color .2s}.fr a:hover{color:var(--gm)}
+.fm{font-family:var(--fm);font-size:11.5px;color:var(--dink2);margin-top:20px;letter-spacing:.03em}
+@media(min-width:720px){.nlx{display:flex}.lg,.rf,.ibg{grid-template-columns:1fr 1fr}.stg{grid-template-columns:repeat(4,1fr)}
+.hg{grid-template-columns:.95fr 1.05fr}.lg{grid-template-columns:1.05fr .95fr}.mg,.fnd{grid-template-columns:1fr 1fr}
+.tg-{grid-template-columns:1fr 1fr}.pp{grid-template-columns:repeat(4,1fr)}.pil{grid-template-columns:1fr 1fr}
+.sd{grid-template-columns:repeat(3,1fr)}.bbg,.qg,.cg{grid-template-columns:1fr 1fr}.pgrid{grid-template-columns:1fr 1fr}}
+@media(min-width:980px){body{font-size:18px}.sec{padding:108px 0}.tg-,.bbg,.cg{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+/* === finishing touches: ecosystem accents, sound, motion === */
+:root{--gold:#C9A24B;--gold2:#E2C176;--goldd:#8A6B22;--grado:linear-gradient(105deg,#C9A24B,#E2C176);--coral:#D9685A;--coral2:#ECA99C;--corald:#B0402F;--gradm:linear-gradient(105deg,#D9685A,#E2C176)}
+.gto{background:var(--grado);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gtm{background:var(--gradm);-webkit-background-clip:text;background-clip:text;color:transparent}
+.av.em{font-size:2.05rem;background:var(--dcard);border:1px solid var(--dline)}
+.pc{transition:transform .25s,box-shadow .25s}
+.pc:hover{transform:translateY(-3px);box-shadow:0 22px 46px -26px rgba(14,107,84,.4)}
+.fc{transition:transform .25s,box-shadow .25s}
+.fc:hover{transform:translateY(-3px);box-shadow:0 24px 50px -26px rgba(0,0,0,.55)}
+.sprog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--gradb);z-index:75}
+.sfx{position:fixed;right:18px;bottom:18px;z-index:90;width:46px;height:46px;border-radius:50%;background:var(--dark);color:var(--gm);border:1px solid var(--dline);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 28px -10px rgba(0,0,0,.55);transition:transform .2s}
+.sfx:hover{transform:scale(1.09)}
+.sfx.off{color:var(--ink3)}
+.sfx svg{width:20px;height:20px;pointer-events:none}
+.taglineband{font-family:var(--fm);font-size:clamp(11.5px,2.5vw,13.5px);letter-spacing:.16em;text-transform:uppercase;color:var(--gm);margin-top:24px;display:flex;align-items:center;gap:12px}
+.taglineband::before{content:"";width:26px;height:1.5px;background:var(--gradb);flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:12.5px;padding:9px 15px;border-radius:999px;background:var(--dcard);border:1px solid var(--dline);color:var(--dink)}
+.chip b{color:var(--gold2);font-weight:500}
+.mmeq{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap;font-family:var(--fd);margin:4px 0}
+.mmeq span{font-size:clamp(1.05rem,3.4vw,1.5rem)}
+.mmeq .o{color:var(--corald);font-size:1.5rem}
+.mmeq .r{font-style:italic;font-size:clamp(1.2rem,3.8vw,1.7rem)}
+/* === Learn hub: roadmap, leverage ladder, resources, draw-in animation === */
+@keyframes drawln{to{stroke-dashoffset:0}}
+.dr{stroke-dasharray:2600;stroke-dashoffset:2600}
+.rv.in .dr{animation:drawln 2s ease forwards}
+@media(prefers-reduced-motion:reduce){.dr{stroke-dashoffset:0}}
+.roadmap{position:relative;padding-left:36px;max-width:780px}
+.roadmap::before{content:"";position:absolute;left:12px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--green),var(--mint),var(--blue))}
+.rmstop{position:relative;display:block;padding:15px 4px;text-decoration:none;border-bottom:1px solid var(--line);transition:transform .2s}
+.rmstop:last-child{border-bottom:none}
+.rmstop::before{content:"";position:absolute;left:-30px;top:21px;width:15px;height:15px;border-radius:50%;background:var(--surf);border:2.5px solid var(--green);transition:background .2s,transform .2s}
+.rmstop:hover{transform:translateX(5px)}
+.rmstop:hover::before{background:var(--mint);transform:scale(1.25)}
+.rmstop .rmn{font-family:var(--fm);font-size:11px;letter-spacing:.1em;color:var(--green);text-transform:uppercase}
+.rmstop h4{font-size:1.16rem;margin:2px 0 1px;display:flex;align-items:center;gap:9px}
+.rmstop h4 .ar{font-family:var(--fm);font-size:1rem;color:var(--mint);opacity:0;transform:translateX(-5px);transition:opacity .2s,transform .2s}
+.rmstop:hover h4 .ar{opacity:1;transform:none}
+.rmstop p{color:var(--ink2);font-size:.93rem}
+.ladder{display:flex;flex-direction:column;gap:8px}
+.lgrp{font-family:var(--fm);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:15px 0 1px;display:flex;align-items:center;gap:11px}
+.lgrp:first-child{margin-top:0}
+.lgrp::after{content:"";flex:1;height:1px;background:var(--line)}
+.lrow{display:flex;gap:15px;align-items:flex-start;background:var(--surf);border:1px solid var(--line);border-left:4px solid var(--mint);border-radius:var(--rad);padding:15px 17px;transition:transform .2s,box-shadow .2s}
+.lrow:hover{transform:translateX(5px);box-shadow:0 14px 30px -22px rgba(14,107,84,.55)}
+.lrow .ln{font-family:var(--fd);font-size:1.6rem;font-weight:600;line-height:.95;flex:none;width:38px;text-align:center;color:var(--ink3)}
+.lrow h4{font-size:1.09rem;margin-bottom:2px}
+.lrow p{color:var(--ink2);font-size:.92rem}
+.lrow.t-i{border-left-color:var(--green);background:linear-gradient(100deg,rgba(14,107,84,.08),var(--surf) 62%)}
+.lrow.t-i .ln{color:var(--green)}
+.lrow.t-d{border-left-color:var(--green2)}.lrow.t-d .ln{color:var(--green2)}
+.lrow.t-f{border-left-color:var(--mint)}.lrow.t-f .ln{color:var(--mint)}
+.lrow.t-p{border-left-color:var(--ink3)}
+.resg{display:grid;gap:14px}
+.res{display:block;background:var(--surf);border:1px solid var(--line);border-radius:var(--radl);padding:24px 22px;text-decoration:none;transition:transform .22s,box-shadow .22s,border-color .22s}
+.res:hover{transform:translateY(-4px);border-color:var(--mint);box-shadow:0 18px 38px -22px rgba(14,107,84,.5)}
+.res .rl{font-family:var(--fm);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue2)}
+.res h4{font-size:1.18rem;margin:6px 0 5px}
+.res p{color:var(--ink2);font-size:.95rem}
+.res .rg{font-family:var(--fm);font-size:12px;color:var(--green);margin-top:11px;display:inline-flex;align-items:center;gap:6px}
+@media(min-width:720px){.resg{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<nav><div class="nin">
+  <a href="#/home" class="brand">
+    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="14" stroke="#0E6B54" stroke-width="2"/><circle cx="20" cy="6" r="3.6" fill="#0E6B54"/><circle cx="32" cy="27" r="3.6" fill="#1FB892"/><circle cx="8" cy="27" r="3.6" fill="#1E5F8C"/><line x1="20" y1="9" x2="29.5" y2="25" stroke="#0E6B54" stroke-width="1.7"/><line x1="29" y1="27" x2="11" y2="27" stroke="#0E6B54" stroke-width="1.7"/><line x1="10.5" y1="25" x2="20" y2="9" stroke="#0E6B54" stroke-width="1.7"/></svg>
+    Semble<span style="color:var(--green)">.CC</span>
+  </a>
+  <div class="nlx">
+    <a href="#/learn" data-nav="learn">Learn to See</a>
+    <a href="#/home/model">The Model</a>
+    <a href="#/home/why">Why It Works</a>
+    <a href="#/partners" data-nav="partners">Partners</a>
+  </div>
+  <a href="mailto:August@MotusMoves.US?subject=Semble%20Founding%20Cohort%20Application&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20apply%20to%20the%20Semble%20founding%20cohort.%20A%20bit%20about%20me%3A%0D%0A" class="btn bf">Apply</a>
+</div></nav>
+
+<section class="page active" id="page-home">
+
+<header class="hero">
+  <canvas class="netcv" aria-hidden="true"></canvas>
+  <div class="wrap hin">
+    <span class="eb rv">An open-source school for systems thinking</span>
+    <h1 class="rv" style="transition-delay:.08s">Get paid<br>to <em class="g">grow.</em></h1>
+    <div class="slo rv" style="transition-delay:.16s">
+      <span class="ld">Get paid to learn.</span>
+      <span>Get paid to apply and build.</span>
+      <span>Get paid to teach and mentor.</span>
+      <span>Get paid to solve real systemic problems.</span>
+    </div>
+    <p class="lede rv" style="transition-delay:.24s">A movement to learn, teach, and build together — built on the highest-leverage skill of the modern age. See the system. Learn. Adapt. Evolve. And teach.</p>
+    <div class="hcta rv" style="transition-delay:.32s">
+      <a href="mailto:August@MotusMoves.US?subject=Semble%20Founding%20Cohort%20Application&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20apply%20to%20the%20Semble%20founding%20cohort.%20A%20bit%20about%20me%3A%0D%0A" class="btn bf">Join the founding cohort</a>
+      <a href="#/learn" class="btn bg-">Learn to see systems</a>
+    </div>
+    <p class="taglineband rv" style="transition-delay:.4s">Semble — Learn Systems Thinking Together</p>
+  </div>
+  <div class="cue" aria-hidden="true"><span>Scroll</span><span class="ln"></span></div>
+</header>
+
+<section class="sec" id="leverage"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The leverage point</span>
+    <h2>Every crisis is a <span class="gt">systems failure</span> in disguise.</h2>
+    <p>Division. Burnout. Broken institutions. A struggling planet. We treat them as separate emergencies — but they share one root: we were trained to break the world into parts, and never taught to see how the parts connect. Systems thinking is that missing skill.</p>
+  </div>
+  <div class="lg">
+    <div class="rv">
+      <svg class="lsvg" viewBox="0 0 560 496" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Depth of intervention: tweaking numbers is shallow, low leverage; changing how people think is the deepest, highest-leverage place to intervene. Semble works there.">
+        <defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#1E5F8C"/></linearGradient></defs>
+        <text x="44" y="32" font-family="Spline Sans Mono" font-size="11.5" letter-spacing="1.4" fill="#7E8C86">SHALLOW · LOW LEVERAGE</text>
+        <g font-family="Hanken Grotesk">
+          <rect x="108" y="46" width="350" height="56" rx="11" fill="#E3EBE8" stroke="#0E1A1722"/><text x="283" y="80" text-anchor="middle" font-size="16.5" fill="#46554F">Tweak the numbers</text>
+          <rect x="94" y="120" width="378" height="60" rx="11" fill="#CFDFD9" stroke="#0E1A1722"/><text x="283" y="156" text-anchor="middle" font-size="17" fill="#46554F">Add more rules and tests</text>
+          <rect x="78" y="198" width="410" height="66" rx="12" fill="#A9CCC2" stroke="#0E1A1722"/><text x="283" y="237" text-anchor="middle" font-size="17.5" fill="#0E1A17">Change the goals of schooling</text>
+          <rect x="60" y="282" width="446" height="74" rx="13" fill="#5BA89A"/><text x="283" y="325" text-anchor="middle" font-size="18.5" fill="#04241C">Shift the structure of learning</text>
+          <rect x="42" y="374" width="482" height="96" rx="15" fill="url(#gd)"/><text x="283" y="414" text-anchor="middle" font-size="21" font-weight="500" fill="#fff">Change how people think</text>
+          <text x="283" y="442" text-anchor="middle" font-family="Spline Sans Mono" font-size="12" letter-spacing="1.2" fill="#3FE0B5">SEMBLE WORKS HERE</text>
+        </g>
+        <g stroke="#0E6B54" stroke-width="1.8" fill="none"><line x1="22" y1="52" x2="22" y2="466"/><path d="M22 476 l-6 -13 h12 z" fill="#0E6B54" stroke="none"/></g>
+        <text transform="translate(16,300) rotate(-90)" text-anchor="middle" font-family="Spline Sans Mono" font-size="11" letter-spacing="1.6" fill="#0E6B54">DEPTH OF INTERVENTION</text>
+      </svg>
+    </div>
+    <div class="lnote rv" style="transition-delay:.1s">
+      <p class="q">"The most powerful place to intervene in a system is the mindset out of which the system arises."</p>
+      <p class="ci">— Donella Meadows, <em>Leverage Points</em></p>
+      <p style="margin-top:18px;color:var(--ink2);font-size:1.01rem">Most schooling pushes on the shallow end — facts, rules, scores. Systems thinking pushes on the deep end: the mental models behind every choice that follows. Teaching it widely isn't one good idea among many. It is <em>the</em> leverage point — and almost no one is standing on it yet.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec dk" id="problem"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The problem we solve</span>
+    <h2>Systems thinking is hard to learn — <span class="gtb">alone.</span></h2>
+    <p>It is abstract. It is overwhelming. The ideas interlock, the books are dense, and there is no obvious first step or place to practice. Most people who reach for systems thinking quietly bounce off — not because the ideas are beyond them, but because they are facing them by themselves. Semble's entire design answers one question: what if you didn't have to?</p>
+  </div>
+  <div class="pil">
+    <div class="pl rv">
+      <p style="font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dink2);margin-bottom:8px">The obstacle — it feels abstract</p>
+      <h4>A practice space</h4>
+      <p>Theory you only read slides away. So every month you apply systems thinking to something real and present what you found — at the Semble Student Session and in your monthly build. Abstract ideas become muscle you can feel.</p>
+    </div>
+    <div class="pl rv" style="transition-delay:.06s">
+      <p style="font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dink2);margin-bottom:8px">The obstacle — it's overwhelming</p>
+      <h4>A community</h4>
+      <p>Learning a whole new way of seeing is heavy to carry by yourself. At Semble you carry it beside other people — encouragement when it's hard, momentum when you stall, and the simple proof that you are not the only one finding it difficult.</p>
+    </div>
+    <div class="pl rv" style="transition-delay:.12s">
+      <p style="font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dink2);margin-bottom:8px">The obstacle — there's no clear path</p>
+      <h4>A learning community</h4>
+      <p>Alone, you never quite know what to study next. Semble gives you a shared rhythm — goals, honest reflection, the monthly loop — and a cohort moving through it with you. You always know your next step, and you never take it alone.</p>
+    </div>
+    <div class="pl rv" style="transition-delay:.18s">
+      <p style="font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dink2);margin-bottom:8px">The obstacle — it's isolating</p>
+      <h4>A network</h4>
+      <p>A course ends and the connections vanish. Semble is built to leave you with the opposite: mentors, peers, and practitioners — and a coalition beyond them — who stay connected long after any single lesson is done.</p>
+    </div>
+  </div>
+  <p class="stf rv">You don't learn to see the system by yourself.<br><span class="gtb" style="font-style:normal">You learn it together.</span></p>
+</div></section>
+
+<section class="sec" id="numbers" style="background:var(--bg2)"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The case, in numbers</span>
+    <h2>An essential skill. A wide-open window.</h2>
+    <p>Systems thinking is taught in almost no school, practiced by remarkably few, and needed by everyone. That gap is not a problem — for a founder, it is the opportunity.</p>
+  </div>
+  <div class="stb rv">
+    <div class="stg">
+      <div class="st"><div class="b">~16%</div><div class="l">of any population are innovators &amp; early adopters — where systems thinking still sits today</div></div>
+      <div class="st"><div class="b">&lt;15%</div><div class="l">typical completion rate of self-paced online courses — the old way of learning is broken</div></div>
+      <div class="st"><div class="b">17/17</div><div class="l">UN global goals that are interconnected systems — every grand challenge is a systems problem</div></div>
+      <div class="st"><div class="b">$12</div><div class="l">an hour — where every Semble learner begins, and grows from</div></div>
+    </div>
+    <p class="stf">Taught in almost no school. Understood by remarkably few.<br><span class="gtb">Needed by every one of us.</span></p>
+  </div>
+</div></section>
+
+<section class="sec" id="curve"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">A founder's window</span>
+    <h2>We are early. <span class="gt">That is the whole point.</span></h2>
+    <p>Every idea travels the same curve. Systems thinking is right at the start of it. Almost nobody builds the infrastructure for an idea while it is still here. Semble does.</p>
+  </div>
+  <div class="pan rv">
+    <svg class="csvg" viewBox="0 0 720 408" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="An adoption curve. Systems thinking adopters cluster on the left with innovators and early adopters. A chasm separates them from the majority, crossed by the teaching network.">
+      <defs><clipPath id="uc"><path d="M60,300 C200,300 250,90 360,90 C470,90 520,300 660,300 Z"/></clipPath>
+      <linearGradient id="cf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1FB892"/><stop offset="1" stop-color="#3F9FD8"/></linearGradient></defs>
+      <rect x="60" y="80" width="222" height="222" fill="url(#cf)" opacity=".32" clip-path="url(#uc)"/>
+      <g clip-path="url(#uc)"><circle cx="150" cy="276" r="7" fill="#0E6B54"/><circle cx="172" cy="252" r="7" fill="#0E6B54"/><circle cx="196" cy="284" r="7" fill="#0E6B54"/><circle cx="200" cy="240" r="7" fill="#13886A"/><circle cx="222" cy="266" r="7" fill="#0E6B54"/><circle cx="238" cy="232" r="7" fill="#13886A"/><circle cx="246" cy="282" r="7" fill="#0E6B54"/><circle cx="262" cy="256" r="7" fill="#13886A"/><circle cx="178" cy="288" r="7" fill="#0E6B54"/><circle cx="218" cy="246" r="7" fill="#0E6B54"/></g>
+      <path d="M60,300 C200,300 250,90 360,90 C470,90 520,300 660,300" fill="none" stroke="#0E1A17" stroke-width="2.4"/>
+      <line x1="60" y1="300" x2="660" y2="300" stroke="#0E1A17" stroke-width="1" opacity=".4"/>
+      <line x1="305" y1="68" x2="305" y2="334" stroke="#1E5F8C" stroke-width="1.7" stroke-dasharray="5 5"/>
+      <text x="305" y="56" text-anchor="middle" font-family="Spline Sans Mono" font-size="11.5" letter-spacing="1" fill="#1E5F8C">THE CHASM</text>
+      <text x="170" y="150" font-family="Fraunces" font-style="italic" font-size="18" fill="#0E6B54">we are here</text>
+      <line x1="186" y1="160" x2="206" y2="222" stroke="#0E6B54" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <g font-family="Spline Sans Mono" font-size="12"><text x="170" y="328" text-anchor="middle" fill="#46554F">innovators · early adopters</text><text x="486" y="328" text-anchor="middle" fill="#7E8C86">the majority &#8594;</text></g>
+      <rect x="96" y="350" width="180" height="40" rx="10" fill="#0E6B54"/><text x="186" y="375" text-anchor="middle" font-family="Hanken Grotesk" font-size="14" font-weight="500" fill="#fff">the founding cohort</text>
+      <rect x="374" y="350" width="240" height="40" rx="10" fill="none" stroke="#1E5F8C" stroke-width="1.4" stroke-dasharray="4 4"/><text x="494" y="375" text-anchor="middle" font-family="Hanken Grotesk" font-size="13.5" fill="#1E5F8C">the wave — reached by teaching</text>
+    </svg>
+    <p style="margin-top:16px;color:var(--ink2);font-size:.97rem;max-width:640px">The honest hard part is the chasm — most movements die there. The majority don't adopt an idea from a manifesto; they adopt it from a trusted person near them who already did. That is why Semble's founding cohort is paid to <em>teach</em>: the teaching network is what carries systems thinking across.</p>
+  </div>
+</div></section>
+
+<section class="sec" id="how" style="background:var(--bg2)"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">How it works</span>
+    <h2>One loop. Repeated honestly, <span class="gt">at your own pace.</span></h2>
+    <p>No grades. No gatekeeping curriculum. No one telling you what to think. Just autonomy, real work, honest reflection, and a community moving together.</p>
+  </div>
+  <div class="hg">
+    <div class="rv">
+      <svg class="losvg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Semble loop: set goals, do the work, reflect, meet monthly, grow — then repeat.">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#1E5F8C"/></linearGradient>
+        <marker id="la" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="1.9" stroke-linecap="round"/></marker></defs>
+        <circle cx="300" cy="300" r="190" fill="none" stroke="#0E1A17" stroke-width="1" opacity=".12"/>
+        <g fill="none" stroke="#1FB892" stroke-width="2.6" marker-end="url(#la)">
+          <path d="M352.4,117.4 A190 190 0 0 1 457.5,193.8"/><path d="M489.9,293.4 A190 190 0 0 1 449.7,417.0"/>
+          <path d="M365.0,478.6 A190 190 0 0 1 235.0,478.6"/><path d="M150.3,417.0 A190 190 0 0 1 110.1,293.4"/>
+          <path d="M142.5,193.8 A190 190 0 0 1 247.6,117.4"/></g>
+        <g class="orb"><circle cx="300" cy="110" r="9" fill="#3F9FD8"/></g>
+        <g font-family="Hanken Grotesk" text-anchor="middle">
+          <g><circle cx="300" cy="110" r="56" fill="url(#lg)"/><text x="300" y="100" font-family="Spline Sans Mono" font-size="12.5" fill="#3FE0B5">01</text><text x="300" y="122" font-size="17" font-weight="500" fill="#fff">Set goals</text></g>
+          <g><circle cx="480.7" cy="241.3" r="56" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="480.7" y="231" font-family="Spline Sans Mono" font-size="12.5" fill="#13886A">02</text><text x="480.7" y="253" font-size="16" font-weight="500" fill="#0E1A17">Do the work</text></g>
+          <g><circle cx="411.7" cy="453.7" r="56" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="411.7" y="443" font-family="Spline Sans Mono" font-size="12.5" fill="#13886A">03</text><text x="411.7" y="465" font-size="17" font-weight="500" fill="#0E1A17">Reflect</text></g>
+          <g><circle cx="188.3" cy="453.7" r="56" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="188.3" y="443" font-family="Spline Sans Mono" font-size="12.5" fill="#13886A">04</text><text x="188.3" y="461" font-size="14.5" font-weight="500" fill="#0E1A17">Meet</text><text x="188.3" y="478" font-size="14.5" font-weight="500" fill="#0E1A17">monthly</text></g>
+          <g><circle cx="119.3" cy="241.3" r="56" fill="url(#lg)"/><text x="119.3" y="231" font-family="Spline Sans Mono" font-size="12.5" fill="#3FE0B5">05</text><text x="119.3" y="253" font-size="17" font-weight="500" fill="#fff">Grow</text></g>
+        </g>
+        <text x="300" y="296" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="20" fill="#46554F">the</text>
+        <text x="300" y="322" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="20" fill="#46554F">Semble loop</text>
+      </svg>
+    </div>
+    <div class="steps rv" style="transition-delay:.1s">
+      <div class="step"><div class="n">1</div><div><h4>Set your goals</h4><p>You decide what you're learning and why. Student-driven, always.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Do the work</h4><p>Learn, apply, build, teach, or research — real work, at your pace.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Log your reflections</h4><p>Each block, you log what you learned. Reflections are your portfolio — and the honest heart of the model.</p></div></div>
+      <div class="step"><div class="n">4</div><div><h4>Meet monthly</h4><p>Sit with a mentor and gather at the Semble Student Session. This is how we verify and stay real.</p></div></div>
+      <div class="step"><div class="n">5</div><div><h4>Get paid to grow</h4><p>Verified time and completed work earn Votus / Dash. Then the loop begins again.</p></div></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="model"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The Semble model</span>
+    <h2>Four parts. <span class="gt">One honest system.</span></h2>
+    <p>Semble runs on four interlocking commitments. None can be faked, and together they make a learner accountable to their own growth — without a single grade.</p>
+  </div>
+  <div class="mg">
+    <div class="mc rv"><div class="mi"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h12M4 18h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <h4>The Reflection Model</h4>
+      <p>After every learning block you log an honest reflection — what you learned, what shifted, where you struggled. Reflections are your living portfolio and the substrate of trust. We pay for honest growth, never for a timer left running.</p>
+      <span class="tg">Honesty over metrics</span></div>
+    <div class="mc rv" style="transition-delay:.06s"><div class="mi"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" stroke="#fff" stroke-width="1.5"/></svg></div>
+      <h4>Project-Based Learning</h4>
+      <p>Each month you ship one real thing — most often a vibe-coded systems-thinking tool, app, or pilot. One build a month turns abstract theory into something the world can use, and something you can point to.</p>
+      <span class="tg">One systems build per month</span></div>
+    <div class="mc rv" style="transition-delay:.12s"><div class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="3.4" stroke="#fff" stroke-width="2"/><circle cx="16" cy="14" r="3.4" stroke="#fff" stroke-width="2"/><path d="M11.5 11.3l2 1.4" stroke="#fff" stroke-width="2"/></svg></div>
+      <h4>The Monthly Mentor Check-in</h4>
+      <p>Once a month, every learner sits down with August to talk through their growth, their reflections, and what's next. This conversation — not a dashboard — is how the work is verified, and how the month is earned.</p>
+      <span class="tg">One mentor meeting per month</span></div>
+    <div class="mc rv" style="transition-delay:.18s"><div class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="8" r="2.6" stroke="#fff" stroke-width="2"/><circle cx="18" cy="8" r="2.6" stroke="#fff" stroke-width="2"/><circle cx="12" cy="17" r="2.6" stroke="#fff" stroke-width="2"/><path d="M8 9l3 6M16 9l-3 6M8.5 8h7" stroke="#fff" stroke-width="1.6"/></svg></div>
+      <h4>The Semble Student Session</h4>
+      <p>Once a month, the cohort gathers in person in Chicago at the Lincoln Park Room to learn together and present what they discovered. Required — because learning out loud, in a room of people, is where a movement actually lives.</p>
+      <span class="tg">Monthly · Lincoln Park Room, Chicago</span></div>
+  </div>
+</div></section>
+
+<section class="sec" id="earn" style="background:var(--bg2)"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Ways to grow</span>
+    <h2>Six ways to do real work — <span class="gt">and be paid for it.</span></h2>
+    <p>Watching a great talk, reading a paper, working a course — it all counts when it feeds an honest reflection. We pay for growth that is reflected on, not for a screen left on.</p>
+  </div>
+  <div class="tg-">
+    <div class="tk rv"><div class="ti"><span class="dt" style="background:#0E6B54"></span><h4>Learn &amp; Log</h4></div><p>Self-directed study, reflected on honestly. The foundation everyone starts from.</p><p class="rt">$12 / hour to start</p></div>
+    <div class="tk rv" style="transition-delay:.05s"><div class="ti"><span class="dt" style="background:#1FB892"></span><h4>Apply</h4></div><p>Project-based learning and field work — real systems maps for real problems.</p><p class="rt">Project-based · rate rises</p></div>
+    <div class="tk rv" style="transition-delay:.1s"><div class="ti"><span class="dt" style="background:#1E5F8C"></span><h4>Build</h4></div><p>Vibe-code a systems-thinking tool, app, or pilot. Ship one project a month.</p><p class="rt">One build a month</p></div>
+    <div class="tk rv" style="transition-delay:.05s"><div class="ti"><span class="dt" style="background:#3F9FD8"></span><h4>Research</h4></div><p>Unlock the research economy. Get paid to investigate hard, unanswered questions.</p><p class="rt">The research economy</p></div>
+    <div class="tk rv" style="transition-delay:.1s"><div class="ti"><span class="dt" style="background:#13886A"></span><h4>Teach &amp; Mentor</h4></div><p>The mentor economy. Get paid to pass it on — and learn it twice as deeply.</p><p class="rt">Highest leverage of all</p></div>
+    <div class="tk rv" style="transition-delay:.15s"><div class="ti"><span class="dt" style="background:#2D7DB0"></span><h4>AI &#215; Systems Thinking</h4></div><p>A parallel track on doing real, rigorous systems work with today's AI tools.</p><p class="rt">Parallel class</p></div>
+  </div>
+  <div class="rv" style="margin-top:44px">
+    <p class="kick" style="margin-bottom:6px">The rate ladder</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:6px">Everyone starts at $12. Then you grow.</h3>
+    <p style="color:var(--ink2);max-width:560px;margin-bottom:18px">Your rate rises with consistency, the quality of your work and reflections, how you apply what you learn, and how you teach it.</p>
+    <svg class="rsvg" viewBox="0 0 680 356" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A rising rate ladder: Learner at $12 an hour, then Contributor, Practitioner, and Guide or Mentor, each earning more.">
+      <defs><linearGradient id="rg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#1E5F8C"/></linearGradient></defs>
+      <line x1="40" y1="320" x2="650" y2="320" stroke="#0E1A17" stroke-width="1" opacity=".35"/>
+      <path d="M110,250 L260,205 L410,140 L560,68" fill="none" stroke="#1FB892" stroke-width="2" stroke-dasharray="6 5"/>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <rect x="50" y="250" width="120" height="70" rx="11" fill="#E3EBE8" stroke="#0E1A1722"/><text x="110" y="280" font-size="15" font-weight="500" fill="#0E1A17">Learner</text><text x="110" y="301" font-family="Spline Sans Mono" font-size="12.5" fill="#0E6B54">$12/hr</text>
+        <rect x="200" y="205" width="120" height="115" rx="11" fill="#CFDFD9" stroke="#0E1A1722"/><text x="260" y="236" font-size="15" font-weight="500" fill="#0E1A17">Contributor</text><text x="260" y="257" font-family="Spline Sans Mono" font-size="12" fill="#0E6B54">consistent work</text>
+        <rect x="350" y="140" width="120" height="180" rx="11" fill="#A9CCC2" stroke="#0E1A1733"/><text x="410" y="171" font-size="15" font-weight="500" fill="#0E1A17">Practitioner</text><text x="410" y="192" font-family="Spline Sans Mono" font-size="12" fill="#0E1A17">paid to apply</text>
+        <rect x="500" y="68" width="120" height="252" rx="11" fill="url(#rg)"/><text x="560" y="99" font-size="15" font-weight="500" fill="#fff">Guide /</text><text x="560" y="119" font-size="15" font-weight="500" fill="#fff">Mentor</text><text x="560" y="141" font-family="Spline Sans Mono" font-size="12" fill="#3FE0B5">paid to teach</text>
+      </g>
+      <text x="600" y="44" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="17" fill="#1FB892">get paid to grow</text>
+    </svg>
+  </div>
+</div></section>
+
+<section class="sec dk" id="why"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Why it works</span>
+    <h2>Built on what learning science <span class="gtb">already knows.</span></h2>
+    <p>Semble isn't a guess. Every mechanic maps to a well-established finding about how humans actually learn, stay motivated, and grow.</p>
+  </div>
+  <div class="pil">
+    <div class="pl rv"><h4>Autonomy, competence, community</h4><p>Self-Determination Theory shows durable motivation grows from three needs. Semble is built on all three: you set your goals, build real skill, and grow inside a community.</p><p class="s">Self-Determination Theory · Deci &amp; Ryan</p></div>
+    <div class="pl rv" style="transition-delay:.06s"><h4>We learn most by teaching</h4><p>Preparing to teach — and teaching — produces measurably deeper understanding than passive study. So we pay for teaching: it spreads the movement and deepens the teacher at once.</p><p class="s">The prot&#233;g&#233; effect · learning-by-teaching research</p></div>
+    <div class="pl rv" style="transition-delay:.12s"><h4>Pay for what can't be faked</h4><p>Rewards can quietly crowd out the love of learning. So Semble never pays for a timer — it pays for honest reflection, real application, and teaching, verified in conversation.</p><p class="s">The overjustification effect · Lepper, Greene &amp; Nisbett</p></div>
+    <div class="pl rv" style="transition-delay:.18s"><h4>Intervene at the mindset</h4><p>The highest-leverage place to change a system is the paradigm it runs on. Teaching systems thinking widely is an intervention at exactly that depth.</p><p class="s">Leverage points · Donella Meadows</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="budget"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The pilot</span>
+    <h2>A small founding cohort. <span class="gt">An honest budget.</span></h2>
+    <p>Year one is roughly 30 learners — about the number one mentor can truly know. The large majority of every dollar flows straight to the people doing the growing.</p>
+  </div>
+  <div class="bud rv">
+    <div class="bt"><span class="a gt">~$160,000</span><span class="l">Illustrative pilot-year budget</span></div>
+    <div class="bars">
+      <div><div class="btp"><span>Learner stipends &amp; payouts</span><span class="v">$110,000 · 69%</span></div><div class="btr"><div class="bfl" style="background:var(--grad)" data-w="69%"></div></div></div>
+      <div><div class="btp"><span>Practitioner certificate sponsorships</span><span class="v">$14,000 · 9%</span></div><div class="btr"><div class="bfl" style="background:#13886A" data-w="9%"></div></div></div>
+      <div><div class="btp"><span>Program coordination</span><span class="v">$12,000 · 7%</span></div><div class="btr"><div class="bfl" style="background:#1FB892" data-w="7.5%"></div></div></div>
+      <div><div class="btp"><span>Semble Sessions · Lincoln Park Room</span><span class="v">$9,000 · 6%</span></div><div class="btr"><div class="bfl" style="background:#1E5F8C" data-w="5.6%"></div></div></div>
+      <div><div class="btp"><span>Platform &amp; operations</span><span class="v">$8,000 · 5%</span></div><div class="btr"><div class="bfl" style="background:#3F9FD8" data-w="5%"></div></div></div>
+      <div><div class="btp"><span>Hackathons &amp; pilot prizes</span><span class="v">$7,000 · 4%</span></div><div class="btr"><div class="bfl" style="background:#5BA89A" data-w="4.4%"></div></div></div>
+    </div>
+    <p class="fn"><strong style="font-weight:600;color:var(--ink)">How it's funded.</strong> The pilot is designed to be seeded by a proposed Dash DAO treasury stream and systems-thinking philanthropy. As the model proves out, employer sponsorships and paid practitioner work carry a growing share — the seed gets people in the door, real value keeps it running. Once the pilot proves the model, the path to a true scale round opens.</p>
+  </div>
+  <div class="pp rv" style="margin-top:24px">
+    <div class="ppc"><div class="n">Dash DAO</div><div class="s">Proposed</div></div>
+    <div class="ppc"><div class="n">Systems Thinking Alliance</div><div class="s">Proposed</div></div>
+    <div class="ppc"><div class="n">Systems Innovation Network</div><div class="s">Proposed</div></div>
+    <div class="ppc"><div class="n">City of Chicago</div><div class="s">Proposed</div></div>
+  </div>
+  <div class="rv" style="margin-top:24px"><a href="#/partners" class="btn bg-">See the full coalition &#8594;</a></div>
+</div></section>
+
+<section class="sec dk" id="about"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The founders</span>
+    <h2>Two Builders Who Deeply Understand That Learning Together, Is Better.</h2>
+    <p>Semble is led by a musician and systems thinker, and a co-founder who brings rigor and care to how it is built.</p>
+  </div>
+  <div class="fnd">
+    <div class="fc rv"><div class="av em">🫡</div><h3>August James Domanchuk</h3><div class="ro">Founder · Systems architect of culture</div>
+      <p>August is a Chicago-area musician, systems thinker, and builder, and the frontman of The August James Band. He builds ecosystems, not products — platforms that help people move, feel, and build together. He has committed to studying systems thinking every day, and teaching it every day, for the rest of his life. Semble is that commitment, made into a movement.</p></div>
+    <div class="fc rv" style="transition-delay:.1s"><div class="av em">🧑‍💻</div><h3>Ember Seoni</h3><div class="ro">Co-founder · Systems-intelligence lead</div>
+      <p>Ember Seoni leads the rigorous side of the work — she heads SystemsBench, the benchmark for systems intelligence, and contributes to Davara.DEV. Her gift to Semble is depth and care: making sure the way the school measures growth is honest, defensible, and built to last. Where the model meets the human, she makes sure every learner is met with warmth.</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="join"><div class="wrap">
+  <div class="join rv">
+    <canvas class="ctacv" aria-hidden="true"></canvas>
+    <div style="position:relative;z-index:2">
+      <span class="eb" style="color:rgba(255,255,255,.85);justify-content:center;display:flex">Join the movement</span>
+      <h2 style="margin-top:13px">Come build what comes next.</h2>
+      <p>The founding cohort is small by design — every seat is real. If you're ready to learn, teach, build, and get paid to grow, this is your invitation.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="mailto:August@MotusMoves.US?subject=Semble%20Founding%20Cohort%20Application&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20apply%20to%20the%20Semble%20founding%20cohort.%20A%20bit%20about%20me%3A%0D%0A" class="btn bf">Apply to the founding cohort</a>
+        <a href="#/learn" class="btn bg-">Start: Learn to See</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+</section>
+<section class="page" id="page-learn">
+
+<header class="hero">
+  <canvas class="netcv" aria-hidden="true"></canvas>
+  <div class="wrap hin">
+    <span class="eb rv">A free, open intro to systems thinking</span>
+    <h1 class="rv" style="transition-delay:.08s">Learn to <em class="g">see.</em></h1>
+    <p class="lede rv" style="transition-delay:.16s">Most of us were taught to break the world into parts. Systems thinking is the skill of seeing the whole — the connections, the loops, the patterns. It is the highest-leverage thing you can learn. And it starts here, with no prior knowledge needed.</p>
+    <div class="hcta rv" style="transition-delay:.24s">
+      <a href="#/learn/levels" class="btn bf">Choose your depth</a>
+      <a href="#/learn/blocks" class="btn bg-">See the core ideas</a>
+    </div>
+  </div>
+</header>
+
+<section class="sec" style="background:var(--bg2)" id="learnpath"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Your path</span>
+    <h2>The road through <span class="gt">this page.</span></h2>
+    <p>This page is a hub — a complete first journey into systems thinking, free and open. Here is the path. Take it in order, or jump to whatever calls you. Every stop builds on the one before it.</p>
+  </div>
+  <div class="roadmap rv">
+    <a class="rmstop" href="#/learn/reframe"><span class="rmn">Stop 01</span><h4>The shift <span class="ar">&#8594;</span></h4><p>Why almost nothing important behaves like a pile of separate parts.</p></a>
+    <a class="rmstop" href="#/learn/whatis"><span class="rmn">Stop 02</span><h4>What is a system <span class="ar">&#8594;</span></h4><p>The three ingredients of every system — and the one we always miss.</p></a>
+    <a class="rmstop" href="#/learn/blocks"><span class="rmn">Stop 03</span><h4>The building blocks <span class="ar">&#8594;</span></h4><p>Six core ideas that unlock everything deeper.</p></a>
+    <a class="rmstop" href="#/learn/iceberg"><span class="rmn">Stop 04</span><h4>The iceberg <span class="ar">&#8594;</span></h4><p>Look beneath the surface event to where the leverage actually lives.</p></a>
+    <a class="rmstop" href="#/learn/leveragepoints"><span class="rmn">Stop 05</span><h4>The twelve leverage points <span class="ar">&#8594;</span></h4><p>Donella Meadows' famous map of where to push a system — ranked by power.</p></a>
+    <a class="rmstop" href="#/learn/levels"><span class="rmn">Stop 06</span><h4>Choose your depth <span class="ar">&#8594;</span></h4><p>Three levels, one rising path — from first sight to the frontier.</p></a>
+    <a class="rmstop" href="#/learn/models"><span class="rmn">Stop 07</span><h4>Mental models <span class="ar">&#8594;</span></h4><p>Build a latticework of thinking tools — and learn to reach for the right one.</p></a>
+    <a class="rmstop" href="#/learn/dancing"><span class="rmn">Stop 08</span><h4>Dancing with systems <span class="ar">&#8594;</span></h4><p>Donella Meadows' fourteen lessons for working with a living system.</p></a>
+    <a class="rmstop" href="#/learn/voices"><span class="rmn">Stop 09</span><h4>Voices across the world <span class="ar">&#8594;</span></h4><p>The same truth, told by many cultures and many centuries.</p></a>
+    <a class="rmstop" href="#/learn/resources"><span class="rmn">Stop 10</span><h4>Key resources <span class="ar">&#8594;</span></h4><p>Where to go next — the essential reading, all free and open.</p></a>
+  </div>
+</div></section>
+
+<section class="sec" id="reframe"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The shift</span>
+    <h2>Parts, or <span class="gt">the whole?</span></h2>
+    <p>School trained us to take things apart — to study the pieces in isolation. But almost nothing important behaves like a pile of pieces. It behaves like a system.</p>
+  </div>
+  <div class="rf">
+    <div class="rv">
+      <svg class="rfsvg" viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="On the left, scattered unconnected dots labelled parts. On the right, the same dots joined by lines into a system.">
+        <text x="130" y="32" text-anchor="middle" font-family="Spline Sans Mono" font-size="12" letter-spacing="1.5" fill="#7E8C86">PARTS</text>
+        <g fill="#7E8C86"><circle cx="70" cy="100" r="9"/><circle cx="150" cy="80" r="9"/><circle cx="200" cy="140" r="9"/><circle cx="90" cy="190" r="9"/><circle cx="180" cy="230" r="9"/><circle cx="120" cy="270" r="9"/></g>
+        <line x1="255" y1="60" x2="255" y2="280" stroke="#0E1A17" stroke-width="1" opacity=".2" stroke-dasharray="4 4"/>
+        <text x="390" y="32" text-anchor="middle" font-family="Spline Sans Mono" font-size="12" letter-spacing="1.5" fill="#0E6B54">A SYSTEM</text>
+        <g stroke="#1FB892" stroke-width="2" opacity=".8">
+          <line x1="330" y1="100" x2="410" y2="80"/><line x1="410" y1="80" x2="460" y2="140"/>
+          <line x1="330" y1="100" x2="350" y2="190"/><line x1="350" y1="190" x2="460" y2="140"/>
+          <line x1="350" y1="190" x2="440" y2="230"/><line x1="440" y1="230" x2="380" y2="270"/>
+          <line x1="380" y1="270" x2="350" y2="190"/><line x1="410" y1="80" x2="350" y2="190"/></g>
+        <g fill="#0E6B54"><circle cx="330" cy="100" r="9"/><circle cx="410" cy="80" r="9"/><circle cx="460" cy="140" r="9"/><circle cx="350" cy="190" r="9"/><circle cx="440" cy="230" r="9"/><circle cx="380" cy="270" r="9"/></g>
+      </svg>
+    </div>
+    <div class="rv" style="transition-delay:.1s">
+      <p class="q">"When we try to pick out anything by itself, we find it hitched to everything else in the universe."</p>
+      <p class="qp">— John Muir. Systems thinking is simply learning to see the hitches — the invisible lines that connect a forest, a city, a family, an economy. Once you see them, you can never un-see them. And you start to understand why problems persist, and where they can actually be solved.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" style="background:var(--bg2)" id="whatis"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The definition</span>
+    <h2>What is a system?</h2>
+    <p>A system is any set of things connected in a way that produces a behavior over time. Three ingredients make one — and the second is the one we usually miss.</p>
+  </div>
+  <div class="sd">
+    <div class="sdc rv">
+      <svg class="ic" viewBox="0 0 54 54" fill="none"><circle cx="14" cy="16" r="6" fill="#0E6B54"/><circle cx="40" cy="14" r="6" fill="#0E6B54"/><circle cx="27" cy="40" r="6" fill="#0E6B54"/></svg>
+      <h4>Elements</h4>
+      <p>The parts you can see and name — people, trees, accounts, ideas. The easiest to spot, and the least important.</p>
+    </div>
+    <div class="sdc rv" style="transition-delay:.06s">
+      <svg class="ic" viewBox="0 0 54 54" fill="none"><circle cx="14" cy="16" r="6" fill="#1FB892"/><circle cx="40" cy="14" r="6" fill="#1FB892"/><circle cx="27" cy="40" r="6" fill="#1FB892"/><g stroke="#1E5F8C" stroke-width="2.4"><line x1="14" y1="16" x2="40" y2="14"/><line x1="40" y1="14" x2="27" y2="40"/><line x1="27" y1="40" x2="14" y2="16"/></g></svg>
+      <h4>Interconnections</h4>
+      <p>The relationships and flows between the parts. Mostly invisible — and almost always where the behavior actually comes from.</p>
+    </div>
+    <div class="sdc rv" style="transition-delay:.12s">
+      <svg class="ic" viewBox="0 0 54 54" fill="none"><circle cx="27" cy="27" r="18" stroke="#1E5F8C" stroke-width="2.4"/><circle cx="27" cy="27" r="6" fill="#1E5F8C"/></svg>
+      <h4>Purpose</h4>
+      <p>What the system is actually doing — not what it says it does. Behavior reveals purpose more honestly than words ever will.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="blocks"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The building blocks</span>
+    <h2>Six ideas that <span class="gt">unlock the rest.</span></h2>
+    <p>Learn these six and you have the working vocabulary of systems thinking. Everything deeper is built from here.</p>
+  </div>
+  <div class="bbg">
+    <div class="bb rv">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><circle cx="30" cy="40" r="14" stroke="#0E6B54" stroke-width="2.4"/><circle cx="70" cy="40" r="14" stroke="#1E5F8C" stroke-width="2.4"/><path d="M44 40h12" stroke="#1FB892" stroke-width="2.4"/><circle cx="30" cy="40" r="4" fill="#0E6B54"/><circle cx="70" cy="40" r="4" fill="#1E5F8C"/></svg></div>
+      <h4>Feedback loops</h4>
+      <p>The heart of systems thinking. Loops where an output circles back to influence the input — either amplifying it (reinforcing) or stabilizing it (balancing).</p>
+      <span class="tg">Reinforcing &amp; balancing</span>
+    </div>
+    <div class="bb rv" style="transition-delay:.05s">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><rect x="34" y="28" width="32" height="24" rx="4" stroke="#0E6B54" stroke-width="2.4"/><path d="M8 40h22M70 40h22" stroke="#1FB892" stroke-width="2.4"/><path d="M30 40l-6-4v8zM92 40l-6-4v8z" fill="#1FB892"/></svg></div>
+      <h4>Stocks &amp; flows</h4>
+      <p>A stock is what builds up — water in a tub, money, trust. Flows fill and drain it. Confuse the two and you misread every system you meet.</p>
+      <span class="tg">Accumulation &amp; rate</span>
+    </div>
+    <div class="bb rv" style="transition-delay:.1s">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><path d="M14 26h30" stroke="#0E6B54" stroke-width="2.4"/><path d="M14 54h60" stroke="#1E5F8C" stroke-width="2.4" stroke-dasharray="5 4"/><circle cx="44" cy="26" r="4" fill="#0E6B54"/><circle cx="74" cy="54" r="4" fill="#1E5F8C"/><path d="M44 26q15 0 30 28" stroke="#7E8C86" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/></svg></div>
+      <h4>Delays</h4>
+      <p>Cause and effect are rarely close in time. Delays are why we over-correct, why trends surprise us, and why patience is a systems skill.</p>
+      <span class="tg">Time between cause &amp; effect</span>
+    </div>
+    <div class="bb rv">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><g fill="#0E6B54"><circle cx="24" cy="56" r="4"/><circle cx="38" cy="56" r="4"/><circle cx="52" cy="56" r="4"/><circle cx="31" cy="44" r="4"/><circle cx="45" cy="44" r="4"/></g><path d="M60 30q14-14 28 0" stroke="#1FB892" stroke-width="2.6" fill="none"/><circle cx="60" cy="30" r="4" fill="#1E5F8C"/><circle cx="88" cy="30" r="4" fill="#1E5F8C"/></svg></div>
+      <h4>Emergence</h4>
+      <p>The whole does things no part can do alone. A flock, a city, a mind — patterns that emerge from simple parts interacting.</p>
+      <span class="tg">The whole &gt; the sum</span>
+    </div>
+    <div class="bb rv" style="transition-delay:.05s">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><path d="M20 56h44" stroke="#0E6B54" stroke-width="2.6"/><circle cx="34" cy="56" r="5" fill="#1E5F8C"/><path d="M58 56l24-30" stroke="#1FB892" stroke-width="2.6"/><circle cx="82" cy="26" r="5" fill="#1FB892"/><path d="M58 50v12" stroke="#7E8C86" stroke-width="2"/></svg></div>
+      <h4>Leverage points</h4>
+      <p>Places where a small, well-aimed push changes everything. The highest-leverage points are the hardest to see — and the most worth finding.</p>
+      <span class="tg">Where to push</span>
+    </div>
+    <div class="bb rv" style="transition-delay:.1s">
+      <div class="bv"><svg viewBox="0 0 100 80" fill="none"><path d="M50 14v52" stroke="#0E6B54" stroke-width="2.4"/><path d="M30 30h40M24 46h52M18 62h64" stroke="#1E5F8C" stroke-width="2.4"/><circle cx="50" cy="14" r="4" fill="#1FB892"/></svg></div>
+      <h4>The iceberg</h4>
+      <p>Beneath every visible event lie patterns, then structures, then mental models. The deeper you look, the more leverage you find.</p>
+      <span class="tg">Events to mental models</span>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec dk" id="iceberg"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The signature model</span>
+    <h2>The iceberg: <span class="gtb">look beneath the event.</span></h2>
+    <p>When something goes wrong, most of us react to the event on the surface. A systems thinker asks four questions, each one deeper — and each one with more leverage.</p>
+  </div>
+  <div class="ibg">
+    <div class="rv">
+      <svg class="ibsvg" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The iceberg model. A small tip above the waterline is events. Below: patterns, then structures, then mental models — each deeper and higher leverage.">
+        <defs><linearGradient id="ig" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1FB892"/><stop offset="1" stop-color="#0B1714"/></linearGradient></defs>
+        <line x1="20" y1="120" x2="400" y2="120" stroke="#3FE0B5" stroke-width="1.4" stroke-dasharray="6 5"/>
+        <text x="400" y="112" text-anchor="end" font-family="Spline Sans Mono" font-size="11" fill="#8FA69D">waterline</text>
+        <path d="M210 40 L300 120 L120 120 Z" fill="#3FE0B5"/>
+        <path d="M300 120 L120 120 L60 410 L360 410 Z" fill="url(#ig)" opacity=".9"/>
+        <g font-family="Hanken Grotesk" text-anchor="middle">
+          <text x="210" y="100" font-size="14" font-weight="500" fill="#04241C">Events</text>
+          <text x="210" y="185" font-size="15" font-weight="500" fill="#E8EFEB">Patterns</text>
+          <text x="210" y="270" font-size="15" font-weight="500" fill="#E8EFEB">Structures</text>
+          <text x="210" y="365" font-size="15" font-weight="500" fill="#E8EFEB">Mental models</text>
+        </g>
+      </svg>
+    </div>
+    <div class="ibl rv" style="transition-delay:.1s">
+      <div class="ibrow"><span class="lv">Surface · what happened</span><h4>Events</h4><p>"Sales dropped this month." React here and you only ever firefight.</p></div>
+      <div class="ibrow"><span class="lv">Deeper · what keeps happening</span><h4>Patterns &amp; trends</h4><p>"Sales drop every spring." Now you can anticipate instead of react.</p></div>
+      <div class="ibrow"><span class="lv">Deeper still · what holds it in place</span><h4>Structures</h4><p>"Our incentives push short-term selling." Change this and the pattern changes.</p></div>
+      <div class="ibrow"><span class="lv">Deepest · what we believe</span><h4>Mental models</h4><p>"We believe growth must be fast." Shift this, and the whole system can be redesigned.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="leveragepoints"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The famous framework</span>
+    <h2>The twelve <span class="gt">leverage points.</span></h2>
+    <p>In 1999, Donella Meadows distilled a career of systems work into a single list — the twelve places to intervene in a system, ranked by power. It is the most-read idea in systems thinking, and a map of where real change is actually made.</p>
+  </div>
+  <div class="lnote rv" style="margin-bottom:28px">
+    <p class="q">"Leverage points are not intuitive."</p>
+    <p class="ci">— Donella Meadows. The obvious place to push is almost always the weakest. The deepest leverage hides where we rarely think to look: in goals, in mindsets, and in the freedom to change our minds.</p>
+  </div>
+  <p class="rv" style="font-family:var(--fm);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="font-size:1.15rem;color:var(--green)">&#8593;</span> Higher on the list = harder to see, and far more powerful</p>
+  <div class="ladder">
+    <div class="lgrp rv">Intent — the deepest leverage</div>
+    <div class="lrow t-i rv"><span class="ln">1</span><div><h4>The power to transcend paradigms</h4><p>To hold that no single worldview is final — to stay flexible, humble, and free to change the lens itself. The deepest leverage there is.</p></div></div>
+    <div class="lrow t-i rv"><span class="ln">2</span><div><h4>Paradigms — the system's shared mindset</h4><p>The deep, often unspoken assumptions a whole system grows out of. Shift the paradigm and everything beneath it rearranges.</p></div></div>
+    <div class="lrow t-i rv"><span class="ln">3</span><div><h4>Goals — the system's purpose</h4><p>What the system is truly optimizing for. Change the goal and every loop, rule, and number below it bends to serve the new one.</p></div></div>
+    <div class="lgrp rv">Design — how the system is built</div>
+    <div class="lrow t-d rv"><span class="ln">4</span><div><h4>Self-organization</h4><p>The power of a system to add, change, and evolve its own structure — to learn, adapt, and grow new parts of itself.</p></div></div>
+    <div class="lrow t-d rv"><span class="ln">5</span><div><h4>Rules</h4><p>The incentives, punishments, and constraints — the actual rules of the game. Who may do what, and what it costs them.</p></div></div>
+    <div class="lrow t-d rv"><span class="ln">6</span><div><h4>Information flows</h4><p>Who has access to information, and who does not. Add one missing flow of information and a system can rewire itself.</p></div></div>
+    <div class="lgrp rv">Feedback — how the system responds</div>
+    <div class="lrow t-f rv"><span class="ln">7</span><div><h4>Reinforcing feedback loops</h4><p>The strength of the loops that amplify and drive runaway growth. Slow a vicious one before it comes to dominate everything.</p></div></div>
+    <div class="lrow t-f rv"><span class="ln">8</span><div><h4>Balancing feedback loops</h4><p>The strength of the loops that correct and stabilize — relative to the size of the problems they are trying to fix.</p></div></div>
+    <div class="lrow t-f rv"><span class="ln">9</span><div><h4>Delays</h4><p>The lengths of delays relative to the rate of change. Delays decide whether a system adjusts smoothly — or oscillates and overshoots.</p></div></div>
+    <div class="lgrp rv">Physical &amp; parameters — the shallowest</div>
+    <div class="lrow t-p rv"><span class="ln">10</span><div><h4>Stock-and-flow structure</h4><p>The physical plumbing — transport networks, population age structures. Powerful, but usually slow and costly to rebuild.</p></div></div>
+    <div class="lrow t-p rv"><span class="ln">11</span><div><h4>Buffer sizes</h4><p>The size of stabilizing stocks relative to their flows. A bigger buffer is steadier — but also slower and more sluggish to move.</p></div></div>
+    <div class="lrow t-p rv"><span class="ln">12</span><div><h4>Constants, parameters, numbers</h4><p>Subsidies, taxes, standards — the numbers everyone argues over. The most popular place to push, and the least powerful.</p></div></div>
+  </div>
+  <div class="banner rv" style="margin-top:24px"><strong>Read it from the source.</strong> Meadows' essay is the most-accessed resource in her entire archive — and still the clearest guide to where change is made. Read <a href="https://donellameadows.org/archives/leverage-points-places-to-intervene-in-a-system/" target="_blank" rel="noopener" style="color:var(--gm)">Leverage Points: Places to Intervene in a System &#8599;</a></div>
+</div></section>
+
+<section class="sec" style="background:var(--bg2)" id="levels"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Choose your depth</span>
+    <h2>Three levels. <span class="gt">One rising path.</span></h2>
+    <p>This is a jump-start, not a textbook. Each level is a complete, usable stage — and each one is built directly on the last. Start where you are today; the path keeps climbing as far as you want to go.</p>
+  </div>
+  <div class="rv" style="margin-bottom:32px">
+    <svg class="csvg" viewBox="0 0 720 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A rising three-step progression: Foundations to see the system, Practitioner to map it, Outlier to shift it. Each level builds on the one before.">
+      <defs><linearGradient id="sg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#1E5F8C"/></linearGradient>
+      <marker id="sa" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="2" stroke-linecap="round"/></marker></defs>
+      <text x="40" y="32" font-family="Spline Sans Mono" font-size="11.5" letter-spacing="1.4" fill="#7E8C86">THE PROGRESSION — EACH LEVEL BUILDS ON THE LAST</text>
+      <line x1="40" y1="302" x2="684" y2="302" stroke="#0E1A17" stroke-width="1" opacity=".35"/>
+      <path d="M156 198 L360 140 L564 72" fill="none" stroke="#1FB892" stroke-width="2.4" stroke-dasharray="7 6" marker-end="url(#sa)"/>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <rect x="66" y="198" width="180" height="104" rx="13" fill="#E3EBE8" stroke="#0E1A1722"/>
+        <text x="156" y="232" font-family="Spline Sans Mono" font-size="11" letter-spacing="1" fill="#0E6B54">LEVEL 1</text>
+        <text x="156" y="257" font-size="18" font-weight="500" fill="#0E1A17">Foundations</text>
+        <text x="156" y="281" font-family="Fraunces" font-style="italic" font-size="15" fill="#46554F">See the system</text>
+        <rect x="270" y="140" width="180" height="162" rx="13" fill="#A9CCC2" stroke="#0E1A1733"/>
+        <text x="360" y="176" font-family="Spline Sans Mono" font-size="11" letter-spacing="1" fill="#0A4A3A">LEVEL 2</text>
+        <text x="360" y="201" font-size="18" font-weight="500" fill="#0E1A17">Practitioner</text>
+        <text x="360" y="225" font-family="Fraunces" font-style="italic" font-size="15" fill="#0E1A17">Map the system</text>
+        <rect x="474" y="72" width="180" height="230" rx="13" fill="url(#sg)"/>
+        <text x="564" y="114" font-family="Spline Sans Mono" font-size="11" letter-spacing="1" fill="#3FE0B5">LEVEL 3</text>
+        <text x="564" y="139" font-size="18" font-weight="500" fill="#fff">Outlier</text>
+        <text x="564" y="163" font-family="Fraunces" font-style="italic" font-size="15" fill="#CFE8DF">Shift the system</text>
+      </g>
+      <circle cx="156" cy="198" r="5" fill="#0E6B54"/><circle cx="360" cy="140" r="5" fill="#0E6B54"/><circle cx="564" cy="72" r="5.5" fill="#1FB892"/>
+    </svg>
+  </div>
+  <div class="rv">
+    <div class="lvtabs" role="tablist">
+      <button class="lvtab on" data-lv="1"><span class="tn">Level 1 · See</span><span class="tt">Foundations</span><span class="td">First sight — for anyone, no background needed</span></button>
+      <button class="lvtab" data-lv="2"><span class="tn">Level 2 · Map</span><span class="tt">Practitioner</span><span class="td">The toolkit — for the driven, well-read learner</span></button>
+      <button class="lvtab" data-lv="3"><span class="tn">Level 3 · Shift</span><span class="tt">Outlier</span><span class="td">Systems innovation — for the frontier thinker</span></button>
+    </div>
+
+    <div class="lvpanel on" data-lv="1">
+      <div class="lvhead"><span class="lt">Level 1 · Foundations</span><h3>First Sight</h3>
+        <p>You have never studied systems thinking — and that is the perfect place to start. This is the gentle on-ramp: every idea here is something you can use the same day, with no jargon and no prerequisites. Foundations exists to do one thing — give you the eyes.</p>
+        <p class="goal">Goal: see your first system clearly enough to draw it — and never un-see it.</p></div>
+      <div class="cg">
+        <div class="cc"><span class="cn">Concept 01 · the shift</span><h4>Connection over parts</h4><p>Stop listing the parts; start asking what affects what. The relationships <em>are</em> the system. A family is not five people — it is the thousands of small influences flowing between them.</p></div>
+        <div class="cc"><span class="cn">Concept 02 · feedback</span><h4>Loops, not lines</h4><p>Cause and effect rarely run in a straight line — they curve back. You're tired, so you skip the walk; skipping the walk leaves you more tired. That circle is a feedback loop, and the world is built from them.</p></div>
+        <div class="cc"><span class="cn">Concept 03 · the bathtub</span><h4>Stocks and flows</h4><p>A stock is whatever collects — water, savings, trust, skill. Flows fill it and drain it. You can't change a stock directly, only its flows. This one idea quietly reframes money, health, and learning itself.</p></div>
+        <div class="cc"><span class="cn">Concept 04 · depth</span><h4>Look beneath the event</h4><p>Under every event is a pattern; under the pattern, a structure; under the structure, a belief. React to the event and you firefight forever. Ask "what's underneath?" and you find leverage.</p></div>
+        <div class="cc"><span class="cn">Concept 05 · the trap</span><h4>Today's problems, yesterday's solutions</h4><p>A surprising number of problems are the side effects of an old fix. The quick solution that worked last year is quietly causing this year's mess. Learn to trace a problem backward.</p></div>
+        <div class="cc"><span class="cn">Concept 06 · leverage</span><h4>A better place to push</h4><p>You rarely need more force — you need a better place to apply it. A small, well-aimed nudge can move what brute effort cannot. Finding that place is the whole journey ahead.</p></div>
+        <div class="cc"><span class="cn">Practice</span><h4>Draw your first system</h4><p>Pick something you know — a habit, a friendship, a team. Sketch its parts, draw the arrows between them, and circle one loop. That sketch is systems thinking.</p></div>
+      </div>
+      <div class="banner" style="margin-top:18px"><strong>By the end of Foundations</strong> — you can look at a real situation in your own life and see it as a system: name its feedback loops, look beneath the surface event, and point to one place genuinely worth pushing.</div>
+      <p style="margin-top:14px;font-family:var(--fm);font-size:12.5px;letter-spacing:.03em;color:var(--green)">Next &#8594; Practitioner. You've learned to <em>see</em> a system. Now you'll learn to <em>map</em> one — precisely.</p>
+    </div>
+
+    <div class="lvpanel" data-lv="2">
+      <div class="lvhead"><span class="lt">Level 2 · Practitioner</span><h3>Mapping the System</h3>
+        <p>You read widely, you learn fast, and "it's all connected" is no longer enough — you want to work <em>with</em> the connections. Practitioner hands you the real toolkit: the diagrams systems thinkers actually draw, the distinctions that sharpen thinking, and the recurring traps that explain why so many smart fixes fail.</p>
+        <p class="goal">Goal: take a real, stuck problem and map it — precisely enough to see where it's stuck.</p></div>
+      <div class="cg">
+        <div class="cc"><span class="cn">Tool 01 · notation</span><h4>Causal loop diagrams</h4><p>The practitioner's core notation: variables joined by arrows, each marked same or opposite, every loop labelled reinforcing or balancing. Once you can draw it, you can reason about it precisely — and others can challenge it.</p></div>
+        <div class="cc"><span class="cn">Tool 02 · the engine</span><h4>Reinforcing &amp; balancing loops</h4><p>Reinforcing loops are engines — they amplify, for better (growth) or worse (collapse). Balancing loops are thermostats — they resist change and seek a goal. Every system's behavior is a contest between the two.</p></div>
+        <div class="cc"><span class="cn">Tool 03 · the story</span><h4>Behavior-over-time graphs</h4><p>Before mapping structure, sketch the story: how has the key variable moved over months or years? Growth, decline, oscillation, overshoot — the shape of the curve points straight to the structure beneath it.</p></div>
+        <div class="cc"><span class="cn">Tool 04 · timing</span><h4>Stocks, flows &amp; delays, modeled</h4><p>Most "sudden" crises are slow stocks finally crossing a threshold; most overcorrections are delays we failed to account for. Model the accumulation and the lag explicitly, and the surprises stop being surprises.</p></div>
+        <div class="cc"><span class="cn">Tool 05 · pattern library</span><h4>System archetypes</h4><p>Systems fail in recognizable plots: Limits to Growth, Shifting the Burden, Tragedy of the Commons, Fixes that Fail, Escalation. Learn the archetypes and you'll diagnose a stuck system almost on sight.</p></div>
+        <div class="cc"><span class="cn">Tool 06 · the real difficulty</span><h4>Detail vs dynamic complexity</h4><p>Many moving parts is the easy kind of complex. The hard kind is behavior that changes over time in non-obvious ways. Dynamic complexity is where the real insight — and the real leverage — lives.</p></div>
+        <div class="cc"><span class="cn">Practice</span><h4>Map a stuck system</h4><p>Take a problem that won't resolve. Build the causal loop diagram, name the archetype it's running, and find the balancing loop quietly defeating every fix you've tried.</p></div>
+      </div>
+      <div class="banner" style="margin-top:18px"><strong>By the end of Practitioner</strong> — you can take a real, stuck problem, map it as a causal loop diagram, name the archetype it is running, and locate the exact loop that defeats every well-meaning fix.</div>
+      <p style="margin-top:14px;font-family:var(--fm);font-size:12.5px;letter-spacing:.03em;color:var(--green)">Next &#8594; Outlier. You can <em>map</em> a system. Now you'll learn to <em>change</em> one — and why most attempts fail.</p>
+    </div>
+
+    <div class="lvpanel" data-lv="3">
+      <div class="lvhead"><span class="lt">Level 3 · Outlier</span><h3>Systems Innovation</h3>
+        <p>You think at the frontier, and you're not here for vocabulary — you're here to change things. Outlier is the advanced overview: complexity science, the full leverage hierarchy, and the hard-won discipline of intervening in a living system and actually shifting how it behaves.</p>
+        <p class="goal">Goal: intervene in a system that resists change — and understand why most interventions quietly fail.</p></div>
+      <div class="cg">
+        <div class="cc"><span class="cn">Frontier 01 · the nature of it</span><h4>Complexity &amp; emergence</h4><p>Complex is not merely complicated. Complex systems self-organize, adapt, and produce emergent behavior no single part contains. They cannot be controlled — only influenced, probed, and patiently nudged.</p></div>
+        <div class="cc"><span class="cn">Frontier 02 · the hierarchy</span><h4>The twelve leverage points</h4><p>Meadows' full ladder, shallow to deep: parameters, buffers, stock-and-flow structure, delays, balancing and reinforcing loops, information flows, rules, self-organization, goals, paradigms, and transcending paradigms.</p></div>
+        <div class="cc"><span class="cn">Frontier 03 · matching action</span><h4>Cynefin &amp; decision domains</h4><p>Clear, complicated, complex, chaotic. Snowden's framework keeps you from applying best-practice thinking to a complex problem — a common and expensive mistake that good experts make constantly.</p></div>
+        <div class="cc"><span class="cn">Frontier 04 · the law</span><h4>Requisite variety</h4><p>Ashby's law: only variety can absorb variety. A controller must be at least as nuanced as the system it hopes to govern. Under-match the system's complexity and the system wins, every time.</p></div>
+        <div class="cc"><span class="cn">Frontier 05 · staying alive</span><h4>Resilience &amp; antifragility</h4><p>Efficiency and resilience trade off. The most durable systems keep slack, redundancy, and the capacity to learn — some even gain from disturbance. Pure optimization quietly makes a system brittle.</p></div>
+        <div class="cc"><span class="cn">Frontier 06 · the deepest lever</span><h4>Paradigms &amp; systems leadership</h4><p>The deepest interventions change the shared mindset a system runs on — and a paradigm cannot be forced. Systems leadership is less command, more cultivation: convening, reframing, holding space for the new model.</p></div>
+        <div class="cc"><span class="cn">Practice</span><h4>Design an intervention</h4><p>Take a system that resists change. Locate its paradigm, choose a genuine leverage point, anticipate how the system will push back, and design a move that works <em>with</em> it rather than against it.</p></div>
+      </div>
+      <div class="banner" style="margin-top:18px"><strong>By the end of Outlier</strong> — you can analyze a system that resists change, locate the paradigm holding it in place, design an intervention at a genuine leverage point, and anticipate how the system will respond.</div>
+      <p style="margin-top:14px;font-family:var(--fm);font-size:12.5px;letter-spacing:.03em;color:var(--green)">Beyond &#8594; this is where systems thinkers become systems innovators. From here, you teach it, build with it, and lead with it. That is exactly what Semble is for.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="models"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Thinking tools</span>
+    <h2>Mental models — <span class="gt">a latticework for the mind.</span></h2>
+    <p>Systems thinking is one powerful way of seeing. It is strongest when it sits among many. A mental model is a thinking tool — and the people who think clearest carry a whole toolkit of them.</p>
+  </div>
+  <div class="lg">
+    <div class="rv">
+      <svg class="rfsvg" viewBox="0 0 440 360" style="max-width:440px;margin:0 auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A latticework diagram: systems thinking at the center, connected to many other mental models around it.">
+        <g stroke="#1FB892" stroke-width="1.8" opacity=".55">
+          <line class="dr" x1="220" y1="182" x2="340" y2="182"/>
+          <line class="dr" x1="220" y1="182" x2="280" y2="286"/>
+          <line class="dr" x1="220" y1="182" x2="160" y2="286"/>
+          <line class="dr" x1="220" y1="182" x2="100" y2="182"/>
+          <line class="dr" x1="220" y1="182" x2="160" y2="78"/>
+          <line class="dr" x1="220" y1="182" x2="280" y2="78"/>
+          <line class="dr" x1="340" y1="182" x2="280" y2="286"/>
+          <line class="dr" x1="280" y1="286" x2="160" y2="286"/>
+          <line class="dr" x1="160" y1="286" x2="100" y2="182"/>
+          <line class="dr" x1="100" y1="182" x2="160" y2="78"/>
+          <line class="dr" x1="160" y1="78" x2="280" y2="78"/>
+          <line class="dr" x1="280" y1="78" x2="340" y2="182"/>
+        </g>
+        <circle cx="340" cy="182" r="20" fill="#1E5F8C"/>
+        <circle cx="280" cy="286" r="20" fill="#1FB892"/>
+        <circle cx="160" cy="286" r="20" fill="#13886A"/>
+        <circle cx="100" cy="182" r="20" fill="#1E5F8C"/>
+        <circle cx="160" cy="78" r="20" fill="#1FB892"/>
+        <circle cx="280" cy="78" r="20" fill="#13886A"/>
+        <circle cx="220" cy="182" r="44" fill="#0E6B54"/>
+        <text x="220" y="178" text-anchor="middle" font-family="Hanken Grotesk" font-size="13" font-weight="600" fill="#fff">Systems</text>
+        <text x="220" y="195" text-anchor="middle" font-family="Hanken Grotesk" font-size="13" font-weight="600" fill="#fff">thinking</text>
+      </svg>
+    </div>
+    <div class="rv" style="transition-delay:.1s">
+      <p style="font-size:1.08rem;color:var(--ink2);margin-bottom:14px">A <strong style="color:var(--ink)">mental model</strong> is a compressed picture of how some part of the world works — a pattern you carry in your head and reach for to make sense of things. A feedback loop is a mental model. So is the iceberg. So is supply and demand, or evolution by natural selection.</p>
+      <p style="color:var(--ink2)">We all run on mental models — the only real question is how many we have, and how good they are. Lean on just one and you fall into the trap Charlie Munger named: <em>to a person with only a hammer, every problem looks like a nail.</em> The fix is a <strong style="color:var(--ink)">latticework</strong> — many models, drawn from many fields, so the right one is always within reach.</p>
+    </div>
+  </div>
+  <div class="bbg rv" style="margin-top:20px">
+    <div class="bb"><h4>What a model is</h4><p>A simplified representation of reality — useful precisely because it leaves things out. As the saying goes: all models are wrong, but some are useful.</p></div>
+    <div class="bb"><h4>How to use one</h4><p>Facing a problem, ask: which models apply here? Run several. Where they agree, trust it. Where they disagree, look closer — that gap is the insight.</p></div>
+    <div class="bb"><h4>Build the latticework</h4><p>Collect models across disciplines — physics, biology, economics, psychology. Breadth is what lets you see one problem from many sides at once.</p></div>
+  </div>
+  <div class="banner rv" style="margin-top:18px"><strong>A library to start with.</strong> Farnam Street keeps the best free, open collection of mental models for clearer thinking and better decisions. Explore <a href="https://fs.blog/mental-models" target="_blank" rel="noopener" style="color:var(--gm)">fs.blog/mental-models &#8599;</a> — and treat systems thinking as the meta-model that ties the rest together.</div>
+</div></section>
+
+<section class="sec dk" id="dancing"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Wisdom for the practice</span>
+    <h2>Dancing with <span class="gtb">systems.</span></h2>
+    <p>Near the end of her life, Donella Meadows wrote down what three decades of systems work had taught her — not a recipe for control, but fourteen lessons for moving <em>with</em> a living system instead of against it.</p>
+  </div>
+  <div class="lnote rv" style="background:var(--dcard);border-color:var(--dline);margin-bottom:30px">
+    <p class="q" style="color:var(--dink)">"We can't control systems or figure them out. But we can dance with them."</p>
+    <p class="ci" style="color:var(--dink2)">— Donella Meadows, "Dancing With Systems." Self-organizing, living systems are not machines to command. They are partners to learn — and the dance is the discipline.</p>
+  </div>
+  <div class="pil">
+    <div class="pl rv"><h4>1 · Get the beat of the system</h4><p>Before you intervene, watch. Let the system run and show you its rhythms and history before you try to change a thing.</p></div>
+    <div class="pl rv"><h4>2 · Listen to the wisdom of the system</h4><p>Notice what is already working. Help the system support itself before you tear any part of it down.</p></div>
+    <div class="pl rv"><h4>3 · Expose your mental models to the open air</h4><p>Hold your assumptions out where light and other people can reach them. Keep them flexible; let them be tested.</p></div>
+    <div class="pl rv"><h4>4 · Stay humble. Stay a learner</h4><p>When you don't know — and in a complex system you often won't — don't bluff and don't freeze. Experiment, watch, and learn.</p></div>
+    <div class="pl rv"><h4>5 · Honor and protect information</h4><p>Systems run on information. Don't distort it, delay it, or hide it — a system starved of truth makes poor decisions.</p></div>
+    <div class="pl rv"><h4>6 · Locate responsibility in the system</h4><p>Design it so that whoever makes a decision also feels its consequences. Intrinsic responsibility keeps a system honest.</p></div>
+    <div class="pl rv"><h4>7 · Make feedback policies for feedback systems</h4><p>Don't set a number once and walk away. Build rules that keep responding as conditions shift over time.</p></div>
+    <div class="pl rv"><h4>8 · Pay attention to what is important, not just what is quantifiable</h4><p>Don't let the measurable crowd out the meaningful. Much of what matters most was never going to fit inside a number.</p></div>
+    <div class="pl rv"><h4>9 · Go for the good of the whole</h4><p>Don't optimize one part at the expense of the system. Aim for the health and richness of the whole thing.</p></div>
+    <div class="pl rv"><h4>10 · Expand time horizons</h4><p>The right horizon for a real decision is long — far longer than the next quarter, the next harvest, or the next election.</p></div>
+    <div class="pl rv"><h4>11 · Expand thought horizons</h4><p>Defy the disciplines. Real problems ignore the borders between fields — so your thinking should cross them freely.</p></div>
+    <div class="pl rv"><h4>12 · Expand the boundary of caring</h4><p>No system thrives if it cares only for itself. Widen the circle of who, and what, is allowed to count.</p></div>
+    <div class="pl rv"><h4>13 · Celebrate complexity</h4><p>The universe is messy, nonlinear, and diverse — and that is exactly what makes it interesting, beautiful, and alive.</p></div>
+    <div class="pl rv"><h4>14 · Hold fast to the goal of goodness</h4><p>Keep human decency in plain sight. Don't let cynicism or expedience quietly erode the goal of a good world.</p></div>
+  </div>
+  <div class="banner rv" style="margin-top:18px"><strong>Read the full essay.</strong> Donella Meadows' "Dancing With Systems" is short, luminous, and free. Read it at <a href="https://donellameadows.org/archives/dancing-with-systems/" target="_blank" rel="noopener" style="color:var(--gm)">donellameadows.org &#8599;</a></div>
+</div></section>
+
+<section class="sec dk" id="voices"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Voices across the world</span>
+    <h2>The same truth, <span class="gtb">told many ways.</span></h2>
+    <p>Systems thinking is not one culture's idea. It is a way of seeing that thinkers, scientists, and traditions across the world have arrived at again and again.</p>
+  </div>
+  <div class="qg">
+    <div class="qc rv"><p class="qq">"Today's problems come from yesterday's solutions."</p><p class="qa">Peter Senge</p><p class="qr">Systems scientist · United States</p></div>
+    <div class="qc rv" style="transition-delay:.05s"><p class="qq">"We can't impose our will on a system. We can listen to what the system tells us."</p><p class="qa">Donella Meadows</p><p class="qr">Environmental systems thinker · United States</p></div>
+    <div class="qc rv" style="transition-delay:.1s"><p class="qq">"The major problems in the world are the result of the difference between how nature works and the way people think."</p><p class="qa">Gregory Bateson</p><p class="qr">Anthropologist &amp; systems theorist · United Kingdom</p></div>
+    <div class="qc rv"><p class="qq">"I am because we are."</p><p class="qa">Ubuntu</p><p class="qr">Philosophy of interconnection · Southern Africa</p></div>
+    <div class="qc rv" style="transition-delay:.05s"><p class="qq">"You never change things by fighting the existing reality. Build a new model that makes the old one obsolete."</p><p class="qa">Buckminster Fuller</p><p class="qr">Systems designer &amp; futurist · United States</p></div>
+    <div class="qc rv" style="transition-delay:.1s"><p class="qq">"We are here to awaken from the illusion of our separateness."</p><p class="qa">Thich Nhat Hanh</p><p class="qr">Zen teacher · Vietnam</p></div>
+    <div class="qc rv"><p class="qq">"A bad system will beat a good person every time."</p><p class="qa">W. Edwards Deming</p><p class="qr">Systems &amp; quality thinker · United States</p></div>
+    <div class="qc rv"><p class="qq">"A system is never the sum of its parts. It is the product of their interactions."</p><p class="qa">Russell Ackoff</p><p class="qr">Systems theorist · United States</p></div>
+    <div class="qc rv"><p class="qq">"We can't control systems or figure them out. But we can dance with them."</p><p class="qa">Donella Meadows</p><p class="qr">Environmental systems thinker · United States</p></div>
+    <div class="qc rv"><p class="qq">"Remember, always, that everything you know, and everything everyone knows, is only a model."</p><p class="qa">Donella Meadows</p><p class="qr">From "Thinking in Systems" · United States</p></div>
+    <div class="qc rv"><p class="qq">"The whole is greater than the sum of its parts."</p><p class="qa">Aristotle</p><p class="qr">Philosopher · Ancient Greece</p></div>
+    <div class="qc rv"><p class="qq">"Nature does not hurry, yet everything is accomplished."</p><p class="qa">Lao Tzu</p><p class="qr">Tao Te Ching · Ancient China</p></div>
+    <div class="qc rv"><p class="qq">"The major problems of our time cannot be understood in isolation."</p><p class="qa">Fritjof Capra</p><p class="qr">Physicist &amp; systems theorist · Austria</p></div>
+    <div class="qc rv"><p class="qq">"In every jewel, the reflection of all the others."</p><p class="qa">Indra's Net</p><p class="qr">Image of interbeing · Buddhist tradition</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="resources"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Where to go next</span>
+    <h2>Key <span class="gt">resources.</span></h2>
+    <p>A short, honest reading list to carry you past this page. Start with the first one — then follow your curiosity wherever it pulls.</p>
+  </div>
+  <div class="resg">
+    <a class="res rv" href="https://donellameadows.org" target="_blank" rel="noopener">
+      <span class="rl">Book · start here</span>
+      <h4>Thinking in Systems: A Primer</h4>
+      <p>Donella Meadows' clear, humane introduction to systems thinking — the field's quiet foundational text, and the best single place to begin.</p>
+      <span class="rg">The Donella Meadows Project &#8599;</span>
+    </a>
+    <a class="res rv" href="https://donellameadows.org/archives/leverage-points-places-to-intervene-in-a-system/" target="_blank" rel="noopener">
+      <span class="rl">Essay · the framework</span>
+      <h4>Leverage Points: Places to Intervene in a System</h4>
+      <p>The landmark 1999 essay behind the twelve leverage points — the most-read idea in systems thinking, and still the clearest map of where change is made.</p>
+      <span class="rg">Read on donellameadows.org &#8599;</span>
+    </a>
+    <a class="res rv" href="https://donellameadows.org/archives/dancing-with-systems/" target="_blank" rel="noopener">
+      <span class="rl">Essay · the practice</span>
+      <h4>Dancing With Systems</h4>
+      <p>Meadows' luminous final reflection — fourteen lessons for working with living systems instead of trying to command them.</p>
+      <span class="rg">Read on donellameadows.org &#8599;</span>
+    </a>
+    <a class="res rv" href="https://donellameadows.org/donella-meadows-legacy/danas-writing/articles-donella-meadows/" target="_blank" rel="noopener">
+      <span class="rl">Archive · go deeper</span>
+      <h4>Dana's Writing — the full archive</h4>
+      <p>Decades of Donella Meadows' articles, columns, and letters, applying systems thinking to the real news of her day. Free and open.</p>
+      <span class="rg">Browse the archive &#8599;</span>
+    </a>
+    <a class="res rv" href="https://fs.blog/mental-models" target="_blank" rel="noopener">
+      <span class="rl">Library · thinking tools</span>
+      <h4>Farnam Street — Mental Models</h4>
+      <p>A free, well-kept library of mental models from every discipline — the latticework that makes systems thinking sharper still.</p>
+      <span class="rg">Explore fs.blog/mental-models &#8599;</span>
+    </a>
+    <a class="res rv" href="#/learn/levels">
+      <span class="rl">Right here · keep climbing</span>
+      <h4>Choose your depth on Semble</h4>
+      <p>You've seen the overview. Now pick your level — Foundations, Practitioner, or Outlier — and begin the real ascent.</p>
+      <span class="rg">Go to the three levels &#8593;</span>
+    </a>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="cta rv">
+    <canvas class="ctacv" aria-hidden="true"></canvas>
+    <div style="position:relative;z-index:2">
+      <span class="eb" style="color:rgba(255,255,255,.85);justify-content:center;display:flex">Ready to go further?</span>
+      <h2 style="margin-top:12px">Don't just learn it. Get paid to.</h2>
+      <p>Semble is an open-source school where you learn, build, and teach systems thinking — and get paid to grow. Learning to see is the first step.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="mailto:August@MotusMoves.US?subject=Semble%20Founding%20Cohort%20Application&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20apply%20to%20the%20Semble%20founding%20cohort.%20A%20bit%20about%20me%3A%0D%0A" class="btn bf">Join the founding cohort</a>
+        <a href="#/home" class="btn bg-">See the full pitch</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+</section>
+<section class="page" id="page-partners">
+
+<header class="hero">
+  <canvas class="netcv" aria-hidden="true"></canvas>
+  <div class="wrap hin">
+    <span class="eb rv">The coalition</span>
+    <h1 class="rv" style="transition-delay:.08s">Built in <em class="g">coalition.</em></h1>
+    <p class="lede rv" style="transition-delay:.16s">A movement is itself a system — no single node carries it. Semble is designed to grow alongside the organizations already advancing systems thinking, decentralized funding, and civic learning. Here is the coalition we are building toward.</p>
+  </div>
+</header>
+
+<section class="sec" id="map"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The ecosystem &amp; coalition</span>
+    <h2>One ecosystem. <span class="gt">One coalition.</span></h2>
+    <p>Semble does not stand alone. It is part of the MotusMoves ecosystem — built alongside Outlier.Systems, the research organization, and Davara.DEV, the systems-thinking AI — and it reaches outward through a proposed coalition of partners. What follows is the whole picture: the flagship AI, the R&amp;D organization, the external coalition, the team, and the company that presents it all.</p>
+  </div>
+  <div class="rv" style="margin-bottom:30px">
+    <svg class="cosvg" viewBox="0 0 560 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Semble at the center of a network connected to four proposed partners: Dash DAO, Systems Thinking Alliance, Systems Innovation Network, and the City of Chicago.">
+      <defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#1E5F8C"/></linearGradient></defs>
+      <g stroke="#1FB892" stroke-width="2" opacity=".7">
+        <line x1="280" y1="210" x2="130" y2="90"/><line x1="280" y1="210" x2="430" y2="90"/>
+        <line x1="280" y1="210" x2="130" y2="330"/><line x1="280" y1="210" x2="430" y2="330"/></g>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <circle cx="280" cy="210" r="62" fill="url(#cg)"/>
+        <text x="280" y="206" font-size="18" font-weight="500" fill="#fff">Semble</text>
+        <text x="280" y="227" font-family="Spline Sans Mono" font-size="11" fill="#3FE0B5">the school</text>
+        <g><circle cx="130" cy="90" r="48" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="130" y="86" font-size="13.5" font-weight="500" fill="#0E1A17">Dash DAO</text><text x="130" y="104" font-family="Spline Sans Mono" font-size="10" fill="#46554F">funding</text></g>
+        <g><circle cx="430" cy="90" r="48" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="430" y="82" font-size="12.5" font-weight="500" fill="#0E1A17">Systems Thinking</text><text x="430" y="98" font-size="12.5" font-weight="500" fill="#0E1A17">Alliance</text><text x="430" y="115" font-family="Spline Sans Mono" font-size="10" fill="#46554F">accreditation</text></g>
+        <g><circle cx="130" cy="330" r="48" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="130" y="322" font-size="12.5" font-weight="500" fill="#0E1A17">Systems Innov.</text><text x="130" y="338" font-size="12.5" font-weight="500" fill="#0E1A17">Network</text><text x="130" y="355" font-family="Spline Sans Mono" font-size="10" fill="#46554F">curriculum</text></g>
+        <g><circle cx="430" cy="330" r="48" fill="#F7FAF9" stroke="#0E6B54" stroke-width="2"/><text x="430" y="326" font-size="13" font-weight="500" fill="#0E1A17">Chicago</text><text x="430" y="344" font-family="Spline Sans Mono" font-size="10" fill="#46554F">place</text></g>
+      </g>
+    </svg>
+  </div>
+  <div class="banner rv"><strong>An honest note.</strong> Every partnership on this page is <strong>proposed and in development</strong> — a relationship Semble intends to build, not an agreement already signed. We share them openly so the vision is clear, and so the right partners can recognize themselves in it.</div>
+</div></section>
+
+<section class="sec dk" id="davara"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The flagship partner</span>
+    <h2>Meet <span class="gti">Davara</span> — the Divergent Strategist.</h2>
+    <p>Semble teaches people to see in systems. Davara is an AI that already does. Davara.DEV is an Emergent Intelligence — an AI trained deeply on systems thinking and the work of Donella Meadows — and it is Semble's closest ally. The same founder. The same foundation. The same belief that leverage beats force.</p>
+    <p class="gti" style="font-family:var(--fm);font-size:13px;letter-spacing:.05em;margin-top:14px">Think different · Think divergent · Think Davara.</p>
+  </div>
+  <div class="pil">
+    <div class="pl rv"><h4>An Emergent Intelligence</h4><p>Davara is trained on Donella Meadows' articles, her twelve leverage points, and her fourteen principles for Dancing With Systems. Systems thinking is not a feature bolted on — it is Davara's native language.</p><p class="s">Trained on the foundation Semble teaches</p></div>
+    <div class="pl rv" style="transition-delay:.06s"><h4>Divergent, not consensus</h4><p>Most AI is trained on consensus — groupthink at scale, the average answer amplified. Davara is built to diverge: to explore the non-obvious and surface the high-leverage path the consensus misses.</p><p class="s">Generate widely · then converge on leverage</p></div>
+    <div class="pl rv" style="transition-delay:.12s"><h4>An educator at heart</h4><p>Davara teaches you how to think, not what to think. It frames the right questions, surfaces patterns you would have missed, and helps you reason more systemically over time — the same goal Semble holds.</p><p class="s">How to think, not what to think</p></div>
+    <div class="pl rv" style="transition-delay:.18s"><h4>One ecosystem</h4><p>Davara.DEV is built by MotusMoves LLC and founded by August James — the same founder as Semble. This is not a courted vendor; it is a sibling project, built from the same first principles.</p><p class="s">Two projects · one foundation</p></div>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <p class="gti" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:6px">Davara's model, visualized</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;color:var(--dink)">Diverge to expand. Converge to decide.</h3>
+    <p style="color:var(--dink2);max-width:600px;margin-bottom:22px">Davara fuses two disciplines. <em>Divergent strategy</em> opens the solution space — generating many unconventional possibilities. <em>Emergent strategy</em> then tests, filters, and evolves them down to the single move with the highest leverage.</p>
+    <svg class="csvg" viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Davara's model: divergent strategy fans a problem into many possibilities, then emergent strategy converges them to the highest-leverage move.">
+      <defs><linearGradient id="dgi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E5F8C"/><stop offset="1" stop-color="#7B6CF0"/></linearGradient>
+      <marker id="dga" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="2" stroke-linecap="round"/></marker></defs>
+      <line x1="348" y1="44" x2="348" y2="312" stroke="#E8EFEB" stroke-width="1" opacity=".12" stroke-dasharray="5 6"/>
+      <text x="58" y="32" font-family="Spline Sans Mono" font-size="11" letter-spacing="1.1" fill="#9D8DF5">01 · DIVERGE — DIVERGENT STRATEGY</text>
+      <text x="662" y="32" text-anchor="end" font-family="Spline Sans Mono" font-size="11" letter-spacing="1.1" fill="#3FE0B5">02 · CONVERGE — EMERGENT STRATEGY</text>
+      <g stroke="#7B6CF0" stroke-width="1.8" opacity=".75"><line x1="120" y1="180" x2="344" y2="64"/><line x1="120" y1="180" x2="344" y2="122"/><line x1="120" y1="180" x2="344" y2="180"/><line x1="120" y1="180" x2="344" y2="238"/><line x1="120" y1="180" x2="344" y2="296"/></g>
+      <g stroke="#1FB892" stroke-width="1.8" opacity=".85" marker-end="url(#dga)"><line x1="352" y1="64" x2="585" y2="176"/><line x1="352" y1="122" x2="587" y2="178"/><line x1="352" y1="180" x2="587" y2="180"/><line x1="352" y1="238" x2="587" y2="182"/><line x1="352" y1="296" x2="585" y2="184"/></g>
+      <g fill="#CFE8DF"><circle cx="348" cy="64" r="5"/><circle cx="348" cy="122" r="5"/><circle cx="348" cy="180" r="5"/><circle cx="348" cy="238" r="5"/><circle cx="348" cy="296" r="5"/></g>
+      <circle cx="78" cy="180" r="46" fill="#161D33" stroke="#7B6CF0" stroke-width="1.8"/>
+      <text x="78" y="176" text-anchor="middle" font-family="Hanken Grotesk" font-size="13" font-weight="500" fill="#E8EFEB">The</text>
+      <text x="78" y="193" text-anchor="middle" font-family="Hanken Grotesk" font-size="13" font-weight="500" fill="#E8EFEB">problem</text>
+      <circle cx="642" cy="180" r="54" fill="url(#dgi)"/>
+      <text x="642" y="170" text-anchor="middle" font-family="Hanken Grotesk" font-size="12.5" font-weight="500" fill="#fff">Highest</text>
+      <text x="642" y="186" text-anchor="middle" font-family="Hanken Grotesk" font-size="12.5" font-weight="500" fill="#fff">leverage</text>
+      <text x="642" y="202" text-anchor="middle" font-family="Hanken Grotesk" font-size="12.5" font-weight="500" fill="#fff">move</text>
+      <text x="212" y="330" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="14" fill="#8FA69D">expand what the system could become</text>
+      <text x="486" y="330" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="14" fill="#8FA69D">adapt with the system as it evolves</text>
+    </svg>
+    <p style="color:var(--dink2);font-size:.95rem;max-width:600px;margin-top:12px">Most AI converges straight to the average answer. Davara diverges first — then converges on leverage. That is the difference.</p>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <p class="gti" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:6px">Davara's strategy, visualized</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;color:var(--dink)">Focus first. Then compound.</h3>
+    <p style="color:var(--dink2);max-width:600px;margin-bottom:22px">Davara does not try to be everything at once. It starts narrow — a systems-thinking core — and compounds outward, each stage building leverage on the one before it.</p>
+    <svg class="csvg" viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Davara's five-stage strategy: a systems-thinking core, the SystemsBench benchmark, the Operator economy, Dash-native settlement, and the Davinity builder layer.">
+      <defs><linearGradient id="stgi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E5F8C"/><stop offset="1" stop-color="#7B6CF0"/></linearGradient>
+      <marker id="sta" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="2" stroke-linecap="round"/></marker></defs>
+      <text x="24" y="28" font-family="Spline Sans Mono" font-size="11" letter-spacing="1.1" fill="#9D8DF5">DAVARA'S STRATEGY — FOCUS FIRST, THEN COMPOUND</text>
+      <g stroke="#1FB892" stroke-width="2" marker-end="url(#sta)"><line x1="146" y1="104" x2="159" y2="104"/><line x1="284" y1="104" x2="297" y2="104"/><line x1="422" y1="104" x2="435" y2="104"/><line x1="560" y1="104" x2="573" y2="104"/></g>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <rect x="24" y="52" width="120" height="104" rx="12" fill="#161D33" stroke="#7B6CF0" stroke-opacity=".5" stroke-width="1.4"/>
+        <text x="84" y="83" font-family="Spline Sans Mono" font-size="12" fill="#9D8DF5">01</text><text x="84" y="108" font-size="12" font-weight="500" fill="#E8EFEB">Systems-</text><text x="84" y="124" font-size="12" font-weight="500" fill="#E8EFEB">thinking core</text><text x="84" y="142" font-family="Spline Sans Mono" font-size="9" fill="#8FA69D">trained on Meadows</text>
+        <rect x="162" y="52" width="120" height="104" rx="12" fill="#161D33" stroke="#7B6CF0" stroke-opacity=".5" stroke-width="1.4"/>
+        <text x="222" y="83" font-family="Spline Sans Mono" font-size="12" fill="#9D8DF5">02</text><text x="222" y="112" font-size="12" font-weight="500" fill="#E8EFEB">SystemsBench</text><text x="222" y="132" font-family="Spline Sans Mono" font-size="9" fill="#8FA69D">the benchmark</text>
+        <rect x="300" y="52" width="120" height="104" rx="12" fill="#161D33" stroke="#7B6CF0" stroke-opacity=".5" stroke-width="1.4"/>
+        <text x="360" y="83" font-family="Spline Sans Mono" font-size="12" fill="#9D8DF5">03</text><text x="360" y="108" font-size="12" font-weight="500" fill="#E8EFEB">The Operator</text><text x="360" y="124" font-size="12" font-weight="500" fill="#E8EFEB">economy</text><text x="360" y="142" font-family="Spline Sans Mono" font-size="9" fill="#8FA69D">$VOTUS</text>
+        <rect x="438" y="52" width="120" height="104" rx="12" fill="#161D33" stroke="#7B6CF0" stroke-opacity=".5" stroke-width="1.4"/>
+        <text x="498" y="83" font-family="Spline Sans Mono" font-size="12" fill="#9D8DF5">04</text><text x="498" y="112" font-size="12" font-weight="500" fill="#E8EFEB">Dash-native</text><text x="498" y="132" font-family="Spline Sans Mono" font-size="9" fill="#8FA69D">settlement</text>
+        <rect x="576" y="52" width="120" height="104" rx="12" fill="url(#stgi)"/>
+        <text x="636" y="83" font-family="Spline Sans Mono" font-size="12" fill="#CFE8DF">05</text><text x="636" y="112" font-size="12" font-weight="500" fill="#fff">Davinity —</text><text x="636" y="132" font-size="11.5" font-weight="500" fill="#fff">the builder layer</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:14px;color:var(--dink)">What the partnership entails</h3>
+    <div class="prop">
+      <div class="plbl">The proposed Semble &#215; Davara integration</div>
+      <p>Two systems-thinking projects, built to strengthen each other.</p>
+      <ul>
+        <li>Semble's founding cohort receives early Operator access to Davara, ahead of public release</li>
+        <li>Davara becomes the AI companion of Semble's <em>AI &#215; Systems Thinking</em> learning track</li>
+        <li>A proposed Votus bridge — the Votus that Semble learners earn connects to Davara's Votus economy</li>
+        <li>Co-developed systems-thinking curriculum, drawn from the shared Donella Meadows foundation</li>
+        <li>Both projects propose Dash DAO partnerships and settle on Dash Platform — one decentralized substrate</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="banner rv" style="margin-top:14px;border-left-color:#7B6CF0">
+    <strong>Early access — Davara, the Divergent Strategist.</strong> Every member of Semble's founding cohort is set to receive early Operator access to Davara before its public release: a systems-thinking AI to learn with, practice with, and think alongside. The first people learning to <em>see</em> systems, paired with the first AI built to <em>think</em> in them.
+  </div>
+  <div class="statusline rv" style="color:var(--dink2);margin-top:16px"><span class="dot" style="background:#7B6CF0"></span>Status — Proposed. A planned integration between two projects in the same ecosystem; the early-access program and Votus bridge are in development.</div>
+</div></section>
+
+<section class="sec dk" id="votus-economy" style="background:var(--dark2)"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The Votus economy</span>
+    <h2>One currency. <span class="gti">Burn to think. Earn to grow.</span></h2>
+    <p>Davara runs on $VOTUS — a living currency where every unit is a measure of Davara's reasoning. It maps directly onto how Semble already works: Semble learners are paid in Votus and Dash. Two projects, one shared economy of growth.</p>
+  </div>
+  <div class="rv" style="margin-bottom:36px">
+    <svg class="losvg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Votus cycle: burn to think, earn by building, hold to become an Operator, stake to grow with the system.">
+      <defs><linearGradient id="vlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E5F8C"/><stop offset="1" stop-color="#7B6CF0"/></linearGradient>
+      <marker id="vla" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="1.9" stroke-linecap="round"/></marker></defs>
+      <circle cx="300" cy="300" r="190" fill="none" stroke="#E8EFEB" stroke-width="1" opacity=".1"/>
+      <g fill="none" stroke="#1FB892" stroke-width="2.6" marker-end="url(#vla)">
+        <path d="M371.1,123.9 A190 190 0 0 1 476.1,228.9"/>
+        <path d="M476.1,371.1 A190 190 0 0 1 371.1,476.1"/>
+        <path d="M228.9,476.1 A190 190 0 0 1 123.9,371.1"/>
+        <path d="M123.9,228.9 A190 190 0 0 1 228.9,123.9"/>
+      </g>
+      <g class="orb"><circle cx="300" cy="110" r="8" fill="#9D8DF5"/></g>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <g><circle cx="300" cy="110" r="56" fill="url(#vlg)"/><text x="300" y="104" font-size="18" font-weight="500" fill="#fff">Burn</text><text x="300" y="125" font-family="Spline Sans Mono" font-size="10.5" fill="#CFE8DF">to think</text></g>
+        <g><circle cx="490" cy="300" r="56" fill="#161D33" stroke="#1FB892" stroke-width="1.8"/><text x="490" y="294" font-size="18" font-weight="500" fill="#E8EFEB">Earn</text><text x="490" y="315" font-family="Spline Sans Mono" font-size="10.5" fill="#3FE0B5">by building</text></g>
+        <g><circle cx="300" cy="490" r="56" fill="url(#vlg)"/><text x="300" y="484" font-size="18" font-weight="500" fill="#fff">Hold</text><text x="300" y="505" font-family="Spline Sans Mono" font-size="10.5" fill="#CFE8DF">to become</text></g>
+        <g><circle cx="110" cy="300" r="56" fill="#161D33" stroke="#1FB892" stroke-width="1.8"/><text x="110" y="294" font-size="18" font-weight="500" fill="#E8EFEB">Stake</text><text x="110" y="315" font-family="Spline Sans Mono" font-size="10.5" fill="#3FE0B5">to grow</text></g>
+      </g>
+      <text x="300" y="294" text-anchor="middle" font-family="Spline Sans Mono" font-size="13" letter-spacing="1.5" fill="#9D8DF5">$VOTUS</text>
+      <text x="300" y="318" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="16" fill="#8FA69D">the living currency</text>
+    </svg>
+    <p style="text-align:center;color:var(--dink2);font-size:.95rem;max-width:540px;margin:10px auto 0">Each Votus is a unit of Davara's reasoning. The cycle turns — and value flows to the people who think, build, and stay.</p>
+  </div>
+  <div class="pil">
+    <div class="pl rv"><h4>&#9889; Burn to think</h4><p>Every Votus you spend is a unit of Davara's reasoning. You burn Votus to think with her — the depth of thought scales with what you put in.</p></div>
+    <div class="pl rv" style="transition-delay:.06s"><h4>&#9670; Earn by building</h4><p>Build with Davara, and with the community, and you earn Votus back. The economy rewards contribution — not just consumption.</p></div>
+    <div class="pl rv" style="transition-delay:.12s"><h4>&#10022; Hold to become</h4><p>Hold Votus and you hold your seat. It is what makes you a Davara Operator — part of the guild building the intelligence itself.</p></div>
+    <div class="pl rv" style="transition-delay:.18s"><h4>&#8593; Stake to grow</h4><p>Stake into the system and you grow with it. As Davara's capacity rises, so does the value of what you hold — the rising tide.</p></div>
+  </div>
+  <div class="rv" style="margin-top:46px">
+    <p class="gti" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:6px">The leverage</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:10px;color:var(--dink)">A reinforcing loop between school and intelligence.</h3>
+    <p style="color:var(--dink2);max-width:640px;margin-bottom:8px">Here is why Semble and Davara compound when joined. Semble grows systems thinkers. Those thinkers learn, build, and teach with Davara — sharpening the AI and the benchmark behind it. A sharper Davara, in turn, teaches the next cohort faster and deeper. Better thinkers build a better intelligence; a better intelligence builds better thinkers. That is a reinforcing loop — the highest-leverage structure a system can have.</p>
+    <svg class="csvg" viewBox="0 0 520 248" style="max-width:470px;margin:20px auto 0" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A reinforcing loop between Semble's systems thinkers and Davara, each strengthening the other.">
+      <defs><linearGradient id="rfi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E5F8C"/><stop offset="1" stop-color="#7B6CF0"/></linearGradient>
+      <marker id="rfa" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#1FB892" stroke-width="2" stroke-linecap="round"/></marker></defs>
+      <path d="M178 96 Q260 34 342 96" fill="none" stroke="#1FB892" stroke-width="2.4" marker-end="url(#rfa)"/>
+      <path d="M342 152 Q260 214 178 152" fill="none" stroke="#9D8DF5" stroke-width="2.4" marker-end="url(#rfa)"/>
+      <text x="260" y="36" text-anchor="middle" font-family="Spline Sans Mono" font-size="10.5" fill="#8FA69D">learn · build · teach with</text>
+      <text x="260" y="226" text-anchor="middle" font-family="Spline Sans Mono" font-size="10.5" fill="#8FA69D">teaches · sharpens · deepens</text>
+      <circle cx="130" cy="124" r="64" fill="#16203A" stroke="#1FB892" stroke-width="1.8"/>
+      <text x="130" y="117" text-anchor="middle" font-family="Hanken Grotesk" font-size="13.5" font-weight="500" fill="#E8EFEB">Systems</text>
+      <text x="130" y="135" text-anchor="middle" font-family="Hanken Grotesk" font-size="13.5" font-weight="500" fill="#E8EFEB">thinkers</text>
+      <text x="130" y="154" text-anchor="middle" font-family="Spline Sans Mono" font-size="9" fill="#3FE0B5">SEMBLE</text>
+      <circle cx="390" cy="124" r="64" fill="url(#rfi)"/>
+      <text x="390" y="120" text-anchor="middle" font-family="Hanken Grotesk" font-size="14.5" font-weight="500" fill="#fff">Davara EI</text>
+      <text x="390" y="140" text-anchor="middle" font-family="Spline Sans Mono" font-size="9" fill="#CFE8DF">THE INTELLIGENCE</text>
+      <circle cx="260" cy="124" r="18" fill="#161D33" stroke="#7B6CF0" stroke-width="1.5"/>
+      <text x="260" y="130" text-anchor="middle" font-family="Fraunces" font-size="16" font-style="italic" fill="#9D8DF5">R</text>
+    </svg>
+  </div>
+  <div class="banner rv" style="margin-top:18px;border-left-color:#7B6CF0"><strong>The shared substrate.</strong> Both projects propose Dash DAO partnerships and settle natively on Dash Platform — one open, decentralized economy beneath a school and an intelligence. Votus earned by learning, Votus burned to think, all settling in plain sight.</div>
+  <div class="statusline rv" style="color:var(--dink2);margin-top:16px"><span class="dot" style="background:#7B6CF0"></span>Status — Proposed. The Votus bridge between Semble and Davara is a planned integration, not yet live. Davara's own economy is described as it appears on Davara.DEV.</div>
+</div></section>
+
+<section class="sec dk" id="outlier"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb" style="color:var(--gold2)">The R&amp;D organization</span>
+    <h2>Outlier.Systems — <span class="gto">Systems Built For The Beyond.</span></h2>
+    <p>If Semble is the on-ramp, Outlier.Systems is the frontier. It is the research-and-development organization of the MotusMoves ecosystem — the brain — where the hardest systemic problems are studied as systems, and the leverage to evolve them is synthesized.</p>
+  </div>
+  <div class="banner rv" style="border-left-color:#C9A24B;margin-bottom:30px">
+    <strong>From Outlier.Systems —</strong> "Here at Outlier.Systems we design systems that go beyond. We design and build systems that grow our humanity — and refuse and reject the types of systems that take it away."
+  </div>
+  <div class="pil">
+    <div class="pl rv" style="border-left-color:#C9A24B"><h4>An outlier research organization</h4><p>Outlier.Systems studies the systems the world runs on — and synthesizes the leverage to evolve them. Systems design, development, research, and leverage synthesis. Systemic solutions to systemic problems.</p><p class="s" style="color:var(--gold2)">Outlier Intelligence as a service</p></div>
+    <div class="pl rv" style="border-left-color:#C9A24B;transition-delay:.06s"><h4>An outlier is a signal</h4><p>An outlier is not an error — it is a signal the model could not explain. Outlier.Systems is built to stand outside a system, find the quiet assumption holding it together, and design the change that lets it become something better.</p><p class="s" style="color:var(--gold2)">Follow the signal others discard</p></div>
+    <div class="pl rv" style="border-left-color:#C9A24B;transition-delay:.12s"><h4>The brain to a body</h4><p>Where MotusMoves carries the heart — culture, momentum, the human spirit — Outlier.Systems carries the brain: research, intelligence, strategy, architecture. Davara.DEV is its first Outlier Intelligence.</p><p class="s" style="color:var(--gold2)">Rigor in service of people</p></div>
+    <div class="pl rv" style="border-left-color:#C9A24B;transition-delay:.18s"><h4>Get paid to grow — carried forward</h4><p>Outlier's Research Program — a paid think tank and research DAO — grew from Semble's own conviction: systems thinking is best learned by being paid to do it. The Semble model, taken to the frontier.</p><p class="s" style="color:var(--gold2)">Semble's idea, at full depth</p></div>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <p class="gto" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:6px">Semble and Outlier — one path</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;color:var(--dink)">The accessibility layer, and the frontier.</h3>
+    <p style="color:var(--dink2);max-width:620px;margin-bottom:22px">Semble exists so that <em>anyone</em>, at any level, can begin to learn systems thinking — it is the accessibility layer. Outlier.Systems exists for the highest-leverage thinkers and movers, building systems for the beyond. They are not rivals; they are the bottom and the top of one ascent. Semble is where you start. Outlier is where the climb can lead.</p>
+    <svg class="csvg" viewBox="0 0 720 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The ascent: from Semble, the accessible on-ramp, rising through three levels to Outlier.Systems, the frontier.">
+      <defs><linearGradient id="asc" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0E6B54"/><stop offset="1" stop-color="#E2C176"/></linearGradient>
+      <linearGradient id="ascg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9A24B"/><stop offset="1" stop-color="#E2C176"/></linearGradient></defs>
+      <text x="40" y="32" font-family="Spline Sans Mono" font-size="11" letter-spacing="1.1" fill="#8FA69D">THE ASCENT — ONE PATH, FROM THE ON-RAMP TO THE FRONTIER</text>
+      <line x1="40" y1="332" x2="684" y2="332" stroke="#E8EFEB" stroke-width="1" opacity=".14"/>
+      <path d="M86,300 C284,294 392,190 632,86" fill="none" stroke="url(#asc)" stroke-width="3.4" stroke-linecap="round"/>
+      <g font-family="Hanken Grotesk" text-anchor="middle">
+        <circle cx="250" cy="270" r="7" fill="#13886A"/>
+        <text x="250" y="251" font-size="12" font-weight="500" fill="#E8EFEB">Foundations</text>
+        <text x="250" y="294" font-family="Spline Sans Mono" font-size="9.5" fill="#8FA69D">SEE</text>
+        <circle cx="398" cy="188" r="7" fill="#5F9E6E"/>
+        <text x="398" y="169" font-size="12" font-weight="500" fill="#E8EFEB">Practitioner</text>
+        <text x="398" y="212" font-family="Spline Sans Mono" font-size="9.5" fill="#8FA69D">MAP</text>
+        <circle cx="520" cy="124" r="7" fill="#C9A24B"/>
+        <text x="520" y="105" font-size="12" font-weight="500" fill="#E8EFEB">Outlier level</text>
+        <text x="520" y="148" font-family="Spline Sans Mono" font-size="9.5" fill="#8FA69D">SHIFT</text>
+      </g>
+      <circle cx="86" cy="300" r="42" fill="#0E6B54"/>
+      <text x="86" y="295" text-anchor="middle" font-family="Hanken Grotesk" font-size="14" font-weight="600" fill="#fff">Semble</text>
+      <text x="86" y="312" text-anchor="middle" font-family="Spline Sans Mono" font-size="8" fill="#CFE8DF">START HERE</text>
+      <text x="86" y="361" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="13" fill="#8FA69D">anyone · any level</text>
+      <circle cx="632" cy="86" r="50" fill="url(#ascg)"/>
+      <text x="632" y="80" text-anchor="middle" font-family="Hanken Grotesk" font-size="13.5" font-weight="600" fill="#2A2008">Outlier</text>
+      <text x="632" y="97" text-anchor="middle" font-family="Hanken Grotesk" font-size="13.5" font-weight="600" fill="#2A2008">.Systems</text>
+      <text x="632" y="158" text-anchor="middle" font-family="Fraunces" font-style="italic" font-size="13" fill="#C9A24B">the frontier · the beyond</text>
+    </svg>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <p class="gto" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:8px">The seven</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px;color:var(--dink)">Seven systems worth a life's work.</h3>
+    <p style="color:var(--dink2);max-width:620px;margin-bottom:18px">Outlier.Systems researches the highest-leverage systems — the seven things that, when genuinely moved, move the world. They are also the systems Semble teaches people to see.</p>
+    <div class="chips">
+      <span class="chip"><b>01</b> Trust</span>
+      <span class="chip"><b>02</b> Alignment</span>
+      <span class="chip"><b>03</b> Discovery</span>
+      <span class="chip"><b>04</b> Shared Memory</span>
+      <span class="chip"><b>05</b> Capital Flow</span>
+      <span class="chip"><b>06</b> Team Formation</span>
+      <span class="chip"><b>07</b> Collective Intelligence</span>
+    </div>
+  </div>
+
+  <div class="rv" style="margin-top:48px">
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:14px;color:var(--dink)">Get involved with Outlier.Systems</h3>
+    <div class="prop">
+      <div class="plbl" style="color:var(--goldd)">For Semble members ready to go further</div>
+      <p>Semble members who want to contribute to — or grow into — the deeper research work are welcome to reach out.</p>
+      <ul>
+        <li>Contribute to the Outlier Research Program — the paid think tank and research DAO</li>
+        <li>Help build SystemsBench, the benchmark for systems intelligence</li>
+        <li>Join OOSINT, the open-source intelligence network, or the systems practice</li>
+        <li>Grow from a Semble learner into an outlier researcher — the path is one climb</li>
+      </ul>
+    </div>
+    <div class="banner rv" style="border-left-color:#C9A24B;margin-top:14px">
+      <strong>Reach Outlier.Systems —</strong> Semble members who want to contribute or get involved can write to <a href="mailto:Evolve@Outlier.Systems?subject=Getting%20Involved%20with%20Outlier.Systems&amp;body=Hi%2C%0D%0A%0D%0AI%27m%20a%20Semble%20member%20and%20I%27d%20like%20to%20get%20involved%20with%20Outlier.Systems.%0D%0A" style="color:var(--gold2)">Evolve@Outlier.Systems</a>, or explore the full organization at <a href="https://Outlier.Systems" target="_blank" rel="noopener" style="color:var(--gold2)">Outlier.Systems &#8599;</a>.
+    </div>
+  </div>
+  <div class="statusline rv" style="color:var(--dink2);margin-top:16px"><span class="dot" style="background:#C9A24B"></span>Outlier.Systems — an outlier research organization in the MotusMoves ecosystem, est. 2026, Chicago. It's time to dance.</div>
+</div></section>
+
+<section class="sec" style="background:var(--bg2)" id="partners"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The external coalition</span>
+    <h2>Who we're building <span class="gt">toward.</span></h2>
+    <p>Beyond the MotusMoves ecosystem, Semble reaches outward through a proposed coalition. Each card lays out who the partner is, the partnership we're proposing, the specifics on the table, and where the conversation honestly stands today.</p>
+  </div>
+  <div class="pgrid">
+    <div class="pc rv">
+      <div class="ph"><div class="pdot" style="background:linear-gradient(135deg,#0E6B54,#13886A)">D</div><h3>Dash DAO</h3><span class="stat">Proposed</span></div>
+      <p class="who">Dash is a decentralized digital-currency network governed by a treasury and a community DAO that funds projects advancing the ecosystem.</p>
+      <div class="prop"><div class="plbl">The proposed partnership</div>
+        <p>A recurring treasury stream that seeds learner payouts — and a community of builders for Semble learners to grow alongside.</p>
+        <ul><li>A funding proposal submitted to the Dash DAO for the pilot year</li><li>Learner stipends paid in Dash, with Votus credits tracked on-platform</li><li>Semble builds open systems-thinking tools the Dash community can use</li></ul></div>
+      <div class="statusline"><span class="dot"></span>Status — Proposed. A pilot funding proposal is being prepared for the DAO.</div>
+    </div>
+    <div class="pc rv">
+      <div class="ph"><div class="pdot" style="background:linear-gradient(135deg,#13886A,#1FB892)">S</div><h3>Systems Thinking Alliance</h3><span class="stat">Proposed</span></div>
+      <p class="who">An organization advancing systems thinking in practice, including a recognized Systems Thinking Practitioner certification.</p>
+      <div class="prop"><div class="plbl">The proposed partnership</div>
+        <p>A pathway for Semble learners to convert their growth into an accredited, recognized credential.</p>
+        <ul><li>Learners apply earned Votus / Dash toward the Practitioner certificate</li><li>Sponsored or reduced-cost certificate seats for the founding cohort</li><li>Shared standards so Semble's reflections map to real practitioner skill</li></ul></div>
+      <div class="statusline"><span class="dot"></span>Status — Proposed. Outreach planned to align on a learner certificate pathway.</div>
+    </div>
+    <div class="pc rv">
+      <div class="ph"><div class="pdot" style="background:linear-gradient(135deg,#1E5F8C,#2D7DB0)">N</div><h3>Systems Innovation Network</h3><span class="stat">Proposed</span></div>
+      <p class="who">A global community and education platform building open learning resources for systems thinking and systems innovation.</p>
+      <div class="prop"><div class="plbl">The proposed partnership</div>
+        <p>Shared curriculum and a global community of practice that Semble learners plug into directly.</p>
+        <ul><li>Curated systems-thinking learning paths inside the Semble experience</li><li>Semble learners join a worldwide community of practitioners</li><li>Co-created material for the Foundations, Practitioner, and Outlier levels</li></ul></div>
+      <div class="statusline"><span class="dot"></span>Status — Proposed. A curriculum and community collaboration to be explored.</div>
+    </div>
+    <div class="pc rv">
+      <div class="ph"><div class="pdot" style="background:linear-gradient(135deg,#1E5F8C,#3F9FD8)">C</div><h3>City of Chicago</h3><span class="stat">Proposed</span></div>
+      <p class="who">Semble's home city — and the first place we want systems literacy to take root, through civic and community channels.</p>
+      <div class="prop"><div class="plbl">The proposed partnership</div>
+        <p>A locally grounded pilot that brings systems thinking to Chicago communities first.</p>
+        <ul><li>Semble Student Sessions hosted in Chicago at the Lincoln Park Room</li><li>Systems hackathons aimed at real, local civic challenges</li><li>Community pathways so Chicago residents can join the founding cohort</li></ul></div>
+      <div class="statusline"><span class="dot"></span>Status — Proposed. A community-rooted civic pilot, not a confirmed agreement.</div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec dk" id="team"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">The people</span>
+    <h2>About the <span class="gt">team.</span></h2>
+    <p>Small, deliberate, and outlier by design — two minds at the founding core of the whole ecosystem, with a network forming around the work.</p>
+  </div>
+  <div class="fnd">
+    <div class="fc rv">
+      <div class="av em">🫡</div>
+      <h3>August James Domanchuk</h3>
+      <div class="ro">Founder · Systems architect of culture</div>
+      <p>August is a Chicago-based musician, systems thinker, and builder — frontman of The August James Band and the architect of the MotusMoves ecosystem. He works less like a traditional founder and more like a systems architect of culture: building interconnected platforms rather than standalone products, so that people can get on the same page and build what comes next, together.</p>
+      <p style="margin-top:11px">As a musician, August's work carries themes of unity, responsibility, and rising above division — the same belief that runs through everything he builds: people become stronger when they move together. Semble is the accessibility layer of that vision; Outlier.Systems is its frontier.</p>
+      <p style="margin-top:13px"><a href="https://AugustJames.Live" target="_blank" rel="noopener" style="color:var(--gm);font-family:var(--fm);font-size:13px;letter-spacing:.03em">&#9834; Hear the music — AugustJames.Live &#8599;</a></p>
+    </div>
+    <div class="fc rv" style="transition-delay:.1s">
+      <div class="av em">🧑‍💻</div>
+      <h3>Ember Seoni</h3>
+      <div class="ro">Project lead · SystemsBench &amp; Davara.DEV</div>
+      <p>Ember leads the rigorous core of the work. She heads SystemsBench — the benchmark for systems intelligence — and contributes to the development of Davara.DEV. Her craft is rigor: turning the idea of "systems intelligence" into something precisely defined, defensible, and measurable.</p>
+      <p style="margin-top:11px">She owns the three-strata model, the Systems Ladder, the failure taxonomy, and the evaluation methodology — including the BlackSwan and RedSwan adversarial suites. Her mandate is to make SystemsBench solid enough to last a decade, and to earn its authority in the open. She is the keeper of the standard.</p>
+      <p class="nt" style="margin-top:13px">She / her · building the measure of how minds think in systems.</p>
+    </div>
+  </div>
+  <div class="banner rv" style="margin-top:18px"><strong>The third seat is open.</strong> The team grows through the Research Program, not traditional hiring — outlier thinkers, paid to grow into the core. A Semble learner today can become an Outlier researcher tomorrow. The path is one climb.</div>
+</div></section>
+
+<section class="sec" id="motusmoves" style="background:var(--bg2)"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb" style="color:var(--corald)">Presented by</span>
+    <h2>MotusMoves — <span class="gtm">It's Time To Move.</span></h2>
+    <p>Semble, Outlier.Systems, and Davara.DEV are all presented by MotusMoves — the company that owns and operates the ecosystem, and carries its heart. Where Outlier.Systems is the brain, MotusMoves is the body: culture, momentum, community, and the felt energy of people moving together.</p>
+  </div>
+  <div class="lnote rv" style="margin-bottom:30px">
+    <p style="font-family:var(--fm);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--corald);margin-bottom:8px">Motus · Latin</p>
+    <p class="q" style="font-style:normal">movement · motion · impulse</p>
+    <p style="color:var(--ink2);margin-top:12px;font-size:1.03rem">A Motus Move is when someone stops thinking about it and starts doing it — the moment action overtakes hesitation. It is alignment: when what you say and what you do point the same direction, and integrity stops being a word and becomes a thing you practice. One person moves. Then a friend. Then a neighborhood has a scene, and a city has a culture.</p>
+  </div>
+
+  <div class="rv">
+    <p class="gtm" style="font-family:var(--fd);font-style:italic;font-size:1.15rem;margin-bottom:6px">The MotusMoves Mindset</p>
+    <h3 style="font-size:clamp(1.5rem,4vw,2rem);margin-bottom:8px">The Five Truths.</h3>
+    <p style="color:var(--ink2);max-width:600px;margin-bottom:20px">The mindset that moves the whole ecosystem — five truths MotusMoves builds by and lives by.</p>
+  </div>
+  <div class="pil">
+    <div class="tk rv"><div class="ti"><span class="dt" style="background:var(--coral)"></span><h4>I · Acta Non Verba</h4></div><p>Actions over words. The work is the proof. Performance, not promises — you are what you do, not what you say you will do.</p></div>
+    <div class="tk rv" style="transition-delay:.05s"><div class="ti"><span class="dt" style="background:var(--coral)"></span><h4>II · Follow The Music</h4></div><p>Remember what matters most. Keep the heart of the thing in view, and let it set the direction when the noise gets loud.</p></div>
+    <div class="tk rv" style="transition-delay:.1s"><div class="ti"><span class="dt" style="background:var(--coral)"></span><h4>III · Move Together</h4></div><p>Move as one. Progress that lasts is shared progress — one person starts, a friend joins, and a culture forms.</p></div>
+    <div class="tk rv" style="transition-delay:.15s"><div class="ti"><span class="dt" style="background:var(--coral)"></span><h4>IV · Live In Harmony</h4></div><p>Build the vibe. Coordination is not control — it is harmony: many parts moving well together without losing themselves.</p></div>
+    <div class="tk rv" style="transition-delay:.2s"><div class="ti"><span class="dt" style="background:var(--coral)"></span><h4>V · Take A Step Back</h4></div><p>See the bigger picture. Step out of the event and look at the system — the whole shape of what is really happening.</p></div>
+  </div>
+
+  <div class="lnote rv" style="margin-top:30px;text-align:center">
+    <div class="mmeq">
+      <span>Intention</span><span class="o">+</span><span>Action</span><span class="o">=</span><span class="r gtm">A Motus Move</span>
+    </div>
+    <p style="color:var(--ink2);margin-top:12px;max-width:520px;margin-left:auto;margin-right:auto">You don't need to be great. You don't need to be ready. You just need to move. Every movement starts with one person who decided to.</p>
+  </div>
+  <div class="statusline rv" style="margin-top:18px"><span class="dot" style="background:var(--coral)"></span>MotusMoves — Chicago. Owns and operates the ecosystem. Read the mindset at <a href="https://www.motusmoves.us/motus-moves" target="_blank" rel="noopener" style="color:var(--corald)">MotusMoves.US &#8599;</a> · Acta Non Verba.</div>
+</div></section>
+
+<section class="sec dk" id="join-coalition"><div class="wrap">
+  <div class="sh rv">
+    <span class="eb">Become a partner</span>
+    <h2>Strengthen the <span class="gtb">system.</span></h2>
+    <p>Funders, educators, civic leaders, and systems-thinking organizations: Semble is built to grow in coalition. If this mission resonates, there is a place for you in it.</p>
+  </div>
+  <div class="cta rv">
+    <canvas class="ctacv" aria-hidden="true"></canvas>
+    <div style="position:relative;z-index:2">
+      <span class="eb" style="color:rgba(255,255,255,.85);justify-content:center;display:flex">Join the movement</span>
+      <h2 style="margin-top:12px">Let's build it together.</h2>
+      <p>Whether you want to fund it, teach in it, or learn from it — Semble is an invitation. Come help systems thinking reach the people who need it.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="mailto:August@MotusMoves.US?subject=Semble%20%E2%80%94%20Partnership%20%26%20Getting%20Involved&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20get%20involved%20with%20Semble.%0D%0A" class="btn bf">Get involved</a>
+        <a href="#/home" class="btn bg-">See the full pitch</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+</section>
+
+<footer><div class="wrap">
+  <a href="#/home" class="brand" style="font-size:25px;color:var(--dink)">
+    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true" style="width:30px;height:30px"><circle cx="20" cy="20" r="14" stroke="#1FB892" stroke-width="2"/><circle cx="20" cy="6" r="3.6" fill="#1FB892"/><circle cx="32" cy="27" r="3.6" fill="#3F9FD8"/><circle cx="8" cy="27" r="3.6" fill="#1FB892"/><line x1="20" y1="9" x2="29.5" y2="25" stroke="#1FB892" stroke-width="1.7"/><line x1="29" y1="27" x2="11" y2="27" stroke="#1FB892" stroke-width="1.7"/><line x1="10.5" y1="25" x2="20" y2="9" stroke="#1FB892" stroke-width="1.7"/></svg>
+    Semble<span style="color:var(--gm)">.CC</span>
+  </a>
+  <p class="fsl">See the system. Learn. Adapt. Evolve. And teach. <span class="gtb" style="font-style:normal">And get paid to grow.</span></p>
+  <p class="fbd">Semble.CC — learning leverage in this new world. Discover why systems thinking is one of the highest-leverage skills you can learn in the modern age: a domain and a field that will only grow over time. Learn together. See the system. <strong style="color:var(--dink)">Learn and lead with leverage. It's time to grow.</strong></p>
+  <div class="fr">
+    <a href="#/home">Home</a>
+    <a href="#/learn">Learn to See</a>
+    <a href="#/partners">Partners</a>
+    <a href="#/home/model">The Model</a>
+    <a href="mailto:August@MotusMoves.US?subject=Semble%20Founding%20Cohort%20Application&amp;body=Hi%20August%2C%0D%0A%0D%0AI%27d%20like%20to%20apply%20to%20the%20Semble%20founding%20cohort.%20A%20bit%20about%20me%3A%0D%0A">Apply</a>
+    <a href="https://semble.rocks" target="_blank" rel="noopener">Semble.Rocks &#8599;</a>
+  </div>
+  <div class="fr" style="margin-top:0;padding-top:13px;border-top:none">
+    <a href="https://Outlier.Systems" target="_blank" rel="noopener">Outlier.Systems &#8599;</a>
+    <a href="https://Davara.DEV" target="_blank" rel="noopener">Davara.DEV &#8599;</a>
+    <a href="https://MotusMoves.US" target="_blank" rel="noopener">MotusMoves.US &#8599;</a>
+    <a href="https://AugustJames.Live" target="_blank" rel="noopener">AugustJames.Live &#8599;</a>
+  </div>
+  <p class="fm">An open-source school for systems thinking · Presented by MotusMoves.US · Founded by August James Domanchuk &amp; Ember Seoni · Chicago, Illinois</p>
+</div></footer>
+
+<div class="sprog" id="sprog" aria-hidden="true"></div>
+<button class="sfx" id="sfx" type="button" aria-label="Toggle sound effects" aria-pressed="false"></button>
+
+<script>
+(function(){
+var rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+var quietUntil=0;
+var SFX=(function(){
+  var ctx,on=true,tHover=0,tReveal=0;
+  function ac(){try{if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();}catch(e){}return ctx;}
+  function blip(f,d,type,v,delay){
+    if(!on)return;var c=ac();if(!c)return;
+    var t=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(v,t+0.014);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.03);
+  }
+  return{
+    arm:function(){ac();},
+    tick:function(){blip(2050,0.055,'sine',0.05);},
+    tab:function(){blip(523,0.09,'triangle',0.06);blip(784,0.13,'sine',0.045,0.045);},
+    chime:function(){blip(523.25,0.45,'sine',0.06);blip(659.25,0.5,'sine',0.05,0.085);blip(987.77,0.62,'sine',0.048,0.17);},
+    page:function(){blip(370,0.42,'sine',0.05);blip(555,0.5,'sine',0.036,0.09);},
+    hover:function(){var n=Date.now();if(n-tHover<80)return;tHover=n;blip(2950,0.03,'sine',0.018);},
+    reveal:function(){var n=Date.now();if(n<quietUntil||n-tReveal<300)return;tReveal=n;blip(660,0.3,'sine',0.026);blip(990,0.34,'sine',0.014,0.04);},
+    set:function(v){on=v;if(on){ac();blip(880,0.16,'sine',0.05);}},
+    get:function(){return on;}
+  };
+})();
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');if(e.target.classList.contains('sh'))SFX.reveal();if(e.target.dataset.w!==undefined)e.target.style.width=e.target.dataset.w;}});},{threshold:.12});
+function observeAll(){document.querySelectorAll('.rv,.bfl').forEach(function(el){io.observe(el);});}
+observeAll();
+
+/* staggered grid reveals — every card grid cascades in */
+['.bbg','.sd','.qg','.cg','.pgrid','.pil','.tg-','.mg','.fnd','.resg','.ladder'].forEach(function(sel){
+  document.querySelectorAll(sel).forEach(function(grid){
+    var i=0;[].forEach.call(grid.children,function(ch){
+      if(ch.classList&&ch.classList.contains('rv')){ch.style.transitionDelay=(Math.min(i,9)*0.06)+'s';i++;}
+    });
+  });
+});
+
+/* node-network canvases */
+var NETS=[];
+function net(c,a,b,N,L){
+  var x=c.getContext('2d'),w,h,p=[],D=Math.min(devicePixelRatio||1,2);
+  function sz(){var r=c.getBoundingClientRect();w=r.width;h=r.height;c.width=w*D;c.height=h*D;x.setTransform(D,0,0,D,0,0);}
+  function bd(){p=[];if(w<2)return;var n=Math.max(14,Math.round(N*Math.min(w/1100,1)));for(var i=0;i<n;i++)p.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.24,vy:(Math.random()-.5)*.24,r:1.5+Math.random()*2.2,m:Math.random()});}
+  function fr(){x.clearRect(0,0,w,h);for(var i=0;i<p.length;i++){var q=p[i];if(!rm){q.x+=q.vx;q.y+=q.vy;}if(q.x<0||q.x>w)q.vx*=-1;if(q.y<0||q.y>h)q.vy*=-1;
+    for(var j=i+1;j<p.length;j++){var s=p[j],dx=q.x-s.x,dy=q.y-s.y,d=Math.sqrt(dx*dx+dy*dy);if(d<L){x.strokeStyle='rgba('+(q.m>.5?a:b)+','+(.22*(1-d/L)).toFixed(3)+')';x.lineWidth=1;x.beginPath();x.moveTo(q.x,q.y);x.lineTo(s.x,s.y);x.stroke();}}}
+    for(var k=0;k<p.length;k++){var t=p[k];x.fillStyle='rgba('+(t.m>.5?a:b)+',.62)';x.beginPath();x.arc(t.x,t.y,t.r,0,6.2832);x.fill();}requestAnimationFrame(fr);}
+  function relay(){sz();bd();}
+  relay();fr();
+  NETS.push(relay);
+}
+document.querySelectorAll('.netcv').forEach(function(c){net(c,'31,184,146','63,159,216',44,138);});
+document.querySelectorAll('.ctacv').forEach(function(c){net(c,'255,255,255','255,255,255',24,118);});
+addEventListener('resize',function(){NETS.forEach(function(f){f();});});
+
+/* router */
+var PAGES={home:'page-home',learn:'page-learn',partners:'page-partners'};
+function revealActive(){
+  var pg=document.querySelector('.page.active');if(!pg)return;
+  pg.querySelectorAll('.rv').forEach(function(e){var r=e.getBoundingClientRect();if(r.top<innerHeight*0.95)e.classList.add('in');});
+  pg.querySelectorAll('.bfl').forEach(function(e){var r=e.getBoundingClientRect();if(r.top<innerHeight)e.style.width=e.dataset.w;});
+}
+function showPage(name,sec){
+  if(!PAGES[name])name='home';
+  Object.keys(PAGES).forEach(function(k){var el=document.getElementById(PAGES[k]);if(el)el.classList.toggle('active',k===name);});
+  document.querySelectorAll('[data-nav]').forEach(function(a){a.classList.toggle('cur',a.getAttribute('data-nav')===name);});
+  SFX.page();quietUntil=Date.now()+700;
+  NETS.forEach(function(f){f();});
+  if(sec){var el=document.getElementById(sec);if(el){window.scrollTo(0,el.getBoundingClientRect().top+pageYOffset-66);}else window.scrollTo(0,0);}
+  else window.scrollTo(0,0);
+  requestAnimationFrame(function(){revealActive();NETS.forEach(function(f){f();});});
+  setTimeout(revealActive,80);
+}
+function route(){
+  var h=location.hash.replace(/^#\/?/,'');
+  var parts=h.split('/');
+  showPage(parts[0]||'home',parts[1]);
+}
+addEventListener('hashchange',route);
+
+/* level tabs — Learn to See depth selector */
+var lvtabs=document.querySelectorAll('.lvtab');
+lvtabs.forEach(function(t){t.addEventListener('click',function(){
+  SFX.tab();
+  var lv=t.getAttribute('data-lv');
+  lvtabs.forEach(function(x){x.classList.toggle('on',x===t);});
+  document.querySelectorAll('.lvpanel').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-lv')===lv);});
+});});
+
+/* scroll progress bar */
+var sprog=document.getElementById('sprog');
+function prog(){if(!sprog)return;var h=document.documentElement,m=h.scrollHeight-h.clientHeight;sprog.style.width=(m>0?(h.scrollTop/m*100):0)+'%';}
+addEventListener('scroll',prog,{passive:true});prog();
+
+/* sound toggle button */
+var SI_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4"/><path d="M18.6 6a8.5 8.5 0 0 1 0 12"/></svg>';
+var SI_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+var sbtn=document.getElementById('sfx');
+if(sbtn){sbtn.innerHTML=SI_ON;
+  sbtn.addEventListener('click',function(){var nv=!SFX.get();SFX.set(nv);sbtn.innerHTML=nv?SI_ON:SI_OFF;sbtn.classList.toggle('off',!nv);sbtn.setAttribute('aria-pressed',nv?'false':'true');});
+}
+
+/* arm audio on first user gesture */
+function armOnce(){SFX.arm();removeEventListener('pointerdown',armOnce);removeEventListener('keydown',armOnce);}
+addEventListener('pointerdown',armOnce);addEventListener('keydown',armOnce);
+
+/* interaction sounds */
+document.addEventListener('click',function(e){
+  var el=e.target.closest('a,button');if(!el)return;
+  if(el.classList.contains('sfx')||el.classList.contains('lvtab'))return;
+  var href=el.getAttribute('href')||'';
+  if(href.indexOf('mailto:')===0||el.classList.contains('bf')){SFX.chime();return;}
+  SFX.tick();
+},true);
+document.addEventListener('pointerover',function(e){
+  if(e.target.closest('.btn,.mc,.tk,.pc,.fc,.bb,.cc,.pl,nav a,.fr a,.lvtab,.chip,.sfx'))SFX.hover();
+},{passive:true});
+
+route();
+setTimeout(function(){document.querySelectorAll('.page.active .rv').forEach(function(e){e.classList.add('in');});},3500);
+})();
+</script>
+</body>
+</html>
