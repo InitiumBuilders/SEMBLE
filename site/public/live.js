@@ -94,7 +94,9 @@ function setDj(dj, andSpin) {
 /* ═══ WAVE POWERS ═══ */
 function setPower(pw) {
   S.power = S.power && S.power.id === pw.id ? null : pw;
-  $$('.power').forEach((c) => c.classList.toggle('on', !!S.power && c.dataset.id === S.power.id));
+  // scoped to the grid — the HUD chip also carries .power and must not be
+  // treated as a trigger (it made querySelectorAll count 6 of 5)
+  $$('#powers .power').forEach((c) => c.classList.toggle('on', !!S.power && c.dataset.id === S.power.id));
   const chip = $('#hud-power');
   chip.style.display = S.power ? '' : 'none';
   if (S.power) chip.textContent = `POWER: ${S.power.name.toUpperCase()}`;
@@ -273,7 +275,10 @@ const SCENES = {
 };
 function vloop(t) {
   if (!vg || REDUCED) return;
-  if (document.hidden || !viz.checkVisibility?.() && false) { requestAnimationFrame(vloop); return; }
+  if (document.hidden) { requestAnimationFrame(vloop); return; }
+  // Self-healing size: a pane that becomes visible without firing `resize`
+  // (embedded previews, background tabs) leaves a zero-px canvas forever.
+  if (!VW || Math.abs(viz.parentElement.getBoundingClientRect().width * devicePixelRatio - VW) > 40) vsize();
   clock(t);
   vg.clearRect(0, 0, VW, VH);
   (SCENES[S.dj.scene] || SCENES.swarm)(vg, t, S.energy);
@@ -297,6 +302,7 @@ setInterval(() => {                                     // the being visits the 
 function swloop(t) {
   if (!sg || REDUCED) return;
   if (document.hidden) { requestAnimationFrame(swloop); return; }
+  if (!SWW || Math.abs(innerWidth * devicePixelRatio - SWW) > 40) swsize();
   sg.clearRect(0, 0, SWW, SWH);
   const ax = attractor.x * innerWidth, ay = attractor.y * innerHeight;
   for (const p of being) {
@@ -389,11 +395,18 @@ function buildDeck() {
     <div class="power" role="button" tabindex="0" data-id="${pw.id}">
       <h4>${pw.name}</h4><div class="sys">${pw.sys}</div><p>${pw.does}</p>
     </div>`).join('');
-  $$('.power').forEach((c) => {
+  $$('#powers .power').forEach((c) => {
     const go = () => setPower(P.powers.find((p) => p.id === c.dataset.id));
     c.addEventListener('click', go);
     c.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
   });
+  // Defaults BEFORE the first successful poll — a page that opens empty while
+  // an API wakes up reads as broken, and this page must never read as broken.
+  $('#goal .v').textContent = 'Between sessions — the systems keep moving.';
+  $('#motus .v').textContent = 'Motus is the mindset. The mindset means move.';
+  $('#feed').innerHTML = '<div class="quiet">Nothing is being broadcast right now. When August goes live, the selected work appears here — only what he chooses to share, ever.</div>';
+  $('#agents').innerHTML = '<div class="quiet">The fleet is resting.</div>';
+  $('#msgs').innerHTML = '<div class="quiet">No sembles yet — be the first voice in the room.</div>';
 }
 
 /* ═══ IGNITION ═══ */

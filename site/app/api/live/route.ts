@@ -4,11 +4,13 @@
 // PRIVACY MODEL: selection happens at August's machine — nothing reaches this
 // endpoint that he did not tick. This route is the SECOND gate: it re-scrubs
 // every string for secret shapes and hard-caps sizes, so even a compromised
-// pusher cannot broadcast a credential. Storage: Vercel Blob via plain REST —
-// no SDK, no added dependency, nothing for the v0 lockfile to reject.
+// pusher cannot broadcast a credential. Storage: Vercel Blob via plain REST
+// with the fresh-path pattern (see ../_blob) — no SDK, no stale CDN reads.
+import { freshRead, freshWrite } from '../_blob';
+
 export const dynamic = 'force-dynamic';
 
-const BLOB_PATH = 'semble-live/state.json';
+const PREFIX = 'semble-live/state-';
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, OPTIONS',
@@ -25,26 +27,12 @@ const clean = (s: unknown, cap: number) => {
   const t = String(s ?? '').slice(0, cap);
   return SECRETISH.some((re) => re.test(t)) ? '' : t;
 };
-
-let blobUrl = '';                       // resolved once per lambda instance
-async function stateUrl(): Promise<string> {
-  if (blobUrl) return blobUrl;
-  const r = await fetch(`https://blob.vercel-storage.com/?prefix=${encodeURIComponent(BLOB_PATH)}`, {
-    headers: { authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` }, cache: 'no-store',
-  });
-  const j = await r.json().catch(() => null);
-  const hit = j?.blobs?.find((b: { pathname: string }) => b.pathname === BLOB_PATH);
-  if (hit) blobUrl = hit.url;
-  return blobUrl;
-}
+const EMPTY = { on: false, items: [], agents: [] };
 
 export async function OPTIONS() { return new Response(null, { status: 204, headers: CORS }); }
 
 export async function GET() {
-  const url = await stateUrl();
-  if (!url) return Response.json({ on: false, items: [], agents: [] }, { headers: CORS });
-  const j = await fetch(`${url}?ts=${Date.now()}`, { cache: 'no-store' }).then((r) => r.json()).catch(() => null);
-  return Response.json(j || { on: false, items: [], agents: [] }, { headers: CORS });
+  return Response.json(await freshRead(PREFIX, EMPTY), { headers: CORS });
 }
 
 export async function POST(req: Request) {
@@ -68,15 +56,6 @@ export async function POST(req: Request) {
       .filter((a: { name: string; focus: string }) => a.name && a.focus),
     ts: Date.now(),
   };
-  const put = await fetch(`https://blob.vercel-storage.com/${BLOB_PATH}`, {
-    method: 'PUT',
-    headers: {
-      authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-      'x-api-version': '7', 'x-content-type': 'application/json',
-      'x-add-random-suffix': '0', 'x-cache-control-max-age': '0',
-    },
-    body: JSON.stringify(state),
-  }).then((r) => r.json()).catch(() => null);
-  if (put?.url) blobUrl = put.url;
-  return Response.json({ ok: !!put?.url, ts: state.ts }, { headers: CORS });
+  const ok = await freshWrite(PREFIX, state);
+  return Response.json({ ok, ts: state.ts }, { headers: CORS });
 }
