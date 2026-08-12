@@ -112,6 +112,42 @@ which is the trade you want.
 It exists to work around a specific CDN behaviour, and it is dead weight anywhere
 else.
 
+### ⚠ …and why writes are append-only
+
+The fresh-path pattern fixed stale *reads*. It did nothing for concurrent
+*writes*, because every write still carried a whole snapshot read moments
+earlier — classic read-modify-write with no compare-and-swap. Two overlapping
+requests both read state S, both write their own S′, and the second silently
+erased the first.
+
+Measured against production before the fix:
+
+| | |
+|---|---|
+| 6 concurrent pledges | **2 registered** — 4 lost |
+| 6 × 60s contributed | **120s of 360s stored** — 67% lost |
+
+This is the worst class of bug this project can have: **silent, invisible to the
+contributor, and it gets worse as more people arrive** — the exact situation the
+whole design is built to create.
+
+So writers stopped overwriting shared state:
+
+```ts
+appendEvent(prefix, ev)   // one immutable event, its own unique path
+readEvents(prefix)        // readers fold the stream over the last snapshot
+dropEvents(prefix, upTo)  // compaction, only after the snapshot includes them
+```
+
+Concurrent writers **cannot collide by construction** — each owns its path. The
+fold is idempotent per `(id, ts)`, so a failed prune costs a slower read and
+never a double-count. Re-measured after: **6 of 6, 360 of 360, zero loss.**
+
+⚠ **Every reader folds, or none of them do.** Converting the compute route alone
+left the work route reading the raw snapshot, so it could not see any node that
+had pledged since the last compaction — settled units credited *nobody*, at
+`+0 MOTUS-s`. Half-converting a shared ledger is worse than not converting it.
+
 ---
 
 ## 4 · The two stream modes

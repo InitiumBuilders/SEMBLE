@@ -134,6 +134,7 @@ curl -s https://www.semble.cc/api/work | jq '.jobsRunning, .queue'
 | [PANTHEON](docs/PANTHEON.md) | The eleven DJs, the rung ladder, the five powers |
 | [VISUALS](docs/VISUALS.md) | The render engine and how to add a world |
 | [SECURITY](docs/SECURITY.md) | Threat model, privacy model, the scrub gate |
+| [MATERIAL](docs/MATERIAL.md) | The Neoneuro Glass surface language, and how to verify it |
 | [CONTRIBUTING](CONTRIBUTING.md) | How to add a world, a DJ, or a fix |
 
 ---

@@ -870,3 +870,132 @@ body.rightnow .witem .t { font-size: 18px; }
   color: var(--ink);
 }
 .work-fine.warn b { color: var(--gold-t); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEONEURO GLASS — the material
+   ═══════════════════════════════════════════════════════════════════════════
+   Neumorphism + glass + futurism, with one tension resolved deliberately:
+
+   ⚠ CLASSIC NEUMORPHISM IS BUILT ON LOW CONTRAST. That is its signature look
+   and it is exactly what the no-grey-text law forbids. So the SURFACE takes the
+   depth and the INK does not move: every panel gets dual-light relief and a
+   frosted rim, and every character on it stays full-strength --ink. Depth is a
+   property of the material, never of the message.
+
+   Four layers make the material, and each one earns its cost:
+     ① a top-left light edge + bottom-right dark edge  → extruded, not painted
+     ② a 1px inner rim that catches the light          → glass, not putty
+     ③ a soft outer drop                                → lifted off the void
+     ④ a faint diagonal sheen                           → the futurist tell
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* the light comes from the top-left, always. A depth system with an
+     inconsistent light source reads as noise rather than as form. */
+  --nn-lite: rgba(190, 225, 240, .085);
+  --nn-dark: rgba(0, 2, 6, .62);
+
+  --nn-raise:
+    inset 0 1px 0 var(--nn-lite),
+    inset 1px 0 0 rgba(190, 225, 240, .05),
+    inset 0 -1px 0 var(--nn-dark),
+    0 1px 1px rgba(0, 0, 0, .45),
+    0 14px 34px -18px rgba(0, 0, 0, .9);
+
+  /* pressed / held: the light edge moves to the bottom, so "inset" is legible
+     as a physical state rather than just a colour change */
+  --nn-inset:
+    inset 0 1px 2px rgba(0, 0, 0, .55),
+    inset 0 -1px 0 var(--nn-lite);
+
+  --nn-sheen: linear-gradient(147deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,0) 42%);
+  --nn-skin:  linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,0) 60%);
+}
+
+/* ── the raised surface ── */
+.card, .ps-card, .pool-stat, .pay-stat, .rail-opt, .cmn-tab, .how li,
+.cmn-live, .pool-ledger, .mine, .bd-strip {
+  position: relative;
+  box-shadow: var(--nn-raise);
+  background-image: var(--nn-skin);
+  background-blend-mode: overlay;
+}
+/* ② the rim + ④ the sheen, as one pseudo-element so nothing extra paints */
+.card::before, .ps-card::before, .pool-stat::before, .pay-stat::before,
+.rail-opt::before, .how li::before, .cmn-live::before, .pool-ledger::before,
+.mine::before, .bd-strip::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--nn-sheen);
+  pointer-events: none;                       /* never eats a click */
+  z-index: 0;
+}
+/* content sits above the sheen without needing a wrapper element */
+.card > *, .ps-card > *, .pool-stat > *, .pay-stat > *, .how li > *,
+.cmn-live > *, .pool-ledger > *, .mine > *, .bd-strip > * { position: relative; z-index: 1; }
+
+/* ── frosted depth, applied ONCE and never nested ──
+   ⚠ Stacked backdrop-filters are what turned a phone into a hand-warmer on this
+   project before. One blur layer, on the outermost glass only. */
+.commons-sec .cmn-live,
+.card.gpu-card, .card.pool-card, .card.work-card, .card.rcpt-card,
+.card.pay-card, .card.gol-card {
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  background-color: rgba(16, 21, 30, .72);
+}
+/* children of a frosted surface must NOT re-blur */
+.card [class*="-card"], .card .ps-card, .card .pool-stat, .card .pay-stat {
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+
+/* ── interactive relief: raised invites, inset means held ── */
+.cmn-tab, .rail-opt, .btn, .mini {
+  transition: box-shadow .28s var(--ease), transform .2s var(--ease), border-color .28s var(--ease);
+}
+.cmn-tab:active, .rail-opt:active, .btn:active { box-shadow: var(--nn-inset); transform: translateY(1px); }
+.cmn-tab.on, .rail-opt.on {
+  box-shadow: var(--nn-inset), 0 0 34px -10px currentColor;   /* held AND lit */
+}
+
+/* ── the futurist tell: a single hairline that catches the eye at the top of
+      each major surface. One line, one job — not a frame, not a border. */
+.card::after, .cmn-live::after {
+  content: ''; position: absolute; left: 12%; right: 12%; top: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(123,227,234,.55), transparent);
+  pointer-events: none;
+}
+
+/* ⚠ Motion budget: this material is static. It reads as depth because of the
+   light model, not because anything moves. Nothing here animates on idle —
+   the page already carries a canvas, and a second ambient animation would cost
+   battery to say something the shadows already say. */
+@media (prefers-reduced-motion: reduce) {
+  .cmn-tab, .rail-opt, .btn, .mini { transition: none; }
+}
+
+/* ── the connector thread, corrected ──
+   It was drawn on each card with `right: -14px`, which pushed every card 14px
+   past its own box (scrollWidth 411 vs clientWidth 397). Invisible, because the
+   page clips horizontally — but an element overflowing its own box is a real
+   defect that only stays harmless until something upstream stops clipping.
+   The thread belongs to the GAPS, so it is drawn by the container. */
+.how li::after { display: none; }             /* retire the per-card version */
+.how { position: relative; }
+.how::before, .how::after {
+  content: ''; position: absolute; top: 50%; height: 2px; width: 14px;
+  background: linear-gradient(90deg, rgba(34,211,238,.55), transparent);
+  pointer-events: none;
+}
+/* 3 equal columns, 14px gap → the gaps start at 1× and 2× the column width */
+.how::before { left: calc((100% - 28px) / 3); }
+.how::after  { left: calc((100% - 28px) / 3 * 2 + 14px); }
+
+@media (max-width: 860px) {
+  /* stacked: the thread turns downward and lives between the rows */
+  .how::before, .how::after { display: none; }
+  .how li::after {
+    display: block; top: auto; bottom: -6px; left: 34px; right: auto;
+    width: 2px; height: 6px;
+    background: linear-gradient(180deg, rgba(34,211,238,.55), transparent);
+  }
+  .how li:last-child::after { display: none; }
+}

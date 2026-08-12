@@ -26,10 +26,10 @@
 //    and served to anyone who asks. If it would be bad for it to be public, it
 //    cannot be a work unit. That is enforced by the shape of the system rather
 //    than by a policy someone has to remember.
-import { freshRead, freshWrite } from '../_blob';
+import { freshRead, freshWrite, readEvents } from '../_blob';
 import {
   EMPTY_LEDGER, WORK, runUnit, capability, accrue, fingerprint,
-  type Ledger, type Unit, type Receipt, type WorkKind,
+  type Ledger, type Node, type Unit, type Receipt, type WorkKind,
 } from '../_motus';
 
 export const dynamic = 'force-dynamic';
@@ -121,6 +121,42 @@ function replenish(w: WLedger, want = 8, forNode = ''): number {
   return made;
 }
 
+/* ⚠ THE WORK ROUTE MUST SEE EVENT-SOURCED PLEDGES.
+   The compute route now appends pledges as events instead of writing them into
+   the snapshot. This route reads the same underlying blob — so reading the
+   snapshot ALONE means every node that pledged since the last compaction is
+   invisible here, `w.nodes.find(...)` misses, and a settled unit credits
+   NOBODY. Caught by the harness reporting `+0 MOTUS-s` and zero receipts on an
+   otherwise-passing consensus run.
+
+   The lesson: converting half a shared ledger to event sourcing is worse than
+   converting none of it. Every reader folds, or none of them do. */
+const CEVENTS = 'semble-live/cev-';
+type PledgeLite = { ts: number; id: string; tier: string; vendor: string; arch: string; klass: string; maxBufferMB: number; invocations: number; seconds: number };
+
+/** Merge event-sourced nodes into a snapshot so this route sees the whole pool.
+ *  Only the fields work-crediting needs — capability inputs and identity. */
+function foldNodes(w: WLedger, evs: PledgeLite[]) {
+  for (const e of evs) {
+    if (!e || !e.id) continue;
+    let n = w.nodes.find((x) => x.id === e.id);
+    if (!n) {
+      n = {
+        id: e.id, tier: (e.tier as Node['tier']) || 'tab',
+        vendor: e.vendor || '', arch: e.arch || '', klass: e.klass || '',
+        maxBufferMB: e.maxBufferMB || 0, invocations: e.invocations || 0,
+        features: [], dash: '', trust: '', payoutPref: 'dash',
+        first: e.ts, last: e.ts, seconds: 0, byDj: {}, byMode: {}, accrued: 0, paid: 0,
+      } as Node;
+      w.nodes.push(n);
+    }
+    n.last = Math.max(n.last || 0, e.ts);
+    if (e.maxBufferMB) n.maxBufferMB = e.maxBufferMB;
+    if (e.invocations) n.invocations = e.invocations;
+    if (e.tier) n.tier = e.tier as Node['tier'];
+  }
+}
+
 function hydrate(l: Partial<WLedger> | null): WLedger {
   const w: WLedger = { ...EMPTY, ...(l || {}) } as WLedger;
   w.nodes = (w.nodes || []).map((n) => ({
@@ -143,6 +179,7 @@ export async function OPTIONS() { return new Response(null, { status: 204, heade
 // ── GET: claim a unit, or read the queue ────────────────────────────────────
 export async function GET(req: Request) {
   const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+  foldNodes(w, await readEvents<PledgeLite>(CEVENTS));
   const url = new URL(req.url);
   const node = clean(url.searchParams.get('node'), 40);
   const now = Date.now();
@@ -265,6 +302,7 @@ export async function POST(req: Request) {
   if (b.op === 'standing') {
     if (!operator(req)) return Response.json({ ok: false, error: 'not the operator' }, { status: 401, headers: CORS });
     const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+  foldNodes(w, await readEvents<PledgeLite>(CEVENTS));
     if (typeof b.on === 'boolean') w.standing.on = b.on;
     if (b.task) w.standing.task = clean(b.task, 120);
     if (['embed', 'score', 'matmul'].includes(b.kind)) w.standing.kind = b.kind;
@@ -279,6 +317,7 @@ export async function POST(req: Request) {
   if (b.op === 'enqueue') {
     if (!operator(req)) return Response.json({ ok: false, error: 'not the operator' }, { status: 401, headers: CORS });
     const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+  foldNodes(w, await readEvents<PledgeLite>(CEVENTS));
     const task = clean(b.task, 120) || 'untitled';
     const kind: WorkKind = ['embed', 'score', 'matmul'].includes(b.kind) ? b.kind : 'embed';
     const chunks: string[] = (Array.isArray(b.chunks) ? b.chunks : [])
@@ -319,6 +358,7 @@ export async function POST(req: Request) {
   if (!node || !unitId || !digest) return Response.json({ ok: false, error: 'node, unit and digest are required' }, { status: 400, headers: CORS });
 
   const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+  foldNodes(w, await readEvents<PledgeLite>(CEVENTS));
   // Quarantine by id AND by coarse hardware fingerprint. Node ids are
   // client-generated, so a reload buys a fresh one; the fingerprint makes that
   // cost more than pressing F5. ⚠ It is NOT identity — a determined actor can
@@ -416,6 +456,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   if (!operator(req)) return Response.json({ ok: false, error: 'not the operator' }, { status: 401, headers: CORS });
   const w = hydrate(await freshRead<WLedger>(PREFIX, EMPTY));
+  foldNodes(w, await readEvents<PledgeLite>(CEVENTS));
   const dropped = w.units.length;
   w.units = [];
   // Deliberately NOT clearing receipts or quarantine. A receipt is a

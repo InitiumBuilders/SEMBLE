@@ -182,10 +182,17 @@ curl -s https://www.semble.cc/api/payouts | grep -o '"moneyMoved":[a-z]*'
 
 - **Rate limiting is per-voice**, which a determined actor can rotate. It stops
   noise, not a motivated attacker.
-- **Blob storage is eventually consistent.** The fresh-path pattern defeats
-  stale reads; it does not provide transactions. Concurrent writes can lose an
-  update. Acceptable for a broadcast surface, **not** acceptable for money —
-  which is one reason settlement is not on this path.
+- **Blob storage is eventually consistent**, and the fresh-path pattern defeats
+  stale reads without providing transactions. ⚠ **This used to mean concurrent
+  writes silently lost updates — and it was much worse than "acceptable".**
+  Measured against production: **6 concurrent pledges registered 2**, and
+  **6 × 60s of contributed time recorded 120s of 360s — 67% lost.** It was
+  written off as tolerable back when the ledger only carried broadcast state; by
+  then it carried work results and accrual, so a lost update meant a
+  contributor's completed work vanishing — and it got *worse* the more people
+  showed up, which is exactly the situation the project exists to create.
+  **Fixed** by making writes append-only (see below). Re-measured: **6 of 6
+  nodes, 360 of 360 seconds, zero loss.**
 - **The credential blocklist is shape-based.** It catches known formats. A novel
   secret format would pass, which is exactly why Gate 1 (selection) exists.
 - **`jobsRunning: false` is a promise about today.** When dispatch ships, this
