@@ -301,3 +301,13 @@ footer p { font-size: 14.5px; margin-bottom: 8px; }
   .btn, .pcard { transition: none; }
   .btn:hover, .pcard:hover { transform: none; }
 }
+
+/* ── long unbreakable strings must not push a phone sideways ──
+   Measured at 375px: the status list ran 311px into a 294px box because
+   "github.com/InitiumBuilders/SEMBLE" has no break opportunity. URLs, code
+   spans and program IDs are exactly the content that does this, and they are
+   exactly the content this project is full of. */
+.status div, .status a, .glass p, .glass li, .person p, .card2 p { overflow-wrap: anywhere; }
+code { overflow-wrap: anywhere; word-break: break-word; }
+.status li { min-width: 0; }
+.status li > div { min-width: 0; }
