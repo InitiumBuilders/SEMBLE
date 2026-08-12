@@ -186,7 +186,21 @@ function Blob(p: { x: string; y: string; size: number; color: string }) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const card = CARDS[(searchParams.get('v') || 'semble').toLowerCase()] || CARDS.semble;
+  const key = (searchParams.get('v') || 'semble').toLowerCase();
+  const card = CARDS[key] || CARDS.semble;
+
+  /* The ZAO card carries the REAL wordmark — the same gold graffiti art as the
+     official partnership card. Fetched from THIS deployment (not a third
+     party), and on any failure the card falls back to the drawn gold text, so
+     the render can slow down but never 500. This is the one deliberate
+     exception to "no fetch in cards", and the fallback is why it is safe. */
+  let zaoLogo: ArrayBuffer | null = null;
+  if (key === 'thezao') {
+    try {
+      const r = await fetch(new URL('/partners/zao-logo.png', req.url));
+      if (r.ok) zaoLogo = await r.arrayBuffer();
+    } catch { /* text fallback below */ }
+  }
 
   return new ImageResponse(
     (
@@ -275,9 +289,16 @@ export async function GET(req: Request) {
                 ×
               </div>
             ) : null}
+            {/* the real wordmark rides IN the row, standing where its name
+                would — the two marks meet across the ×, which is the point */}
+            {card.join && zaoLogo ? (
+              // @ts-expect-error — Satori accepts an ArrayBuffer as img src
+              <img src={zaoLogo} width={256} height={256}
+                style={{ width: 190, height: 190, margin: '-34px 0', objectFit: 'contain' }} />
+            ) : null}
           </div>
 
-          {card.titleB ? (
+          {card.titleB && !zaoLogo ? (
             <div
               style={{
                 display: 'flex',
@@ -299,7 +320,7 @@ export async function GET(req: Request) {
               fontSize: 27,
               color: C.ink2,
               lineHeight: 1.45,
-              marginTop: 22,
+              marginTop: zaoLogo ? 14 : 22,
               maxWidth: 940,
             }}
           >

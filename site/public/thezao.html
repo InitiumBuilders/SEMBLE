@@ -166,6 +166,9 @@
 <section>
   <div class="wrap">
     <div class="kicker">The product we are building for</div>
+    <!-- the official mark, from wavewarz.com's own og:image. The heading stays
+         underneath it for screen readers and for the day the file is missing. -->
+    <img class="ww-logo" src="/partners/wavewarz-logo.png" alt="" onerror="this.remove()">
     <h2>WaveWarZ.</h2>
     <p class="lead"><strong>“The world's first music prediction market.”</strong> Two artists. Three consecutive 20-minute battles. A Triple Judging System — human judges, X community votes, and SOL pool voting — where <strong>2 out of 3 takes the round</strong>.</p>
 
@@ -180,6 +183,27 @@
       <h3>Built on Solana</h3>
       <p style="margin-top:10px">Individual Program Derived Addresses per battle, supporting unlimited concurrent battles. Rust and Anchor for the programs; React, TypeScript and Solana Web3.js on the front end; Phantom and Solflare for wallets.</p>
       <p style="margin-top:12px">The prize split is the part worth reading twice: <strong>50% back to losing traders</strong>, 40% to winners, 5% to the winning artist, 3% platform, 2% to the losing artist. <em>Even the losing side of a battle gets paid.</em></p>
+
+      <!-- ═══ THE SPLIT, DRAWN ═══
+           The same numbers as the sentence above, as one bar. Static whitepaper
+           data, pure HTML/CSS — nothing to fetch, nothing that can fail. The
+           sentence stays: the bar is the picture, never the record. -->
+      <div class="split" role="img" aria-label="WaveWarZ prize split: 50% losing traders, 40% winners, 5% winning artist, 3% platform, 2% losing artist">
+        <div class="split-bar" aria-hidden="true">
+          <span style="flex-basis:50%" class="sp-a"><b>50%</b></span>
+          <span style="flex-basis:40%" class="sp-b"><b>40%</b></span>
+          <span style="flex-basis:5%"  class="sp-c"></span>
+          <span style="flex-basis:3%"  class="sp-d"></span>
+          <span style="flex-basis:2%"  class="sp-e"></span>
+        </div>
+        <ul class="split-key" aria-hidden="true">
+          <li><i class="sp-a"></i>losing traders <b>50%</b></li>
+          <li><i class="sp-b"></i>winners <b>40%</b></li>
+          <li><i class="sp-c"></i>winning artist <b>5%</b></li>
+          <li><i class="sp-d"></i>platform <b>3%</b></li>
+          <li><i class="sp-e"></i>losing artist <b>2%</b></li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -298,6 +322,11 @@
         <div class="pf"><b data-pf="machines">—</b><i>machines that have joined</i></div>
         <div class="pf zero"><b data-pf="paid">—</b><i>paid out so far</i></div>
       </div>
+      <!-- the pulse: compute over time, drawn from the same /api/compute
+           payload the numbers came from. The container ships EMPTY — if the
+           fetch fails there is no chart, no axes, no placeholder, nothing to
+           mistake for data. -->
+      <div class="pulse" data-pulse aria-hidden="true"></div>
       <p class="proof-note">That last number is the one most pages would leave off. The rail is built and tested end to end; it has not been armed, so nothing has been sent. It changes the day it changes. Run it yourself — <code>curl semble.cc/api/compute</code></p>
     </div>
 
@@ -401,6 +430,29 @@
     // through the same rate the ledger publishes rather than hard-coding one.
     if (typeof m.paid === 'number' && typeof m.rate === 'number' && typeof m.dashUsd === 'number') {
       put('paid', '$' + (m.paid * m.rate * m.dashUsd).toFixed(2));
+    }
+
+    /* ── the pulse: compute over time, as one drawn line ──
+       Same additive contract as the numbers: the container ships empty, and it
+       stays empty unless there are >= 2 real history points. The line draws
+       itself in with a dash animation — motion that means "this just arrived". */
+    var hist = (c && c.history) || [];
+    var box = document.querySelector('[data-pulse]');
+    if (box && hist.length >= 2) {
+      var W = 600, H = 56, P = 4;
+      var vals = hist.map(function (h) { return h.motusSeconds || 0; });
+      var max = Math.max.apply(null, vals) || 1;
+      var pts = vals.map(function (v, i) {
+        var x = P + (W - 2 * P) * (i / (vals.length - 1));
+        var y = H - P - (H - 2 * P) * (v / max);
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+      box.innerHTML =
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+        '<polyline class="pulse-glow" pathLength="1" points="' + pts + '"/>' +
+        '<polyline class="pulse-line" pathLength="1" points="' + pts + '"/>' +
+        '</svg>' +
+        '<span class="pulse-cap">MOTUS-seconds per hour, from the same ledger</span>';
     }
   }).catch(function () {
     /* Deliberately empty. The dashes are the honest state and they are already
