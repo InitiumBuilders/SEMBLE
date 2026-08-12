@@ -320,15 +320,21 @@ body.rightnow .witem .t { font-size: 18px; }
   /* the stage breaks the gutter — full width, taller frame, deeper corners */
   .horizon { margin-left: -14px; margin-right: -14px; }
   .horizon::before { inset: -8px; border-radius: 34px; filter: blur(calc(18px + var(--pulse) * 16px)); }
-  .stage { border-radius: 26px; aspect-ratio: 4 / 3; max-height: 56vh; }
-  .curtain { padding: 20px 18px; gap: 15px; }
-  .curtain h2 { font-size: clamp(1.9rem, 10vw, 2.8rem); }
-  .curtain p { font-size: 15.5px; line-height: 1.5; }
-  .btn.big { padding: 16px 26px; font-size: 15.5px; min-height: 52px; }
+  /* Taller stage on a phone — the world IS the experience here, and a 16:9
+     letterbox wastes the screen the visuals should be filling. */
+  .stage { border-radius: 26px; aspect-ratio: 1 / 1.12; max-height: 62vh; }
+  /* The curtain becomes COMPACT: the title and the door. The paragraph is
+     explanation the deck below already gives, and on a phone it was pushing
+     the panel straight out through the top of its own stage. */
+  .curtain { padding: 16px 14px 20px; justify-content: flex-end; }
+  .curtain .said { padding: 16px 18px 18px; gap: 10px; border-radius: 24px; width: 100%; }
+  .curtain h2 { font-size: clamp(1.7rem, 8.4vw, 2.3rem); }
+  .curtain p { display: none; }
+  .btn.big { padding: 15px 22px; font-size: 15px; min-height: 50px; width: 100%; }
 
-  /* HUD: one row that never wraps into the video */
-  .hud { left: 10px; right: 10px; bottom: 10px; gap: 7px; }
-  .hud .chip { font-size: 11.5px; padding: 8px 11px; border-radius: 13px; }
+  /* HUD sits ABOVE the curtain panel on a phone so the two never collide */
+  .hud { left: 10px; right: 10px; top: 10px; bottom: auto; gap: 7px; align-items: flex-start; }
+  .hud .chip { font-size: 11px; padding: 7px 10px; border-radius: 12px; }
 
   .transport { gap: 8px; margin-top: 14px; }
   .transport .btn { flex: 1 1 auto; min-height: 48px; }
